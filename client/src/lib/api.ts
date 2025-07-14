@@ -40,18 +40,7 @@ export interface FetchOptions {
 }
 
 // Interface definitions for API modules
-export interface SmsApi {
-  getAllCampaigns: (page: number, limit: number) => Promise<ApiResponse>;
-  createCampaign: (campaignData: any) => Promise<ApiResponse>;
-  getCampaignById: (id: string) => Promise<ApiResponse>;
-  updateCampaign: (id: string, campaignData: any) => Promise<ApiResponse>;
-  deleteCampaign: (id: string) => Promise<ApiResponse>;
-  uploadMedia: (campaignId: string, formData: FormData) => Promise<ApiResponse>;
-  createScheduledMessage: (campaignId: string, messageData: any) => Promise<ApiResponse>;
-  executeScheduledMessage: (messageId: string) => Promise<ApiResponse>;
-  sendDirectMessage: (campaignId: string, candidateId: string) => Promise<ApiResponse>;
-  getCandidatesByFilters: (filterCriteria: any) => Promise<ApiResponse>;
-}
+
 
 export interface CompaniesApi {
   getAll: () => Promise<ApiResponse>;
@@ -773,262 +762,39 @@ class ApiClient {
   }
   
   // Declare properties for API modules
-  sms: SmsApi;
   companies: CompaniesApi;
   departments: DepartmentsApi;
   positions: PositionsApi;
 }
 
-// SMS API methods
-const sms: SmsApi = {
-  getAllCampaigns: async (page = 1, limit = 10) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sms/campaigns?page=${page}&limit=${limit}`, {
-        headers: getAuthHeaders()
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch SMS campaigns');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching SMS campaigns:', error);
-      throw error;
-    }
-  },
-  
-  createCampaign: async (campaignData) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sms/campaigns`, {
-        method: 'POST',
-        headers: {
-          ...getAuthHeaders(),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(campaignData)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create SMS campaign');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error creating SMS campaign:', error);
-      throw error;
-    }
-  },
-  
-  getCampaignById: async (id) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sms/campaigns/${id}`, {
-        headers: getAuthHeaders()
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch SMS campaign');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching SMS campaign:', error);
-      throw error;
-    }
-  },
-  
-  updateCampaign: async (id, campaignData) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sms/campaigns/${id}`, {
-        method: 'PUT',
-        headers: {
-          ...getAuthHeaders(),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(campaignData)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update SMS campaign');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error updating SMS campaign:', error);
-      throw error;
-    }
-  },
-  
-  deleteCampaign: async (id) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sms/campaigns/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete SMS campaign');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error deleting SMS campaign:', error);
-      throw error;
-    }
-  },
-  
-  uploadMedia: async (campaignId, formData) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sms/campaigns/${campaignId}/media`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: formData
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to upload media');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error uploading media:', error);
-      throw error;
-    }
-  },
-  
-  createScheduledMessage: async (campaignId, messageData) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sms/campaigns/${campaignId}/messages`, {
-        method: 'POST',
-        headers: {
-          ...getAuthHeaders(),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(messageData)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create scheduled message');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error creating scheduled message:', error);
-      throw error;
-    }
-  },
-  
-  executeScheduledMessage: async (messageId) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sms/messages/${messageId}/execute`, {
-        method: 'POST',
-        headers: getAuthHeaders()
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to execute scheduled message');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error executing scheduled message:', error);
-      throw error;
-    }
-  },
-  
-  sendDirectMessage: async (campaignId, candidateId) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sms/direct/${campaignId}/${candidateId}`, {
-        method: 'POST',
-        headers: getAuthHeaders()
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send direct message');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error sending direct message:', error);
-      throw error;
-    }
-  },
-  
-  getCandidatesByFilters: async (filterCriteria) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sms/candidates/filter`, {
-        method: 'POST',
-        headers: {
-          ...getAuthHeaders(),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(filterCriteria)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch candidates');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching candidates:', error);
-      throw error;
-    }
-  }
-}
 
-// Create an API client instance
-const api = new ApiClient(env.apiUrl || '/api');
+// Legacy exports for backward compatibility
+export const getCompanies = async () => {
+  const response = await fetch(`${API_BASE_URL}/companies`, {
+    headers: getAuthHeaders()
+  });
+  if (!response.ok) throw new Error('Failed to fetch companies');
+  return await response.json();
+};
 
-export default api;
+export const getDepartments = async (companyId?: string) => {
+  const url = companyId ? `${API_BASE_URL}/departments?companyId=${companyId}` : `${API_BASE_URL}/departments`;
+  const response = await fetch(url, {
+    headers: getAuthHeaders()
+  });
+  if (!response.ok) throw new Error('Failed to fetch departments');
+  const data = await response.json();
+  return data.data || [];
+};
 
-/**
- * Fetch departments from the API.
- * @param companyId Optional company ID to filter departments
- * @param withPositions If true, include positions for each department (default: false)
- */
-export const getDepartments = async (companyId?: string, withPositions?: boolean) => {
-  try {
-    let url = companyId && companyId !== 'all'
-      ? `${API_BASE_URL}/departments?companyId=${companyId}`
-      : `${API_BASE_URL}/departments`;
-    if (withPositions) {
-      url += (url.includes('?') ? '&' : '?') + 'withPositions=true';
-    }
-    const response = await fetch(url, {
-      headers: getAuthHeaders()
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to fetch departments');
-    }
-    const data = await response.json();
-    // Debug log for API response
-    console.log('[API] /api/departments response:', data);
-    
-    // Return consistent array format
-    if (data && data.success && Array.isArray(data.data)) {
-      return data.data;
-    } else if (Array.isArray(data)) {
-      return data;
-    } else {
-      console.error('Unexpected departments response format:', data);
-      return [];
-    }
-  } catch (error) {
-    console.error('Error fetching departments:', error);
-    return []; // Return empty array on error
-  }
+export const getPositions = async (departmentId?: string) => {
+  const url = departmentId ? `${API_BASE_URL}/positions?departmentId=${departmentId}` : `${API_BASE_URL}/positions`;
+  const response = await fetch(url, {
+    headers: getAuthHeaders()
+  });
+  if (!response.ok) throw new Error('Failed to fetch positions');
+  const data = await response.json();
+  return data.data || [];
 };
 
 export const getDepartment = async (id: string) => {
@@ -1118,35 +884,7 @@ export const deleteDepartment = async (id: string) => {
   }
 };
 
-// Position API
-export const getPositions = async (departmentId?: string) => {
-  try {
-    const url = departmentId 
-      ? `${API_BASE_URL}/positions?departmentId=${departmentId}`
-      : `${API_BASE_URL}/positions`;
-    
-    const response = await fetch(url, {
-      headers: getAuthHeaders()
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to fetch positions');
-    }
-    
-    const data = await response.json();
-    // Extract the positions array from the response
-    if (data && data.success && Array.isArray(data.data)) {
-      return data.data;
-    } else {
-      console.error('Unexpected response format from positions API:', data);
-      return [];
-    }
-  } catch (error) {
-    console.error('Error fetching positions:', error);
-    return []; // Return empty array on error
-  }
-};
+
 
 export const getPosition = async (id: string) => {
   try {
@@ -1241,37 +979,7 @@ export const deletePosition = async (id: string) => {
   }
 };
 
-// Company API
-export const getCompanies = async (): Promise<ApiResponse> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/companies`, {
-      headers: getAuthHeaders()
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to fetch companies');
-    }
-    
-    const data = await response.json();
-    
-    // Ensure we return a proper ApiResponse structure
-    if (data.success && Array.isArray(data.data)) {
-      return data;
-    } else {
-      // Return empty array as fallback
-      return { success: true, data: [] };
-    }
-  } catch (error) {
-    console.error('Error fetching companies:', error);
-    // Return empty array as fallback when server is unavailable
-    return { 
-      success: false, 
-      data: [], 
-      error: error instanceof Error ? error.message : 'Unknown error' 
-    };
-  }
-};
+
 
 export const getCompany = async (id: string) => {
   try {
@@ -1354,15 +1062,6 @@ export const deleteCompany = async (id: string) => {
   }
 };
 
-// Bot API functions
-export const createBot = async (data: any) => {
-  // Make request to create a bot and unwrap the response so callers receive the bot object directly
-  const response = await api.post('/bots', data);
-  if (!response.success) {
-    throw new Error(response.error || 'Failed to create bot');
-  }
-  return response.data;
-};
 
 export const getBotById = async (botId: string) => {
   return await api.get(`/bots/${botId}`);
@@ -1504,8 +1203,7 @@ export const createCandidateDeepLink = async (
   return await api.post(`/bots/${botId}/deeplink`, { positionId, fullName });
 };
 
-// Add SMS endpoints to the API client
-api.sms = sms;
+
 
 // Add companies endpoints to the API client
 api.companies = {
@@ -1626,6 +1324,180 @@ export const getRequiredFieldsConfig = async (type: string) => {
     throw error;
   }
 };
+
+// Companies API implementation
+const companies: CompaniesApi = {
+  getAll: async () => {
+    const response = await fetch(`${API_BASE_URL}/companies`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch companies');
+    return await response.json();
+  },
+  getById: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/companies/${id}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch company');
+    return await response.json();
+  },
+  create: async (companyData: FormData) => {
+    const response = await fetch(`${API_BASE_URL}/companies`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: companyData
+    });
+    if (!response.ok) throw new Error('Failed to create company');
+    return await response.json();
+  },
+  update: async (id: string, companyData: FormData) => {
+    const response = await fetch(`${API_BASE_URL}/companies/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: companyData
+    });
+    if (!response.ok) throw new Error('Failed to update company');
+    return await response.json();
+  },
+  delete: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/companies/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to delete company');
+    return await response.json();
+  }
+};
+
+// Departments API implementation
+const departments: DepartmentsApi = {
+  getAll: async (companyId?: string) => {
+    const url = companyId ? `${API_BASE_URL}/departments?companyId=${companyId}` : `${API_BASE_URL}/departments`;
+    const response = await fetch(url, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch departments');
+    const data = await response.json();
+    return data.data || [];
+  },
+  getById: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/departments/${id}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch department');
+    return await response.json();
+  },
+  getByCompany: async (companyId: string) => {
+    const response = await fetch(`${API_BASE_URL}/departments?companyId=${companyId}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch departments');
+    const data = await response.json();
+    return data.data || [];
+  },
+  create: async (departmentData) => {
+    const response = await fetch(`${API_BASE_URL}/departments`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(departmentData)
+    });
+    if (!response.ok) throw new Error('Failed to create department');
+    return await response.json();
+  },
+  update: async (id: string, departmentData) => {
+    const response = await fetch(`${API_BASE_URL}/departments/${id}`, {
+      method: 'PUT',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(departmentData)
+    });
+    if (!response.ok) throw new Error('Failed to update department');
+    return await response.json();
+  },
+  delete: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/departments/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to delete department');
+    return await response.json();
+  }
+};
+
+// Positions API implementation
+const positions: PositionsApi = {
+  getAll: async (departmentId?: string) => {
+    const url = departmentId ? `${API_BASE_URL}/positions?departmentId=${departmentId}` : `${API_BASE_URL}/positions`;
+    const response = await fetch(url, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch positions');
+    const data = await response.json();
+    return data.data || [];
+  },
+  getById: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/positions/${id}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch position');
+    return await response.json();
+  },
+  getByDepartment: async (departmentId: string) => {
+    const response = await fetch(`${API_BASE_URL}/positions?departmentId=${departmentId}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch positions');
+    const data = await response.json();
+    return data.data || [];
+  },
+  create: async (positionData) => {
+    const response = await fetch(`${API_BASE_URL}/positions`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(positionData)
+    });
+    if (!response.ok) throw new Error('Failed to create position');
+    return await response.json();
+  },
+  update: async (id: string, positionData) => {
+    const response = await fetch(`${API_BASE_URL}/positions/${id}`, {
+      method: 'PUT',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(positionData)
+    });
+    if (!response.ok) throw new Error('Failed to update position');
+    return await response.json();
+  },
+  delete: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/positions/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to delete position');
+    return await response.json();
+  }
+};
+
+// Create and export API client instance
+const api = new ApiClient(API_BASE_URL);
+
+// Add API modules to the client
+api.companies = companies;
+api.departments = departments;
+api.positions = positions;
+
+export default api;
 
 // ----------------- Training / Documents -----------------
 

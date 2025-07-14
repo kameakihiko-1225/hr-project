@@ -76,6 +76,8 @@ async function initializeDatabase() {
         created_at TIMESTAMP DEFAULT NOW()
       );
     `;
+    
+
     console.log("✓ Positions table created");
 
     console.log("Database initialization completed successfully!");

@@ -5,10 +5,6 @@ import {
   Building2, 
   LayoutList, 
   Briefcase, 
-  Bot, 
-  MessageSquare, 
-  Send, 
-  Brain, 
   Users,
   Menu,
   X,
@@ -52,17 +48,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: "Companies", href: "/admin/companies", icon: Building2 },
     { name: "Departments", href: "/admin/departments", icon: LayoutList },
     { name: "Positions", href: "/admin/positions", icon: Briefcase },
-    { 
-      name: "Bot Manager", 
-      icon: Bot, 
-      submenu: [
-        { name: "Bot Settings", href: "/admin/bots" },
-        { name: "Candidates", href: "/admin/bots/candidates" }
-      ]
-    },
-    { name: "Bitrix Integration", href: "/admin/bitrix", icon: MessageSquare },
-    { name: "SMS Manager", href: "/admin/sms", icon: Send },
-    { name: "AI Trainer", href: "/admin/ai-trainer", icon: Brain },
+
     { name: "Admin Users", href: "/admin/admins", icon: Users },
   ];
 

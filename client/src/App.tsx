@@ -15,12 +15,8 @@ import AdminDashboard from "./pages/admin/dashboard/index";
 import AdminCompanies from "./pages/admin/companies/index";
 import AdminDepartments from "./pages/admin/departments/index";
 import AdminPositions from "./pages/admin/positions/index";
-import AdminBots from "./pages/admin/bots/index";
-import AdminCandidates from "./pages/admin/bots/candidates";
-import CandidateDetail from "./pages/admin/bots/candidate-detail";
-import AdminSMS from "./pages/admin/sms/index";
-import CampaignDetail from "./pages/admin/sms/campaign-detail";
-import AiTrainerPage from "./pages/admin/ai-trainer/index";
+
+
 
 const queryClient = new QueryClient();
 
@@ -58,41 +54,7 @@ const App = () => (
                 <AdminPositions />
               </ProtectedRoute>
             </Route>
-            <Route path="/admin/ai-trainer">
-              <ProtectedRoute>
-                <AiTrainerPage />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/admin/bots">
-              <ProtectedRoute>
-                <AdminBots />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/admin/bots/candidates">
-              <ProtectedRoute>
-                <AdminCandidates />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/admin/bots/candidate-detail/:id">
-              <ProtectedRoute>
-                <CandidateDetail />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/admin/sms">
-              <ProtectedRoute>
-                <AdminSMS />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/admin/sms/campaign-detail/:id">
-              <ProtectedRoute>
-                <CampaignDetail />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/admin/sms/:id">
-              <ProtectedRoute>
-                <CampaignDetail />
-              </ProtectedRoute>
-            </Route>
+
             
             {/* Catch-all route for 404 */}
             <Route component={NotFound} />
