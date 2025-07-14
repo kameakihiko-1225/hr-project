@@ -1,0 +1,89 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "79afaf2d-af25-4837-a796-bc8dd3f6ad31",
+      "title": "test",
+      "description": "this is a test positions",
+      "location": null,
+      "city": null,
+      "country": null,
+      "salaryRange": "$12000-$14000",
+      "employmentType": "Temporary",
+      "expectedStartDate": null,
+      "languageRequirements": null,
+      "qualifications": null,
+      "responsibilities": null,
+      "createdAt": "2025-07-05T13:02:52.896Z",
+      "departments": [
+        {
+          "departmentId": "737b7fa9-d703-4bc2-a18e-51403a598ffc",
+          "positionId": "79afaf2d-af25-4837-a796-bc8dd3f6ad31",
+          "department": {
+            "id": "737b7fa9-d703-4bc2-a18e-51403a598ffc",
+            "name": "HR department",
+            "description": "HR",
+            "companyId": "22c2d422-14b7-46fb-ae3c-1dc2bfa4c34f",
+            "createdAt": "2025-07-04T17:39:52.636Z",
+            "company": {
+              "id": "22c2d422-14b7-46fb-ae3c-1dc2bfa4c34f",
+              "name": "Millat Umidi",
+              "logoUrl": "/api/files/993d7c0d-f2e6-4f5e-bc31-e1898a524d82",
+              "color": "#b79d85",
+              "address": null,
+              "phone": "941701078",
+              "email": "shohabbosusmonovwork@gmail.com",
+              "city": "Tashkent",
+              "country": "Uzbekistan",
+              "description": "Test test test",
+              "adminId": "96c56ee5-c56f-4ced-b14a-c3628e8ca020",
+              "createdAt": "2025-07-04T06:54:55.275Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "09479fea-48d2-4c18-bfab-16ae9c302359",
+      "title": "HR manager",
+      "description": "This is HR department",
+      "location": null,
+      "city": null,
+      "country": null,
+      "salaryRange": "$12000-$14000",
+      "employmentType": "Full-time",
+      "expectedStartDate": null,
+      "languageRequirements": null,
+      "qualifications": null,
+      "responsibilities": null,
+      "createdAt": "2025-07-04T09:42:22.063Z",
+      "departments": [
+        {
+          "departmentId": "1b1372b0-dec7-4fb8-a65f-bc08b4a08cd5",
+          "positionId": "09479fea-48d2-4c18-bfab-16ae9c302359",
+          "department": {
+            "id": "1b1372b0-dec7-4fb8-a65f-bc08b4a08cd5",
+            "name": "HR department",
+            "description": "This department is for HR.",
+            "companyId": "22c2d422-14b7-46fb-ae3c-1dc2bfa4c34f",
+            "createdAt": "2025-07-04T09:41:27.439Z",
+            "company": {
+              "id": "22c2d422-14b7-46fb-ae3c-1dc2bfa4c34f",
+              "name": "Millat Umidi",
+              "logoUrl": "/api/files/993d7c0d-f2e6-4f5e-bc31-e1898a524d82",
+              "color": "#b79d85",
+              "address": null,
+              "phone": "941701078",
+              "email": "shohabbosusmonovwork@gmail.com",
+              "city": "Tashkent",
+              "country": "Uzbekistan",
+              "description": "Test test test",
+              "adminId": "96c56ee5-c56f-4ced-b14a-c3628e8ca020",
+              "createdAt": "2025-07-04T06:54:55.275Z"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

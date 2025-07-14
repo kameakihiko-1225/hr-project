@@ -1,0 +1,252 @@
+import { useState, useEffect } from "react";
+import { PositionCard } from "@/components/PositionCard";
+import { getPositions } from "@/lib/api";
+import { Position } from "@/types/position";
+import { AlertCircle, Filter } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+interface OpenPositionsProps {
+  selectedCompanies: string[];
+  selectedDepartments: string[];
+  selectedPositions: string[];
+  hasSearched: boolean;
+}
+
+export const OpenPositions = ({ 
+  selectedCompanies, 
+  selectedDepartments, 
+  selectedPositions,
+  hasSearched
+}: OpenPositionsProps) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const isMobile = useIsMobile();
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  const [allPositions, setAllPositions] = useState<Position[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load positions initially
+  useEffect(() => {
+    const fetchPositions = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getPositions();
+        console.log('⇠ positions from API', data);
+        setAllPositions(Array.isArray(data) ? (data as Position[]) : []);
+      } catch (error) {
+        console.error('Failed to fetch positions', error);
+        setAllPositions([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPositions();
+  }, []);
+
+  // Set view mode based on mobile state
+  useEffect(() => {
+    setViewMode(isMobile ? "list" : "grid");
+  }, [isMobile]);
+
+  // === Filtering ===
+  const filteredPositions = allPositions.filter(pos => {
+    const companyName = (pos.company?.name ?? pos.departments?.[0]?.department?.company?.name ?? '').trim();
+    const departmentName = (pos.departments?.[0]?.department?.name ?? '').trim();
+
+    const toLower = (s: string) => s.toLowerCase();
+
+    const companyMatch =
+      selectedCompanies.length === 0 ||
+      selectedCompanies.some(c => toLower(c) === toLower(companyName));
+
+    const departmentMatch =
+      selectedDepartments.length === 0 ||
+      selectedDepartments.some(d => toLower(d) === toLower(departmentName));
+
+    const positionMatch =
+      selectedPositions.length === 0 ||
+      selectedPositions.some(sel => pos.title?.toLowerCase().includes(sel.toLowerCase()));
+
+    return companyMatch && departmentMatch && positionMatch;
+  });
+
+  console.log('🔎 filteredPositions', filteredPositions);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredPositions.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentPositions = filteredPositions.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Generate page numbers for pagination
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
+  // Handle page change
+  const handlePageChange = (pageNumber: number) => {
+    if (pageNumber < 1 || pageNumber > totalPages) return;
+    setCurrentPage(pageNumber);
+    // Scroll to top of job listings
+    document.getElementById('job-listings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  // Generate filter summary text
+  const getFilterSummary = () => {
+    const filters = [];
+    if (selectedCompanies.length > 0) filters.push(`${selectedCompanies.length} companies`);
+    if (selectedDepartments.length > 0) filters.push(`${selectedDepartments.length} departments`);
+    if (selectedPositions.length > 0) filters.push(`${selectedPositions.length} positions`);
+    
+    return filters.length > 0 
+      ? `Filtered by: ${filters.join(', ')}` 
+      : "Showing all positions";
+  };
+
+  // Toggle view mode
+  const toggleViewMode = () => {
+    setViewMode(viewMode === "grid" ? "list" : "grid");
+  };
+
+  // Render pagination controls
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+    
+    return (
+      <div className="mt-10">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => handlePageChange(currentPage - 1)}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+            
+            {pageNumbers.map(number => (
+              <PaginationItem key={number}>
+                <PaginationLink
+                  isActive={number === currentPage}
+                  onClick={() => handlePageChange(number)}
+                  className="cursor-pointer"
+                >
+                  {number}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => handlePageChange(currentPage + 1)}
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+    );
+  };
+
+  return (
+    <section className="py-16 px-6 bg-white">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Available Positions
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Apply instantly and get interviewed with Telegram and go to the main interviews!
+          </p>
+          
+          {hasSearched && (
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+              <Badge variant="secondary" className="px-3 py-1 text-base">
+                {filteredPositions.length} position{filteredPositions.length !== 1 ? 's' : ''} found
+              </Badge>
+              {(selectedCompanies.length > 0 || selectedDepartments.length > 0 || selectedPositions.length > 0) && (
+                <Badge variant="outline" className="px-3 py-1 text-sm">
+                  <Filter className="h-3 w-3 mr-1" />
+                  {getFilterSummary()}
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {isMobile && filteredPositions.length > 0 && hasSearched && (
+            <div className="mt-4">
+              <Button
+                onClick={toggleViewMode}
+                variant="outline"
+                size="sm"
+                className="text-xs"
+              >
+                {viewMode === "grid" ? "Switch to List View" : "Switch to Grid View"}
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <div id="job-listings">
+          {filteredPositions.length > 0 ? (
+            <>
+              {viewMode === "grid" ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {currentPositions.map((pos, index) => (
+                    <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in">
+                      <PositionCard position={pos} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col space-y-4">
+                  {currentPositions.map((pos, index) => (
+                    <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in">
+                      <PositionCard position={pos} showDepartment={true} />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {renderPagination()}
+              
+              <div className="text-center text-gray-500 mt-4">
+                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredPositions.length)} of {filteredPositions.length} positions
+              </div>
+            </>
+          ) : (
+            <Alert variant="default" className="bg-blue-50 border-blue-200 mb-12">
+              <AlertCircle className="h-5 w-5 text-blue-600" />
+              <AlertTitle className="text-xl font-semibold text-gray-800 mb-2">
+                No positions match your filters
+              </AlertTitle>
+              <AlertDescription className="text-gray-600">
+                {hasSearched ? (
+                  <>
+                    <p className="mb-4">
+                      We couldn't find any positions matching your current filter criteria. 
+                      Try broadening your search by:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Selecting different companies</li>
+                      <li>Choosing additional departments</li>
+                      <li>Adding more position types</li>
+                    </ul>
+                  </>
+                ) : (
+                  <p>Use the search button above to find available positions.</p>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
