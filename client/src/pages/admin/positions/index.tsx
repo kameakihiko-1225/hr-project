@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { AdminLayout } from '../../../components/admin/AdminLayout';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -14,7 +14,7 @@ import { Department } from '../../../types/department';
 import { Loader2, Plus, Briefcase, Search } from 'lucide-react';
 
 export default function PositionsPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [location] = useLocation();
   const { toast } = useToast();
   
   const [positions, setPositions] = useState<Position[]>([]);

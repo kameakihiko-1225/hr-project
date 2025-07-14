@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { AdminLayout } from '../../../components/admin/AdminLayout';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -14,16 +14,14 @@ import { Company } from '../../../types/company';
 import { Loader2, Plus, Building2, Search } from 'lucide-react';
 
 export default function DepartmentsPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [location] = useLocation();
   const { toast } = useToast();
   
   const [departments, setDepartments] = useState<Department[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>(
-    searchParams.get('companyId') || 'all'
-  );
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all');
 
   // Dialog states
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);

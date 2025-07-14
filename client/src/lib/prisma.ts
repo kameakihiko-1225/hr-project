@@ -180,14 +180,9 @@ if (isBrowser) {
   PrismaClient = MockPrismaClient;
 } else {
   // Use real client in Node.js
-  try {
-    // Use dynamic import for ESM compatibility
-    const { PrismaClient: NodePrismaClient } = await import('../../generated/prisma');
-    PrismaClient = NodePrismaClient;
-  } catch (e) {
-    logger.error('Failed to import PrismaClient', e);
-    PrismaClient = MockPrismaClient;
-  }
+  // For now, use MockPrismaClient in server-side as well until Prisma is properly set up
+  logger.warn('Using MockPrismaClient on server side - Prisma not configured');
+  PrismaClient = MockPrismaClient;
 }
 
 // Create a singleton instance of PrismaClient

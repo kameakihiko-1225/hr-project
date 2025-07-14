@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useRoute } from "wouter";
 import { AdminLayout } from '../../../components/admin/AdminLayout';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
@@ -71,7 +71,7 @@ interface Candidate {
 
 const CampaignDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const [location, navigate] = useLocation();
   const { toast } = useToast();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [candidates, setCandidates] = useState<Candidate[]>([]);

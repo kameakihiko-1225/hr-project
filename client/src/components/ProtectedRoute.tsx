@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { useLocation, Redirect } from 'wouter';
 import { useAuth } from '@/lib/authContext';
 import { createLogger } from '@/lib/logger';
 
@@ -16,7 +16,7 @@ interface ProtectedRouteProps {
  */
 export function ProtectedRoute({ children, requireSuperAdmin = false }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, admin } = useAuth();
-  const location = useLocation();
+  const [location] = useLocation();
 
   // Show nothing while checking authentication
   if (isLoading) {
@@ -25,16 +25,16 @@ export function ProtectedRoute({ children, requireSuperAdmin = false }: Protecte
 
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
-    logger.warn(`Unauthenticated access attempt to: ${location.pathname}`);
+    logger.warn(`Unauthenticated access attempt to: ${location}`);
     
-    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+    return <Redirect to="/admin/login" />;
   }
 
   // If super admin is required but user is not a super admin
   if (requireSuperAdmin && admin && !admin.isSuperAdmin) {
-    logger.warn(`Non-super admin access attempt to protected route: ${location.pathname}`);
+    logger.warn(`Non-super admin access attempt to protected route: ${location}`);
     
-    return <Navigate to="/admin/dashboard" replace />;
+    return <Redirect to="/admin/dashboard" />;
   }
 
   // User is authenticated and meets requirements

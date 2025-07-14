@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useRoute } from 'wouter';
 import { getCandidateById } from '../../../lib/api';
 import { AdminLayout } from '../../../components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
@@ -12,8 +12,9 @@ import { toast } from '../../../components/ui/use-toast';
 import { Separator } from '../../../components/ui/separator';
 
 const CandidateDetailPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const [location, navigate] = useLocation();
+  const [match, params] = useRoute('/admin/bots/candidate-detail/:id');
+  const id = params?.id;
   const [candidate, setCandidate] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 

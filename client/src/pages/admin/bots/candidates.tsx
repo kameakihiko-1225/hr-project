@@ -10,7 +10,7 @@ import { Skeleton } from '../../../components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
 import { Search, Download, Eye } from 'lucide-react';
 import { toast } from '../../../components/ui/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 
 const CandidatesPage = () => {
   const { admin } = useAuth();
@@ -18,7 +18,7 @@ const CandidatesPage = () => {
   const [candidates, setCandidates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
+  const [location, navigate] = useLocation();
 
   useEffect(() => {
     if (admin?.id) {

@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 import { Pencil, Trash2, Building2, Users, BriefcaseBusiness } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Separator } from './ui/separator';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { createLogger } from '@/lib/logger';
 
@@ -20,7 +20,7 @@ interface DepartmentCardProps {
 }
 
 export function DepartmentCard({ department, onEdit, onDelete, showCompany = false }: DepartmentCardProps) {
-  const navigate = useNavigate();
+  const [location, navigate] = useLocation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [companyLogoError, setCompanyLogoError] = useState(false);

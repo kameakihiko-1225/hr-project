@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "wouter";
 import { 
   LayoutDashboard, 
   Building2, 
@@ -41,8 +41,7 @@ interface AdminLayoutProps {
 }
 
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [location, navigate] = useLocation();
   const isMobile = useIsMobile();
   const { admin, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
@@ -68,7 +67,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
   ];
 
   const isActive = (path: string) => {
-    return location.pathname.startsWith(path);
+    return location.startsWith(path);
   };
 
   const toggleSidebar = () => {

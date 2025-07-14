@@ -13,7 +13,7 @@ import { Badge } from '../../../components/ui/badge';
 import { useToast } from '../../../hooks/use-toast';
 import { EntityValidationModal } from '../../../components/EntityValidationModal';
 import api, { validateCampaignEntities } from '../../../lib/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'wouter';
 
 interface Campaign {
   id: string;
@@ -113,7 +113,7 @@ const SMSManagerPage: React.FC = () => {
   const [pendingCampaignCreation, setPendingCampaignCreation] = useState(false);
   
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const [location, navigate] = useLocation();
 
   useEffect(() => {
     fetchCampaigns();

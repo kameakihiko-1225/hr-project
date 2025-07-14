@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "wouter";
 import { Eye, EyeOff, Lock, Mail, AlertTriangle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,8 +14,7 @@ import { useAuth } from "@/lib/authContext";
 const logger = createLogger('loginPage');
 
 export default function Login() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [location, navigate] = useLocation();
   const { login, isAuthenticated, isLoading: authLoading, isAuthConfigured } = useAuth();
   
   const [email, setEmail] = useState("");
@@ -27,11 +26,11 @@ export default function Login() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
-      const from = location.state?.from?.pathname || "/admin/dashboard";
-      logger.debug(`Already authenticated, redirecting to: ${from}`);
-      navigate(from, { replace: true });
+      const redirectTo = "/admin/dashboard";
+      logger.debug(`Already authenticated, redirecting to: ${redirectTo}`);
+      navigate(redirectTo);
     }
-  }, [isAuthenticated, authLoading, navigate, location]);
+  }, [isAuthenticated, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

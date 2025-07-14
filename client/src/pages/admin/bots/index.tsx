@@ -13,12 +13,12 @@ import { toast } from '../../../components/ui/use-toast';
 import { Skeleton } from '../../../components/ui/skeleton';
 import { Badge } from '../../../components/ui/badge';
 import { AdminLayout } from '../../../components/admin/AdminLayout';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'wouter';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const BotManagementPage = () => {
   const { admin } = useAuth();
-  const navigate = useNavigate();
+  const [location, navigate] = useLocation();
   const [bot, setBot] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);

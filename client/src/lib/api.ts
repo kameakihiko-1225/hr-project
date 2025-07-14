@@ -1467,6 +1467,24 @@ export const getBotStatistics = async (botId: string) => {
   }
 };
 
+export const getCandidates = async () => {
+  try {
+    logger.debug('Fetching all candidates');
+    
+    // For now, return mock data
+    return {
+      success: true,
+      data: []
+    };
+  } catch (error) {
+    logger.error('Error fetching candidates:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch candidates'
+    };
+  }
+};
+
 export const getCandidatesByBotId = async (botId: string) => {
   return await api.get(`/bots/${botId}/candidates`);
 };
