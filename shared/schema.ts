@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -8,10 +8,77 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
+export const companies = pgTable("companies", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  logoUrl: text("logo_url"),
+  color: text("color"),
+  address: text("address"),
+  phone: text("phone"),
+  email: text("email"),
+  city: text("city"),
+  country: text("country"),
+  adminId: text("admin_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const departments = pgTable("departments", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  companyId: integer("company_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const positions = pgTable("positions", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  location: text("location"),
+  city: text("city"),
+  country: text("country"),
+  salaryRange: text("salary_range"),
+  employmentType: text("employment_type"),
+  expectedStartDate: text("expected_start_date"),
+  languageRequirements: text("language_requirements"),
+  qualifications: text("qualifications"),
+  responsibilities: text("responsibilities"),
+  departmentId: integer("department_id").notNull(),
+  applyLink: text("apply_link"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
 });
 
+export const insertCompanySchema = createInsertSchema(companies).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertDepartmentSchema = createInsertSchema(departments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPositionSchema = createInsertSchema(positions).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+export type InsertCompany = z.infer<typeof insertCompanySchema>;
+export type Company = typeof companies.$inferSelect;
+
+export type InsertDepartment = z.infer<typeof insertDepartmentSchema>;
+export type Department = typeof departments.$inferSelect;
+
+export type InsertPosition = z.infer<typeof insertPositionSchema>;
+export type Position = typeof positions.$inferSelect;

@@ -1,13 +1,266 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
+  // Companies endpoints
+  app.get("/api/companies", async (req, res) => {
+    try {
+      const companies = await storage.getAllCompanies();
+      res.json({ success: true, data: companies });
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch companies" });
+    }
+  });
 
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
+  app.get("/api/companies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const company = await storage.getCompanyById(id);
+      if (!company) {
+        return res.status(404).json({ success: false, error: "Company not found" });
+      }
+      res.json({ success: true, data: company });
+    } catch (error) {
+      console.error('Error fetching company:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch company" });
+    }
+  });
+
+  app.post("/api/companies", async (req, res) => {
+    try {
+      let companyData;
+      
+      // Handle both FormData and JSON payloads
+      if (req.headers['content-type']?.includes('multipart/form-data')) {
+        // For FormData uploads
+        companyData = {
+          name: req.body.name,
+          description: req.body.description,
+          logoUrl: req.body.logoUrl,
+          color: req.body.color,
+          address: req.body.address,
+          phone: req.body.phone,
+          email: req.body.email,
+          city: req.body.city,
+          country: req.body.country,
+          adminId: req.body.adminId,
+        };
+      } else {
+        // For JSON payloads
+        companyData = req.body;
+      }
+
+      const validatedData = insertCompanySchema.parse(companyData);
+      const company = await storage.createCompany(validatedData);
+      res.json({ success: true, data: company });
+    } catch (error) {
+      console.error('Error creating company:', error);
+      res.status(400).json({ success: false, error: error.message || "Failed to create company" });
+    }
+  });
+
+  app.put("/api/companies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      let updateData;
+      
+      // Handle both FormData and JSON payloads
+      if (req.headers['content-type']?.includes('multipart/form-data')) {
+        updateData = {
+          name: req.body.name,
+          description: req.body.description,
+          logoUrl: req.body.logoUrl,
+          color: req.body.color,
+          address: req.body.address,
+          phone: req.body.phone,
+          email: req.body.email,
+          city: req.body.city,
+          country: req.body.country,
+          adminId: req.body.adminId,
+        };
+      } else {
+        updateData = req.body;
+      }
+
+      const company = await storage.updateCompany(id, updateData);
+      if (!company) {
+        return res.status(404).json({ success: false, error: "Company not found" });
+      }
+      res.json({ success: true, data: company });
+    } catch (error) {
+      console.error('Error updating company:', error);
+      res.status(400).json({ success: false, error: error.message || "Failed to update company" });
+    }
+  });
+
+  app.delete("/api/companies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteCompany(id);
+      if (!deleted) {
+        return res.status(404).json({ success: false, error: "Company not found" });
+      }
+      res.json({ success: true, message: "Company deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting company:', error);
+      res.status(500).json({ success: false, error: "Failed to delete company" });
+    }
+  });
+
+  // Departments endpoints
+  app.get("/api/departments", async (req, res) => {
+    try {
+      const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
+      const departments = await storage.getAllDepartments(companyId);
+      res.json({ success: true, data: departments });
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch departments" });
+    }
+  });
+
+  app.get("/api/departments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const department = await storage.getDepartmentById(id);
+      if (!department) {
+        return res.status(404).json({ success: false, error: "Department not found" });
+      }
+      res.json({ success: true, data: department });
+    } catch (error) {
+      console.error('Error fetching department:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch department" });
+    }
+  });
+
+  app.post("/api/departments", async (req, res) => {
+    try {
+      const validatedData = insertDepartmentSchema.parse(req.body);
+      const department = await storage.createDepartment(validatedData);
+      res.json({ success: true, data: department });
+    } catch (error) {
+      console.error('Error creating department:', error);
+      res.status(400).json({ success: false, error: error.message || "Failed to create department" });
+    }
+  });
+
+  app.put("/api/departments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const department = await storage.updateDepartment(id, req.body);
+      if (!department) {
+        return res.status(404).json({ success: false, error: "Department not found" });
+      }
+      res.json({ success: true, data: department });
+    } catch (error) {
+      console.error('Error updating department:', error);
+      res.status(400).json({ success: false, error: error.message || "Failed to update department" });
+    }
+  });
+
+  app.delete("/api/departments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteDepartment(id);
+      if (!deleted) {
+        return res.status(404).json({ success: false, error: "Department not found" });
+      }
+      res.json({ success: true, message: "Department deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting department:', error);
+      res.status(500).json({ success: false, error: "Failed to delete department" });
+    }
+  });
+
+  // Positions endpoints
+  app.get("/api/positions", async (req, res) => {
+    try {
+      const departmentId = req.query.departmentId ? parseInt(req.query.departmentId as string) : undefined;
+      const positions = await storage.getAllPositions(departmentId);
+      res.json({ success: true, data: positions });
+    } catch (error) {
+      console.error('Error fetching positions:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch positions" });
+    }
+  });
+
+  app.get("/api/positions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const position = await storage.getPositionById(id);
+      if (!position) {
+        return res.status(404).json({ success: false, error: "Position not found" });
+      }
+      res.json({ success: true, data: position });
+    } catch (error) {
+      console.error('Error fetching position:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch position" });
+    }
+  });
+
+  app.post("/api/positions", async (req, res) => {
+    try {
+      const validatedData = insertPositionSchema.parse(req.body);
+      const position = await storage.createPosition(validatedData);
+      res.json({ success: true, data: position });
+    } catch (error) {
+      console.error('Error creating position:', error);
+      res.status(400).json({ success: false, error: error.message || "Failed to create position" });
+    }
+  });
+
+  app.put("/api/positions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const position = await storage.updatePosition(id, req.body);
+      if (!position) {
+        return res.status(404).json({ success: false, error: "Position not found" });
+      }
+      res.json({ success: true, data: position });
+    } catch (error) {
+      console.error('Error updating position:', error);
+      res.status(400).json({ success: false, error: error.message || "Failed to update position" });
+    }
+  });
+
+  app.delete("/api/positions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deletePosition(id);
+      if (!deleted) {
+        return res.status(404).json({ success: false, error: "Position not found" });
+      }
+      res.json({ success: true, message: "Position deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting position:', error);
+      res.status(500).json({ success: false, error: "Failed to delete position" });
+    }
+  });
+
+  // Dashboard stats endpoint
+  app.get("/api/dashboard/stats", async (req, res) => {
+    try {
+      const companies = await storage.getAllCompanies();
+      const departments = await storage.getAllDepartments();
+      const positions = await storage.getAllPositions();
+      
+      const stats = {
+        companies: companies.length,
+        departments: departments.length,
+        positions: positions.length,
+        candidates: 0, // TODO: Implement candidates when needed
+        matchRate: "0%" // TODO: Calculate match rate when candidates are implemented
+      };
+      
+      res.json({ success: true, data: stats });
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch dashboard stats" });
+    }
+  });
 
   const httpServer = createServer(app);
 

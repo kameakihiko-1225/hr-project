@@ -1,39 +1,153 @@
-import { users, type User, type InsertUser } from "@shared/schema";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { eq, and } from "drizzle-orm";
+import dotenv from "dotenv";
+import { 
+  users, companies, departments, positions,
+  type User, type InsertUser,
+  type Company, type InsertCompany,
+  type Department, type InsertDepartment,
+  type Position, type InsertPosition
+} from "@shared/schema";
 
-// modify the interface with any CRUD methods
-// you might need
+// Load environment variables
+dotenv.config();
+
+// Database connection
+const DATABASE_URL = process.env.DATABASE_URL || "postgresql://neondb_owner:npg_TVDxarv9Nn3Q@ep-raspy-mode-a85brbk6-pooler.eastus2.azure.neon.tech/neondb?sslmode=require";
+
+if (!DATABASE_URL) {
+  throw new Error("DATABASE_URL environment variable is not set. Please check your .env file.");
+}
+
+const sql = neon(DATABASE_URL);
+const db = drizzle(sql);
 
 export interface IStorage {
+  // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+
+  // Company methods
+  getAllCompanies(): Promise<Company[]>;
+  getCompanyById(id: number): Promise<Company | undefined>;
+  createCompany(company: InsertCompany): Promise<Company>;
+  updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined>;
+  deleteCompany(id: number): Promise<boolean>;
+
+  // Department methods
+  getAllDepartments(companyId?: number): Promise<Department[]>;
+  getDepartmentById(id: number): Promise<Department | undefined>;
+  createDepartment(department: InsertDepartment): Promise<Department>;
+  updateDepartment(id: number, department: Partial<InsertDepartment>): Promise<Department | undefined>;
+  deleteDepartment(id: number): Promise<boolean>;
+
+  // Position methods
+  getAllPositions(departmentId?: number): Promise<Position[]>;
+  getPositionById(id: number): Promise<Position | undefined>;
+  createPosition(position: InsertPosition): Promise<Position>;
+  updatePosition(id: number, position: Partial<InsertPosition>): Promise<Position | undefined>;
+  deletePosition(id: number): Promise<boolean>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  currentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.currentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
+  // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const result = await db.select().from(users).where(eq(users.username, username));
+    return result[0];
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async createUser(user: InsertUser): Promise<User> {
+    const result = await db.insert(users).values(user).returning();
+    return result[0];
+  }
+
+  // Company methods
+  async getAllCompanies(): Promise<Company[]> {
+    return await db.select().from(companies);
+  }
+
+  async getCompanyById(id: number): Promise<Company | undefined> {
+    const result = await db.select().from(companies).where(eq(companies.id, id));
+    return result[0];
+  }
+
+  async createCompany(company: InsertCompany): Promise<Company> {
+    const result = await db.insert(companies).values(company).returning();
+    return result[0];
+  }
+
+  async updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined> {
+    const result = await db.update(companies).set(company).where(eq(companies.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteCompany(id: number): Promise<boolean> {
+    const result = await db.delete(companies).where(eq(companies.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Department methods
+  async getAllDepartments(companyId?: number): Promise<Department[]> {
+    if (companyId) {
+      return await db.select().from(departments).where(eq(departments.companyId, companyId));
+    }
+    return await db.select().from(departments);
+  }
+
+  async getDepartmentById(id: number): Promise<Department | undefined> {
+    const result = await db.select().from(departments).where(eq(departments.id, id));
+    return result[0];
+  }
+
+  async createDepartment(department: InsertDepartment): Promise<Department> {
+    const result = await db.insert(departments).values(department).returning();
+    return result[0];
+  }
+
+  async updateDepartment(id: number, department: Partial<InsertDepartment>): Promise<Department | undefined> {
+    const result = await db.update(departments).set(department).where(eq(departments.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteDepartment(id: number): Promise<boolean> {
+    const result = await db.delete(departments).where(eq(departments.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Position methods
+  async getAllPositions(departmentId?: number): Promise<Position[]> {
+    if (departmentId) {
+      return await db.select().from(positions).where(eq(positions.departmentId, departmentId));
+    }
+    return await db.select().from(positions);
+  }
+
+  async getPositionById(id: number): Promise<Position | undefined> {
+    const result = await db.select().from(positions).where(eq(positions.id, id));
+    return result[0];
+  }
+
+  async createPosition(position: InsertPosition): Promise<Position> {
+    const result = await db.insert(positions).values(position).returning();
+    return result[0];
+  }
+
+  async updatePosition(id: number, position: Partial<InsertPosition>): Promise<Position | undefined> {
+    const result = await db.update(positions).set(position).where(eq(positions.id, id)).returning();
+    return result[0];
+  }
+
+  async deletePosition(id: number): Promise<boolean> {
+    const result = await db.delete(positions).where(eq(positions.id, id));
+    return result.rowCount > 0;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
