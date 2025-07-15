@@ -768,15 +768,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       let galleryData = { ...req.body };
       
+      // Parse JSON strings from FormData
+      if (galleryData.tags && typeof galleryData.tags === 'string') {
+        try {
+          galleryData.tags = JSON.parse(galleryData.tags);
+        } catch (e) {
+          galleryData.tags = [];
+        }
+      }
+      
+      // Convert string booleans and numbers from FormData
+      if (galleryData.isActive !== undefined) {
+        galleryData.isActive = galleryData.isActive === 'true' || galleryData.isActive === true;
+      }
+      if (galleryData.sortOrder !== undefined) {
+        galleryData.sortOrder = parseInt(galleryData.sortOrder) || 0;
+      }
+      
       // If a file was uploaded, set the imageUrl
       if (req.file) {
         const imageUrl = `/uploads/${req.file.filename}`;
         galleryData.imageUrl = imageUrl;
       }
       
+      console.log('Gallery data after processing:', galleryData);
+      
       const validation = insertGalleryItemSchema.safeParse(galleryData);
       
       if (!validation.success) {
+        console.error('Validation failed:', validation.error.errors);
         return res.status(400).json({ 
           success: false, 
           error: "Invalid gallery item data",
@@ -816,6 +836,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       let updateData = { ...req.body };
       
+      // Parse JSON strings from FormData
+      if (updateData.tags && typeof updateData.tags === 'string') {
+        try {
+          updateData.tags = JSON.parse(updateData.tags);
+        } catch (e) {
+          updateData.tags = [];
+        }
+      }
+      
+      // Convert string booleans and numbers from FormData
+      if (updateData.isActive !== undefined) {
+        updateData.isActive = updateData.isActive === 'true' || updateData.isActive === true;
+      }
+      if (updateData.sortOrder !== undefined) {
+        updateData.sortOrder = parseInt(updateData.sortOrder) || 0;
+      }
+      
       // If a new file was uploaded, update the imageUrl
       if (req.file) {
         const imageUrl = `/uploads/${req.file.filename}`;
@@ -838,9 +875,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      console.log('Update data after processing:', updateData);
+      
       const validation = insertGalleryItemSchema.partial().safeParse(updateData);
       
       if (!validation.success) {
+        console.error('Validation failed:', validation.error.errors);
         return res.status(400).json({ 
           success: false, 
           error: "Invalid gallery item data",
