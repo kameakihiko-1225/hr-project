@@ -133,7 +133,7 @@ export default function AdminBlog() {
 
       const result = await response.json();
       if (result.success) {
-        setGalleryItems(galleryItems.map(item => 
+        setBlogItems(blogItems.map(item => 
           item.id === id ? { ...item, ...result.data } : item
         ));
         setIsDialogOpen(false);
@@ -166,7 +166,7 @@ export default function AdminBlog() {
 
       const result = await response.json();
       if (result.success) {
-        setGalleryItems(galleryItems.filter(item => item.id !== id));
+        setBlogItems(blogItems.filter(item => item.id !== id));
         toast({
           title: "Success",
           description: "Gallery item deleted successfully"
@@ -450,7 +450,7 @@ export default function AdminBlog() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {galleryItems.map((item) => (
+          {blogItems.map((item) => (
             <Card key={item.id} className="relative">
               <div className="absolute top-2 right-2 z-10">
                 <Badge variant={item.isActive ? "default" : "secondary"}>
@@ -510,7 +510,7 @@ export default function AdminBlog() {
           ))}
         </div>
 
-        {galleryItems.length === 0 && (
+        {blogItems.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400 text-lg">
               No gallery items found. Create your first gallery item to get started.
