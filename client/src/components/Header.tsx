@@ -90,14 +90,6 @@ export const Header = () => {
                 </a>
               </div>
             ))}
-            {/* Contact button */}
-            <Button 
-              variant="ghost" 
-              onClick={() => scrollToSection("contact")}
-              className="text-gray-700 hover:text-blue-600 hover:bg-transparent px-3 py-2 text-sm font-medium transition-colors"
-            >
-              {t('contact')}
-            </Button>
             {/* Apply Now button */}
             <Button 
               onClick={() => scrollToSection("filter-section")}
