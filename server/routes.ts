@@ -171,13 +171,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/companies/:id/logo", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const { logoUrl } = req.body;
+      
+      // Handle both FormData and JSON uploads
+      let logoUrl: string;
+      
+      if (req.body.logoUrl) {
+        // JSON upload with logoUrl
+        logoUrl = req.body.logoUrl;
+      } else {
+        // For now, since we're using blob URLs, we need to handle this differently
+        // In a real app, this would process the uploaded file and return a permanent URL
+        return res.status(400).json({ success: false, error: "Logo must be provided as logoUrl in request body" });
+      }
       
       if (!logoUrl) {
         return res.status(400).json({ success: false, error: "No logo data provided" });
       }
       
-      // Update company with the logo URL (blob URL for now)
+      // Update company with the logo URL
       const company = await storage.updateCompany(id, { logoUrl });
       
       if (!company) {

@@ -99,17 +99,9 @@ export function CompanyLogoUpload({
         // Upload file to company-specific endpoint
         const endpoint = companyId ? `/companies/${companyId}/logo` : '/companies/logo';
         
-        // Use 'logo' as the parameter name instead of 'file' for company logo uploads
-        const formData = new FormData();
-        formData.append('logo', resizedFile);
-        
-        // Add additional data to form data
-        Object.entries(additionalData).forEach(([key, value]) => {
-          formData.append(key, value);
-        });
-        
-        // Make the request directly instead of using uploadFile
-        const response = await api.post(endpoint, formData);
+        // For now, send the blob URL since we don't have real file storage
+        // In a real implementation, this would upload the actual file
+        const response = await api.post(endpoint, { logoUrl: previewUrl });
         
         if (response.success && response.data?.logoUrl) {
           // Clean up the temporary preview URL
