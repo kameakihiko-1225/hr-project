@@ -189,7 +189,8 @@ export default function PositionsPage() {
       description: position.description || '',
       salaryRange: position.salaryRange || '',
       employmentType: position.employmentType || '',
-      departmentId: position.departmentId || ''
+      departmentId: position.departmentId || '',
+      applyLink: position.applyLink || ''
     });
     setIsEditDialogOpen(true);
   };
@@ -212,7 +213,8 @@ export default function PositionsPage() {
         title: formData.title,
         description: formData.description,
         salaryRange: formData.salaryRange,
-        employmentType: formData.employmentType
+        employmentType: formData.employmentType,
+        applyLink: formData.applyLink
       });
 
       setPositions(prev => 
