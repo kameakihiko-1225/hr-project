@@ -155,8 +155,10 @@ export const OpenPositions = ({
   };
 
   return (
-    <section id="open-positions" className="py-16 px-6 bg-white">
-      <div className="max-w-7xl mx-auto">
+    <section id="open-positions" className="relative py-16 px-6 bg-white dark:bg-gray-950 overflow-hidden">
+      {/* Subtle background decoration - same as hero */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/20 dark:from-blue-950/20 dark:via-transparent dark:to-indigo-950/10"></div>
+      <div className="max-w-7xl mx-auto relative">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Available Positions

@@ -119,7 +119,9 @@ export const CTASection = () => {
   };
 
   return (
-    <section className="py-20 md:py-24 bg-white dark:bg-gray-950 relative overflow-hidden">
+    <section className="relative py-20 md:py-24 bg-white dark:bg-gray-950 overflow-hidden">
+      {/* Subtle background decoration - same as hero */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/20 dark:from-blue-950/20 dark:via-transparent dark:to-indigo-950/10"></div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12 md:mb-16">

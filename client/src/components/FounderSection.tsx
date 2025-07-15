@@ -13,16 +13,20 @@ export const FounderSection = () => {
   };
 
   return (
-    <section className="py-20 px-4 bg-white dark:bg-gray-950">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-8 items-center">
+    <section className="relative bg-white dark:bg-gray-950 py-20 px-4 overflow-hidden">
+      {/* Subtle background decoration - same as hero */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/20 dark:from-blue-950/20 dark:via-transparent dark:to-indigo-950/10"></div>
+      
+      <div className="max-w-6xl mx-auto relative">
+        <div className="grid lg:grid-cols-2 gap-8 items-start">
           {/* Left side - Founder Photo */}
           <div className="flex flex-col items-center lg:items-center space-y-6 order-2 lg:order-1">
             <div className="relative">
               <img
                 src={founderImage}
                 alt="Umidjon Ishmukhamedov"
-                className="w-72 h-auto lg:w-80 lg:h-auto object-contain drop-shadow-2xl"
+                className="w-72 h-auto lg:w-80 lg:h-auto object-cover object-top drop-shadow-2xl"
+                style={{ clipPath: 'inset(0 0 15% 0)' }}
               />
             </div>
             
