@@ -69,11 +69,9 @@ export const HeroSection = () => {
   };
 
   return (
-    <section id="hero-section" className="relative bg-gradient-to-br from-blue-600/20 via-white to-[#1D4ED8]/20 py-12 md:py-16 overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-1/2 h-full opacity-5">
-        <div className="w-full h-full bg-gradient-to-l from-blue-600/20 to-transparent"></div>
-      </div>
+    <section id="hero-section" className="relative bg-white dark:bg-gray-950 py-20 md:py-24 overflow-hidden">
+      {/* Subtle background decoration */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/20 dark:from-blue-950/20 dark:via-transparent dark:to-indigo-950/10"></div>
       
       {/* Floating elements */}
       <div className="absolute top-20 left-10 w-16 h-16 bg-blue-100 rounded-full opacity-20 animate-pulse"></div>

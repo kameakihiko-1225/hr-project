@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import founderImage from "@assets/Umidjon aka_1752577894019.jpg";
+import founderImage from "@assets/Umidjon_aka-removebg-preview_1752578772239.png";
 
 export const FounderSection = () => {
   const scrollToPositions = () => {
@@ -13,16 +13,16 @@ export const FounderSection = () => {
   };
 
   return (
-    <section className="py-16 px-4 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+    <section className="py-20 px-4 bg-white dark:bg-gray-950">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 items-center">
           {/* Left side - Founder Photo */}
-          <div className="flex flex-col items-center lg:items-start space-y-6">
+          <div className="flex flex-col items-center lg:items-center space-y-6 order-2 lg:order-1">
             <div className="relative">
               <img
                 src={founderImage}
                 alt="Umidjon Ishmukhamedov"
-                className="w-80 h-auto lg:w-96 lg:h-auto object-contain rounded-2xl shadow-2xl border-4 border-white dark:border-gray-800 bg-white dark:bg-gray-800"
+                className="w-72 h-auto lg:w-80 lg:h-auto object-contain drop-shadow-2xl"
               />
             </div>
             
@@ -37,7 +37,7 @@ export const FounderSection = () => {
           </div>
 
           {/* Right side - Inspirational Message */}
-          <div className="space-y-6">
+          <div className="space-y-6 order-1 lg:order-2">
             <div className="space-y-4">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
                 Join Our Mission to 

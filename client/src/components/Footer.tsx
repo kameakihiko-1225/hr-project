@@ -21,7 +21,7 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="flex flex-col items-center justify-center py-6 border-t border-border bg-white">
+    <footer className="flex flex-col items-center justify-center py-12 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
       <img src="/2025-07-14 1.05.36 PM.jpg" alt="Millat Umidi HR Logo" className="h-20 w-20 object-contain mb-2" />
       <span className="text-lg font-semibold" style={{ color: '#222' }}>
         Millat Umidi Group
