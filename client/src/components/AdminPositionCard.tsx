@@ -244,16 +244,39 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-center gap-2 border-t border-border pt-2 pb-3 relative z-10 mt-auto shrink-0">
+      <CardFooter className="flex flex-col gap-2 border-t border-border pt-2 pb-3 relative z-10 mt-auto shrink-0">
         {postedAgo && (
-          <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
+          <span className="text-xs text-muted-foreground flex items-center gap-1 justify-center"><Clock className="h-3 w-3" /> {postedAgo}</span>
         )}
 
-        <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="sm" onClick={() => setIsDetailsDialogOpen(true)}>View Details</Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
+        {/* Action buttons row */}
+        <div className="flex justify-center gap-2 w-full">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsCompanyModalOpen(true)}
+            className="flex items-center gap-1 flex-1 max-w-[80px]"
+          >
+            <Building2 className="h-3 w-3" />
+            Company
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsDepartmentModalOpen(true)}
+            className="flex items-center gap-1 flex-1 max-w-[80px]"
+          >
+            <Briefcase className="h-3 w-3" />
+            Dept
+          </Button>
+          <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="flex items-center gap-1 flex-1 max-w-[90px]">
+                <ExternalLink className="h-3 w-3" />
+                Details
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>{position.title}</DialogTitle>
               <DialogDescription>Position Details</DialogDescription>
@@ -328,11 +351,35 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
-        {/* Admin-specific footer - no Apply button */}
-        <div className="text-xs text-muted-foreground">
-          Admin View - Position Management
         </div>
+
+        {/* Edit and Delete buttons for admin */}
+        {(onEdit || onDelete) && (
+          <div className="flex justify-center gap-2 w-full">
+            {onEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleEdit}
+                className="flex items-center gap-1"
+              >
+                <Pencil className="h-3 w-3" />
+                Edit
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsDeleteDialogOpen(true)}
+                className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 flex items-center gap-1"
+              >
+                <Trash2 className="h-3 w-3" />
+                Delete
+              </Button>
+            )}
+          </div>
+        )}
       </CardFooter>
       
       {/* Company Info Modal */}
