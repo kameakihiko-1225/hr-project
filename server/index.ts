@@ -13,7 +13,7 @@ function startTelegramBotService() {
   try {
     log('[TELEGRAM-BOT] Starting Telegram bot service...');
     
-    const botProcess = spawn('npx', ['tsx', 'services/telegram-bot/simple-server.ts'], {
+    const botProcess = spawn('node', ['services/telegram-bot/simple-server.js'], {
       stdio: 'pipe',
       cwd: process.cwd(),
       env: {
