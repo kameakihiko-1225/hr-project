@@ -77,7 +77,7 @@ export function CompanyLogoUpload({
       const formData = new FormData();
       formData.append('file', file);
       
-      const endpoint = companyId ? `/api/companies/${companyId}/logo` : '/api/upload/temp';
+      const endpoint = companyId ? `/api/companies/${companyId}/logo` : '/api/upload';
       
       const response = await fetch(endpoint, {
         method: 'POST',

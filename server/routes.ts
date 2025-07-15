@@ -119,6 +119,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const validatedData = insertCompanySchema.parse(companyData);
       const company = await storage.createCompany(validatedData);
+      
+      // If company has a logo URL, link it to the file attachments
+      if (company.logoUrl && company.logoUrl.includes('/uploads/')) {
+        try {
+          const filename = company.logoUrl.split('/').pop();
+          if (filename) {
+            await db.execute(
+              `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
+               VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+              ['company_logo', company.id.toString(), filename, filename, `uploads/${filename}`, 'image/*', 0]
+            );
+            console.log(`Company ${company.id} created with logo: ${company.logoUrl}`);
+          }
+        } catch (dbError) {
+          console.warn('Failed to link company logo to file attachments:', dbError);
+        }
+      }
+      
       res.json({ success: true, data: company });
     } catch (error) {
       console.error('Error creating company:', error);
@@ -153,6 +171,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!company) {
         return res.status(404).json({ success: false, error: "Company not found" });
       }
+
+      // If logo was updated and is from uploads, link it to file attachments
+      if (updateData.logoUrl && updateData.logoUrl.includes('/uploads/')) {
+        try {
+          const filename = updateData.logoUrl.split('/').pop();
+          if (filename) {
+            await db.execute(
+              `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
+               VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+              ['company_logo', id.toString(), filename, filename, `uploads/${filename}`, 'image/*', 0]
+            );
+            console.log(`Company ${id} updated with logo: ${updateData.logoUrl}`);
+          }
+        } catch (dbError) {
+          console.warn('Failed to link updated company logo to file attachments:', dbError);
+        }
+      }
       res.json({ success: true, data: company });
     } catch (error) {
       console.error('Error updating company:', error);
@@ -174,10 +209,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // General file upload endpoint for temporary use
-  app.post("/api/upload/temp", uploadSingle, async (req, res) => {
+  // General file upload endpoint for permanent storage
+  app.post("/api/upload", uploadSingle, async (req, res) => {
     try {
       const file = req.file;
+      const { entityType, entityId } = req.body;
 
       if (!file) {
         return res.status(400).json({ success: false, error: "No file uploaded" });
@@ -186,7 +222,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create the URL path for the uploaded file
       const fileUrl = `/uploads/${file.filename}`;
 
-      console.log(`Temporary file uploaded: ${fileUrl}`);
+      // Save file metadata to database if entity info provided
+      if (entityType && entityId) {
+        try {
+          await db.execute(
+            `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [entityType, entityId, file.filename, file.originalname, file.path, file.mimetype, file.size]
+          );
+          console.log(`File uploaded and linked to ${entityType} ${entityId}: ${fileUrl}`);
+        } catch (dbError) {
+          console.warn('Failed to save file metadata:', dbError);
+        }
+      } else {
+        console.log(`File uploaded (unlinked): ${fileUrl}`);
+      }
 
       res.json({ 
         success: true, 
@@ -246,46 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Associate uploaded logo with company
-  app.post("/api/companies/:id/logo-associate", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const { logoUrl } = req.body;
 
-      if (!logoUrl) {
-        return res.status(400).json({ success: false, error: "Logo URL is required" });
-      }
-
-      // Extract filename from URL
-      const filename = logoUrl.split('/').pop();
-      if (!filename) {
-        return res.status(400).json({ success: false, error: "Invalid logo URL" });
-      }
-
-      // Save file metadata to database
-      try {
-        const result = await db.execute(
-          `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          ['company_logo', id.toString(), filename, filename, `uploads/${filename}`, 'image/*', 0]
-        );
-        console.log('Logo association saved:', result);
-      } catch (dbError) {
-        console.warn('Failed to save logo association:', dbError);
-        // Continue even if metadata save fails
-      }
-
-      console.log(`Logo associated with company ${id}: ${logoUrl}`);
-
-      res.json({ 
-        success: true, 
-        message: "Logo associated successfully" 
-      });
-    } catch (error) {
-      console.error('Error associating logo:', error);
-      res.status(500).json({ success: false, error: "Failed to associate logo" });
-    }
-  });
 
   // Industry tags endpoints
   app.get("/api/industry-tags", async (req, res) => {
@@ -679,9 +690,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.file) {
         const imageUrl = `/uploads/${req.file.filename}`;
         galleryData.imageUrl = imageUrl;
-        
-        // Save file metadata to database (we'll get the ID after creation)
-        // For now, we'll use a temporary placeholder and update after creation
       }
       
       const validation = insertGalleryItemSchema.safeParse(galleryData);
@@ -698,11 +706,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If a file was uploaded, save the metadata now that we have the gallery item ID
       if (req.file) {
-        await db.execute(
-          `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          ['gallery_item', galleryItem.id.toString(), req.file.filename, req.file.originalname, req.file.path, req.file.mimetype, req.file.size]
-        );
+        try {
+          await db.execute(
+            `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            ['gallery_item', galleryItem.id.toString(), req.file.filename, req.file.originalname, req.file.path, req.file.mimetype, req.file.size]
+          );
+          console.log(`Gallery item ${galleryItem.id} created with file: ${galleryData.imageUrl}`);
+        } catch (dbError) {
+          console.warn('Failed to save gallery file metadata:', dbError);
+        }
       }
       
       res.json({ success: true, data: galleryItem });
@@ -723,11 +736,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData.imageUrl = imageUrl;
         
         // Save file metadata to database
-        await db.execute(
-          `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          ['gallery_item', id.toString(), req.file.filename, req.file.originalname, req.file.path, req.file.mimetype, req.file.size]
-        );
+        try {
+          await db.execute(
+            `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            ['gallery_item', id.toString(), req.file.filename, req.file.originalname, req.file.path, req.file.mimetype, req.file.size]
+          );
+          console.log(`Gallery item ${id} updated with new file: ${imageUrl}`);
+        } catch (dbError) {
+          console.warn('Failed to save updated gallery file metadata:', dbError);
+        }
       }
       
       const validation = insertGalleryItemSchema.partial().safeParse(updateData);
