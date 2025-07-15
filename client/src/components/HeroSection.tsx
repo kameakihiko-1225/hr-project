@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ArrowRight, Users, Building, Briefcase } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getPositions, getDepartments, getCompanies } from "@/lib/api";
+import { API_BASE_URL } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Stats {
@@ -25,17 +26,21 @@ export const HeroSection = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [positionsData, departmentsData, companiesData] = await Promise.all([
+        const [positionsData, departmentsData, companiesData, statsResponse] = await Promise.all([
           getPositions(),
           getDepartments(),
-          getCompanies()
+          getCompanies(),
+          fetch(`${API_BASE_URL}/dashboard/stats`)
         ]);
+
+        const statsData = await statsResponse.json();
+        const candidatesCount = statsData.success && statsData.data ? statsData.data.candidates : 0;
 
         setStats({
           companies: companiesData?.data?.length || 0,
           departments: departmentsData?.length || 0,
           positions: positionsData?.length || 0,
-          applicants: 42 // TODO: Get actual applicants count from API
+          applicants: candidatesCount
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
