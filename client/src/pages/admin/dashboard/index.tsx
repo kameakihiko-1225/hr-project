@@ -10,7 +10,10 @@ import {
   Calendar,
   AlertCircle,
   CheckCircle,
-  XCircle
+  XCircle,
+  Eye,
+  MousePointer,
+  BarChart3
 } from "lucide-react";
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -42,6 +45,17 @@ interface DashboardStats {
     action: string;
     date: string;
   }>;
+}
+
+interface ClickStats {
+  totalViews: number;
+  totalApplies: number;
+}
+
+interface PositionStats {
+  positionId: number;
+  viewCount: number;
+  applyCount: number;
 }
 
 interface SystemStatus {
@@ -81,6 +95,39 @@ export default function Dashboard() {
         throw new Error(response.error || 'Failed to fetch dashboard statistics');
       }
       return response;
+    },
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  // Fetch position click analytics
+  const { data: clickStatsData, isLoading: clickStatsLoading } = useQuery<{ success: boolean; data: ClickStats }>({
+    queryKey: ['clickStats'],
+    queryFn: async () => {
+      const response = await fetch('/api/dashboard/click-stats');
+      return response.json();
+    },
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  // Fetch position-specific stats
+  const { data: positionStatsData, isLoading: positionStatsLoading } = useQuery<{ success: boolean; data: PositionStats[] }>({
+    queryKey: ['positionStats'],
+    queryFn: async () => {
+      const response = await fetch('/api/positions/stats');
+      return response.json();
+    },
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  // Fetch positions for title mapping
+  const { data: positionsData } = useQuery<{ success: boolean; data: Array<{ id: number; title: string }> }>({
+    queryKey: ['positions'],
+    queryFn: async () => {
+      const response = await fetch('/api/positions');
+      return response.json();
     },
     retry: 1,
     refetchOnWindowFocus: false,
@@ -127,6 +174,21 @@ export default function Dashboard() {
   }, [dbHealthData]);
 
   const stats = data?.data;
+  const clickStats = clickStatsData?.success ? clickStatsData.data : { totalViews: 0, totalApplies: 0 };
+  const positionStats = positionStatsData?.success ? positionStatsData.data : [];
+  const positions = positionsData?.success ? positionsData.data : [];
+
+  // Helper function to calculate conversion rate
+  const calculateConversionRate = (views: number, applies: number) => {
+    if (views === 0) return 0;
+    return ((applies / views) * 100).toFixed(1);
+  };
+
+  // Helper function to get position title
+  const getPositionTitle = (positionId: number) => {
+    const position = positions.find(p => p.id === positionId);
+    return position?.title || `Position #${positionId}`;
+  };
 
   const statCards = [
     {
@@ -146,6 +208,27 @@ export default function Dashboard() {
       value: stats?.positions ?? 0,
       icon: Briefcase,
       color: "bg-purple-500",
+    },
+    {
+      title: "Position Views",
+      value: clickStats.totalViews,
+      icon: Eye,
+      color: "bg-emerald-500",
+      subtitle: "Job seekers viewing positions"
+    },
+    {
+      title: "Applications",
+      value: clickStats.totalApplies,
+      icon: MousePointer,
+      color: "bg-rose-500",
+      subtitle: "Apply button clicks"
+    },
+    {
+      title: "Conversion Rate",
+      value: `${calculateConversionRate(clickStats.totalViews, clickStats.totalApplies)}%`,
+      icon: BarChart3,
+      color: "bg-violet-500",
+      subtitle: "Views to applications"
     },
     {
       title: "Jobs Posted",
@@ -215,10 +298,15 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                {isLoading ? (
+                {isLoading || clickStatsLoading ? (
                   <Skeleton className="h-8 w-20" />
                 ) : (
-                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <>
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                    {stat.subtitle && (
+                      <p className="text-xs text-muted-foreground mt-1">{stat.subtitle}</p>
+                    )}
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -330,6 +418,65 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Position Performance Analytics */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Position Performance Analytics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {positionStatsLoading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            ) : !positionStats || positionStats.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Briefcase className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p>No position analytics yet</p>
+                <p className="text-sm">Analytics will appear as users interact with job positions</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {positionStats.map((stat) => (
+                  <div key={stat.positionId} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900">{getPositionTitle(stat.positionId)}</h3>
+                      <p className="text-sm text-gray-500">Position ID: {stat.positionId}</p>
+                    </div>
+                    <div className="flex items-center gap-6 text-sm">
+                      <div className="text-center">
+                        <div className="font-semibold text-blue-600 flex items-center gap-1">
+                          <Eye className="h-4 w-4" />
+                          {stat.viewCount}
+                        </div>
+                        <div className="text-gray-500">Views</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-green-600 flex items-center gap-1">
+                          <MousePointer className="h-4 w-4" />
+                          {stat.applyCount}
+                        </div>
+                        <div className="text-gray-500">Applies</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-purple-600 flex items-center gap-1">
+                          <BarChart3 className="h-4 w-4" />
+                          {calculateConversionRate(stat.viewCount, stat.applyCount)}%
+                        </div>
+                        <div className="text-gray-500">Rate</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
         
         <DatabaseStats />
       </div>

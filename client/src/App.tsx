@@ -18,7 +18,7 @@ import AdminCompanies from "./pages/admin/companies/index";
 import AdminDepartments from "./pages/admin/departments/index";
 import AdminPositions from "./pages/admin/positions/index";
 import AdminBlog from "./pages/AdminBlog";
-import { AdminAnalytics } from "./pages/AdminAnalytics";
+
 
 
 
@@ -89,11 +89,7 @@ const App = () => (
                 <AdminBlog />
               </ProtectedRoute>
             </Route>
-            <Route path="/admin/analytics">
-              <ProtectedRoute>
-                <AdminAnalytics />
-              </ProtectedRoute>
-            </Route>
+
             
             {/* Catch-all route for 404 */}
             <Route component={NotFound} />
