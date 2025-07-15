@@ -16,8 +16,8 @@ interface FileUploadConfig {
  * Default configuration for file uploads
  */
 const defaultConfig: FileUploadConfig = {
-  maxSizeMB: 5, // 5MB max file size
-  allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'],
+  maxSizeMB: 50, // Increased from 5MB to 50MB to remove size limitations
+  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'],
 };
 
 /**

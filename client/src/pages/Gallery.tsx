@@ -30,15 +30,14 @@ export default function Gallery() {
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
 
   // Fetch gallery items from API
-  const { data: galleryResponse, isLoading } = useQuery({
-    queryKey: ['/api/gallery'],
+  const { data: galleryResponse, isLoading, error } = useQuery({
+    queryKey: ['gallery'],
+    queryFn: () => fetch('/api/gallery').then(res => res.json()),
   });
 
   const galleryItems: GalleryItem[] = galleryResponse?.data || [];
 
-  // Debug log to check what we're getting
-  console.log('Gallery items from API:', galleryItems);
-  console.log('Gallery response:', galleryResponse);
+
 
   const categories = [
     { key: 'all', label: 'All', icon: Target },

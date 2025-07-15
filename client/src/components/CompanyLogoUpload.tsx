@@ -97,19 +97,24 @@ export function CompanyLogoUpload({
         }
         
         // Upload file to company-specific endpoint
-        const endpoint = companyId ? `/companies/${companyId}/logo` : '/companies/logo';
+        const endpoint = companyId ? `/api/companies/${companyId}/logo` : '/api/companies/logo';
         
-        // For now, send the blob URL since we don't have real file storage
-        // In a real implementation, this would upload the actual file
-        const response = await api.post(endpoint, { logoUrl: previewUrl });
+        // Send the blob URL
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ logoUrl: previewUrl }),
+        }).then(res => res.json());
         
-        if (response.success && response.data?.logoUrl) {
+        if (response.success && response.logoUrl) {
           // Clean up the temporary preview URL
           if (previewUrl) {
             revokeLocalFileUrl(previewUrl);
           }
           
-          const uploadedUrl = response.data.logoUrl;
+          const uploadedUrl = response.logoUrl;
           
           // Set the uploaded URL as the preview
           setLogoPreview(uploadedUrl);
