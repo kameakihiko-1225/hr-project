@@ -168,12 +168,10 @@ app.post('/webhook', async (req, res) => {
       UF_CRM_1752622669492: ageRaw, // age field
     };
     
-    // Phone field with proper crm_multifield format for Bitrix24
+    // Store phone for later processing - don't add to initial contact creation
+    let phoneNumber = null;
     if (phone) {
-      contactFields.PHONE = [{ 
-        VALUE: `+${phone}`, 
-        VALUE_TYPE: 'WORK'
-      }];
+      phoneNumber = `+${phone}`;
     }
     
     // Resolve resume & diploma links
@@ -268,7 +266,28 @@ app.post('/webhook', async (req, res) => {
           headers: contactForm.getHeaders(),
         });
         console.log('[TELEGRAM-BOT] Contact create response:', createResp.data);
+        
+        // Log any errors in the response
+        if (createResp.data.error) {
+          console.log('[TELEGRAM-BOT] Bitrix24 API Error:', createResp.data.error);
+        }
         contactId = createResp.data.result;
+        
+        // Add phone number via separate API call after contact creation
+        if (phoneNumber && contactId) {
+          try {
+            const phoneForm = new FormData();
+            phoneForm.append('id', contactId.toString());
+            phoneForm.append('fields[PHONE]', JSON.stringify([{ VALUE: phoneNumber, VALUE_TYPE: 'WORK' }]));
+            
+            const phoneResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, phoneForm, {
+              headers: phoneForm.getHeaders(),
+            });
+            console.log('[TELEGRAM-BOT] Phone update response:', phoneResp.data);
+          } catch (phoneError) {
+            console.error('[TELEGRAM-BOT] Failed to update phone:', phoneError.response?.data || phoneError.message);
+          }
+        }
       }
     } else {
       // No phone – always create
@@ -277,6 +296,22 @@ app.post('/webhook', async (req, res) => {
       });
       console.log('[TELEGRAM-BOT] Contact create response:', createResp.data);
       contactId = createResp.data.result;
+      
+      // Add phone number via separate API call after contact creation
+      if (phoneNumber && contactId) {
+        try {
+          const phoneForm = new FormData();
+          phoneForm.append('id', contactId.toString());
+          phoneForm.append('fields[PHONE]', JSON.stringify([{ VALUE: phoneNumber, VALUE_TYPE: 'WORK' }]));
+          
+          const phoneResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, phoneForm, {
+            headers: phoneForm.getHeaders(),
+          });
+          console.log('[TELEGRAM-BOT] Phone update response:', phoneResp.data);
+        } catch (phoneError) {
+          console.error('[TELEGRAM-BOT] Failed to update phone:', phoneError.response?.data || phoneError.message);
+        }
+      }
     }
 
     // 3. Prepare deal fields (always create new deal attached to contact)
