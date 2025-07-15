@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useQuery } from "@tanstack/react-query";
 
 interface OpenPositionsProps {
   selectedCompanies: string[];
@@ -28,57 +29,46 @@ export const OpenPositions = ({
   const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const [allPositions, setAllPositions] = useState<Position[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // Use React Query for positions with shorter cache time to ensure fresh data
+  const { data: positionsResponse, isLoading } = useQuery({
+    queryKey: ['/api/positions'],
+    staleTime: 30000, // 30 seconds - shorter cache for public site to get fresh apply links
+    gcTime: 2 * 60 * 1000, // 2 minutes
+  });
 
-  // Load positions initially
+  const allPositions = positionsResponse?.data || [];
+  
+  // Debug log to track position data updates
   useEffect(() => {
-    const fetchPositions = async () => {
-      setIsLoading(true);
-      try {
-        const data = await getPositions();
-        console.log('⇠ positions from API', data);
-        setAllPositions(Array.isArray(data) ? (data as Position[]) : []);
-      } catch (error) {
-        console.error('Failed to fetch positions', error);
-        setAllPositions([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPositions();
-  }, []);
+    if (allPositions.length > 0) {
+      console.log('⇠ positions from API (React Query)', allPositions);
+      // Log apply links to verify they're current
+      allPositions.forEach(pos => {
+        console.log(`Position ${pos.id} (${pos.title}) applyLink:`, pos.applyLink);
+      });
+    }
+  }, [allPositions]);
 
   // Set view mode based on mobile state
   useEffect(() => {
     setViewMode(isMobile ? "list" : "grid");
   }, [isMobile]);
 
-  // === Filtering ===
-  const [departments, setDepartments] = useState<any[]>([]);
-  const [companies, setCompanies] = useState<any[]>([]);
+  // Use React Query for departments and companies with proper caching
+  const { data: departmentsResponse } = useQuery({
+    queryKey: ['/api/departments'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
 
-  // Load departments and companies for filtering
-  useEffect(() => {
-    const fetchFilterData = async () => {
-      try {
-        const [deptData, compData] = await Promise.all([
-          getDepartments(),
-          getCompanies()
-        ]);
-        // Filter data loaded successfully
-        setDepartments(Array.isArray(deptData) ? deptData : []);
-        
-        // Handle companies data structure (could be wrapped in {success, data} or direct array)
-        const companyArray = compData.data ? compData.data : (Array.isArray(compData) ? compData : []);
-        setCompanies(companyArray);
-      } catch (error) {
-        console.error('Failed to fetch filter data', error);
-      }
-    };
-    fetchFilterData();
-  }, []);
+  const { data: companiesResponse } = useQuery({
+    queryKey: ['/api/companies'],
+    staleTime: 5 * 60 * 1000, // 5 minutes 
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  const departments = departmentsResponse?.data || [];
+  const companies = companiesResponse?.data || [];
 
   const filteredPositions = allPositions.filter(pos => {
     // Find department and company data for this position

@@ -182,6 +182,13 @@ Preferred communication style: Simple, everyday language.
 - **Inheritance Chain**: Position -> Department -> Company for logo, location, description, and other fields
 - **Modal Integration**: AdminPositionCard maintains company/department info modals with proper data inheritance
 
+### July 15, 2025 - Apply Now Button Cache Fix & React Query Migration
+- **Apply Now Button Issue**: Fixed critical caching issue where Apply Now button redirected to old link instead of updated one
+- **React Query Migration**: Converted OpenPositions component from manual useEffect/useState to React Query for proper cache management
+- **Cache Optimization**: Set shorter cache times (30 seconds) for positions to ensure fresh apply links on public site
+- **Debug Logging**: Added position apply link logging to track data freshness and cache updates
+- **Data Synchronization**: Fixed disconnection between admin updates and public site display through proper cache invalidation
+
 ### July 15, 2025 - Unified Hover Effects & Mobile Responsiveness Enhancement
 - **Consistent Hover Effects**: Applied FeaturesSection hover effects (hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1) across all cards and buttons
 - **Position Card Improvements**: Increased position card height to 480px and enhanced Apply Now button height (py-4 instead of py-3)
