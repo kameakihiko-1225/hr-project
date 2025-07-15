@@ -2,8 +2,58 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema } from "@shared/schema";
+import bcrypt from "bcryptjs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Authentication endpoints
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Email and password are required" 
+        });
+      }
+
+      // Get user from database
+      const user = await storage.getUserByUsername(email);
+      
+      if (!user) {
+        return res.status(401).json({ 
+          success: false, 
+          error: "Invalid email or password" 
+        });
+      }
+
+      // Check password
+      const passwordValid = await bcrypt.compare(password, user.password);
+      
+      if (!passwordValid) {
+        return res.status(401).json({ 
+          success: false, 
+          error: "Invalid email or password" 
+        });
+      }
+
+      // Return user without password
+      const { password: _, ...userWithoutPassword } = user;
+      
+      res.json({
+        success: true,
+        admin: userWithoutPassword,
+        token: "dummy-jwt-token" // Simple token for now
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: "An error occurred during login" 
+      });
+    }
+  });
+
   // Companies endpoints
   app.get("/api/companies", async (req, res) => {
     try {
