@@ -45,7 +45,7 @@ export const positions = pgTable("positions", {
   qualifications: text("qualifications"),
   responsibilities: text("responsibilities"),
   departmentId: integer("departmentid").notNull(),
-  applyLink: text("apply_link"),
+  applyLink: text("applyLink"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
