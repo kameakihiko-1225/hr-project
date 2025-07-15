@@ -10,6 +10,7 @@ import { getBotByAdminId, createCandidateDeepLink, createPositionDeepLink } from
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { createLogger } from '@/lib/logger';
+import { useClickCounter } from '@/contexts/ClickCounterContext';
 
 const logger = createLogger('positionCard');
 
@@ -26,6 +27,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
   const [logoError, setLogoError] = useState(false);
   const { admin } = useAuth();
   const [isApplying, setIsApplying] = useState(false);
+  const { incrementJobSeekers, incrementApplicants } = useClickCounter();
 
   const handleEdit = () => {
     if (onEdit) {
@@ -46,8 +48,17 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
   };
 
   const handleApply = async () => {
+    // Increment counters for any apply button click
+    incrementJobSeekers();
+    incrementApplicants();
+
+    // If position has a direct apply link, use it
     if (position.applyLink) {
-      window.open(position.applyLink, '_blank', 'noopener');
+      window.open(position.applyLink, '_blank', 'noopener,noreferrer');
+      toast({ 
+        title: 'Redirected to Application', 
+        description: 'You\'ve been redirected to the application form.' 
+      });
       return;
     }
 
@@ -343,14 +354,12 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
         </Dialog>
 
         {position.applyLink ? (
-          <a
-            href={position.applyLink}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={handleApply}
             className="px-6 py-1.5 text-xs font-medium rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center gap-1"
           >
             Apply Now <ExternalLink className="h-3 w-3" />
-          </a>
+          </button>
         ) : (
           <Button
             onClick={handleApply}

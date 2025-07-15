@@ -435,8 +435,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companies: companies.length,
         departments: departments.length,
         positions: positions.length,
-        candidates: candidatesData.length,
-        matchRate: "85%" // TODO: Calculate match rate when candidates are implemented
+        candidates: candidatesData.length
       };
       
       res.json({ success: true, data: stats });

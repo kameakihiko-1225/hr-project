@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Router, Route, Switch } from "wouter";
 import { AuthProvider } from "@/lib/authContext";
+import { ClickCounterProvider } from "@/contexts/ClickCounterContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -24,9 +25,10 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <Router>
+        <ClickCounterProvider>
+          <Toaster />
+          <Sonner />
+          <Router>
           <Switch>
             <Route path="/" component={Index} />
             
@@ -59,10 +61,11 @@ const App = () => (
             {/* Catch-all route for 404 */}
             <Route component={NotFound} />
           </Switch>
-        </Router>
-        
-        {/* Debug component for environment variables */}
-        <EnvDebug />
+          </Router>
+          
+          {/* Debug component for environment variables */}
+          <EnvDebug />
+        </ClickCounterProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

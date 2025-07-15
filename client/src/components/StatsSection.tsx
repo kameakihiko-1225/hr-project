@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Users, Building2, Award, Bot } from "lucide-react";
+import { Users, Building2, Award, Briefcase } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useClickCounter } from "@/contexts/ClickCounterContext";
 import { API_BASE_URL } from "@/lib/api";
 
 interface StatsApi {
@@ -9,19 +10,19 @@ interface StatsApi {
   departments: number;
   positions: number;
   candidates: number;
-  matchRate: string;
 }
 
 export const StatsSection = () => {
   const isMobile = useIsMobile();
   const { t } = useTranslation();
   const [isCompact, setIsCompact] = useState(false);
+  const { jobSeekers, applicants } = useClickCounter();
   
   const [stats, setStats] = useState([
-    { icon: Users, number: "-", label: "Job Seekers", description: "Placed via the platform", color: "from-blue-500 to-blue-600" },
+    { icon: Users, number: "-", label: "Job Seekers", description: "Applied via platform", color: "from-blue-500 to-blue-600" },
     { icon: Building2, number: "-", label: "Companies", description: "Using our platform", color: "from-indigo-500 to-indigo-600" },
-    { icon: Bot, number: "-", label: "Match Rate", description: "Candidate-company matches", color: "from-green-500 to-green-600" },
-    { icon: Award, number: "24/7", label: "You can app anytime", description: "Interview anytime", color: "from-purple-500 to-purple-600" },
+    { icon: Briefcase, number: "-", label: "Open Positions", description: "Available roles", color: "from-green-500 to-green-600" },
+    { icon: Award, number: "24/7", label: "Apply Anytime", description: "Always available", color: "from-purple-500 to-purple-600" },
   ]);
 
   // Load live stats
@@ -38,9 +39,9 @@ export const StatsSection = () => {
               case 'Companies':
                 return { ...item, number: apiStats.companies.toString() };
               case 'Job Seekers':
-                return { ...item, number: apiStats.candidates.toString() };
-              case 'Match Rate':
-                return { ...item, number: apiStats.matchRate };
+                return { ...item, number: (apiStats.candidates + jobSeekers).toString() };
+              case 'Open Positions':
+                return { ...item, number: apiStats.positions.toString() };
               default:
                 return item;
             }
@@ -52,7 +53,7 @@ export const StatsSection = () => {
     };
 
     loadStats();
-  }, []);
+  }, [jobSeekers, applicants]);
 
   useEffect(() => {
     setIsCompact(isMobile);

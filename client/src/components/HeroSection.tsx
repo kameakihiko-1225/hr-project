@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ArrowRight, Users, Building, Briefcase } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getPositions, getDepartments, getCompanies } from "@/lib/api";
+import { useClickCounter } from "@/contexts/ClickCounterContext";
 import { API_BASE_URL } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -14,6 +15,7 @@ interface Stats {
 
 export const HeroSection = () => {
   const { t } = useTranslation();
+  const { jobSeekers, applicants } = useClickCounter();
   
   const [stats, setStats] = useState<Stats>({
     companies: 0,
@@ -40,7 +42,7 @@ export const HeroSection = () => {
           companies: companiesData?.data?.length || 0,
           departments: departmentsData?.length || 0,
           positions: positionsData?.length || 0,
-          applicants: candidatesCount
+          applicants: candidatesCount + applicants
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -56,7 +58,7 @@ export const HeroSection = () => {
     }
 
     fetchData();
-  }, []);
+  }, [applicants]);
 
   // Function to scroll to a section by ID
   const scrollToSection = (id: string) => {
