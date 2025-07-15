@@ -141,7 +141,7 @@ export default function Gallery() {
                               className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
-                                target.src = '/placeholder-image.jpg';
+                                target.src = 'https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80';
                               }}
                             />
                             <div className="absolute top-4 left-4">

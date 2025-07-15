@@ -1,0 +1,140 @@
+Great! Since you're using **PostgreSQL** to store metadata and want to attach uploaded **files (images/videos)** to a **related entity** (e.g. user, post, course, etc.), here’s how you can do that in a clean and scalable way.
+
+---
+
+## 🧩 Overview: How File Upload + PostgreSQL Metadata Works
+
+### 🗂️ 1. **File is uploaded using `multer`**
+
+### 🧾 2. **Metadata (filename, path, mimetype, size, etc.) is saved into PostgreSQL**
+
+### 🔗 3. **It's linked to a related entity via a foreign key**
+
+---
+
+## ✅ STEP-BY-STEP SETUP
+
+---
+
+### 📁 1. `multer` File Upload (as discussed)
+
+Use `multer` to store files locally or in a temporary folder.
+
+```js
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: 'uploads/',
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const base = path.basename(file.originalname, ext);
+    cb(null, `${base}-${Date.now()}${ext}`);
+  },
+});
+
+const upload = multer({ storage });
+```
+
+---
+
+### 🧱 2. PostgreSQL Table Design
+
+Example: You’re uploading attachments for a `posts` table.
+
+```sql
+CREATE TABLE posts (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT
+);
+
+CREATE TABLE attachments (
+  id SERIAL PRIMARY KEY,
+  post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+  filename TEXT NOT NULL,
+  filepath TEXT NOT NULL,
+  mimetype TEXT,
+  size INTEGER,
+  uploaded_at TIMESTAMP DEFAULT now()
+);
+```
+
+---
+
+### 🚀 3. Upload Route with Metadata Save
+
+```js
+const express = require('express');
+const { Pool } = require('pg');
+const upload = require('./upload'); // from step 1
+
+const router = express.Router();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+router.post('/posts/:postId/upload', upload.single('file'), async (req, res) => {
+  const { postId } = req.params;
+  const file = req.file;
+
+  if (!file) return res.status(400).json({ error: 'No file uploaded.' });
+
+  try {
+    const { originalname, filename, mimetype, size, path: filepath } = file;
+
+    await pool.query(
+      `INSERT INTO attachments (post_id, filename, filepath, mimetype, size)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [postId, originalname, filepath, mimetype, size]
+    );
+
+    res.json({ message: 'File uploaded and metadata saved.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to save file metadata.' });
+  }
+});
+```
+
+---
+
+### 📦 4. Sample Response
+
+```json
+{
+  "message": "File uploaded and metadata saved."
+}
+```
+
+---
+
+### 🧩 5. Fetch Files for a Post
+
+```js
+router.get('/posts/:postId/files', async (req, res) => {
+  const { postId } = req.params;
+  const result = await pool.query(
+    'SELECT * FROM attachments WHERE post_id = $1',
+    [postId]
+  );
+  res.json(result.rows);
+});
+```
+
+---
+
+## 🔐 Optional Improvements
+
+* Validate file types (e.g., allow only `.jpg`, `.png`, `.mp4`)
+* Use UUIDs for filenames to avoid duplicates
+* Store files in cloud (like S3) and save URLs in DB
+* Add `description`, `uploaded_by`, etc. fields to `attachments`
+
+---
+
+Would you like the same setup for:
+
+* 🔁 **Multiple file upload** per post?
+* 📦 **NestJS version**?
+* 📤 **Cloud storage (e.g. AWS S3)**?
+
+Let me know and I’ll generate the code tailored to your stack.

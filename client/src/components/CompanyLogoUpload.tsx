@@ -55,7 +55,7 @@ export function CompanyLogoUpload({
     if (!file) return;
     
     // Validate file
-    const validation = validateFile(file);
+    const validation = validateFile(file, { maxSizeMB: 50 }); // Use increased limit
     if (!validation.valid) {
       toast({
         title: "Invalid file",
@@ -69,78 +69,42 @@ export function CompanyLogoUpload({
       setIsUploading(true);
       logger.debug(`Logo file selected: ${file.name}`);
       
-      // Resize image before upload
-      const resizedFile = await resizeImageFile(file, 400, 400);
-      
-      // Clean up previous preview if exists
-      if (logoPreview && logoPreview.startsWith('blob:')) {
-        try {
-          revokeLocalFileUrl(logoPreview);
-        } catch (error) {
-          logger.error('Error revoking previous blob URL', error);
-        }
-      }
-      
-      // Create a temporary URL for preview
-      const previewUrl = createLocalFileUrl(resizedFile);
+      // Create a temporary URL for immediate preview
+      const previewUrl = createLocalFileUrl(file);
       setLogoPreview(previewUrl);
       
-      // Pass the local URL to parent for immediate preview
-      onLogoChange(previewUrl);
+      // Upload the actual file using FormData
+      const formData = new FormData();
+      formData.append('file', file);
       
-      // Upload the file using API client
-      try {
-        // Create additional data object if companyId exists
-        const additionalData: Record<string, string> = {};
-        if (companyId) {
-          additionalData.companyId = companyId;
+      const endpoint = companyId ? `/api/companies/${companyId}/logo` : '/api/companies/logo';
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        body: formData, // Use FormData instead of JSON
+      }).then(res => res.json());
+      
+      if (response.success && response.logoUrl) {
+        // Clean up the temporary preview URL
+        if (previewUrl) {
+          revokeLocalFileUrl(previewUrl);
         }
         
-        // Upload file to company-specific endpoint
-        const endpoint = companyId ? `/api/companies/${companyId}/logo` : '/api/companies/logo';
+        const uploadedUrl = response.logoUrl;
         
-        // Send the blob URL
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ logoUrl: previewUrl }),
-        }).then(res => res.json());
+        // Set the uploaded URL as the preview
+        setLogoPreview(uploadedUrl);
         
-        if (response.success && response.logoUrl) {
-          // Clean up the temporary preview URL
-          if (previewUrl) {
-            revokeLocalFileUrl(previewUrl);
-          }
-          
-          const uploadedUrl = response.logoUrl;
-          
-          // Set the uploaded URL as the preview
-          setLogoPreview(uploadedUrl);
-          
-          // Pass the URL to the parent component
-          onLogoChange(uploadedUrl);
-          
-          toast({
-            title: "Logo uploaded",
-            description: "Logo has been successfully uploaded",
-          });
-        } else {
-          logger.warn('Upload response not successful or missing logoUrl', response);
-          throw new Error(response.error || 'Upload failed');
-        }
-      } catch (uploadError) {
-        logger.error('Error uploading file to storage', uploadError);
+        // Pass the URL to the parent component
+        onLogoChange(uploadedUrl);
         
-        // Keep the local preview but notify about upload failure
         toast({
-          title: "Upload failed",
-          description: "Failed to upload to server, using local preview instead",
-          variant: "destructive",
+          title: "Logo uploaded",
+          description: "Logo has been successfully uploaded",
         });
-        
-        // We already passed the local URL to parent for temporary use
+      } else {
+        logger.warn('Upload response not successful or missing logoUrl', response);
+        throw new Error(response.error || 'Upload failed');
       }
     } catch (error) {
       logger.error("Error processing logo upload", error);

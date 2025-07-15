@@ -59,14 +59,28 @@ export default function AdminGallery() {
     fetchGalleryItems();
   }, [toast]);
 
-  const createGalleryItem = async (data: InsertGalleryItem) => {
+  const createGalleryItem = async (data: InsertGalleryItem, file?: File) => {
     try {
+      const formData = new FormData();
+      
+      // Add file if provided
+      if (file) {
+        formData.append('file', file);
+      }
+      
+      // Add other data fields
+      Object.keys(data).forEach(key => {
+        const value = data[key as keyof InsertGalleryItem];
+        if (Array.isArray(value)) {
+          formData.append(key, JSON.stringify(value));
+        } else if (value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
+      });
+
       const response = await fetch('/api/gallery', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body: formData, // Use FormData instead of JSON
       });
 
       const result = await response.json();
@@ -93,14 +107,28 @@ export default function AdminGallery() {
     }
   };
 
-  const updateGalleryItem = async (id: number, data: Partial<InsertGalleryItem>) => {
+  const updateGalleryItem = async (id: number, data: Partial<InsertGalleryItem>, file?: File) => {
     try {
+      const formData = new FormData();
+      
+      // Add file if provided
+      if (file) {
+        formData.append('file', file);
+      }
+      
+      // Add other data fields
+      Object.keys(data).forEach(key => {
+        const value = data[key as keyof InsertGalleryItem];
+        if (Array.isArray(value)) {
+          formData.append(key, JSON.stringify(value));
+        } else if (value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
+      });
+
       const response = await fetch(`/api/gallery/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body: formData, // Use FormData instead of JSON
       });
 
       const result = await response.json();
@@ -207,12 +235,15 @@ export default function AdminGallery() {
     }
   });
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const handleSubmit = (data: InsertGalleryItem) => {
     if (editingItem) {
-      updateGalleryItem(editingItem.id, data);
+      updateGalleryItem(editingItem.id, data, selectedFile || undefined);
     } else {
-      createGalleryItem(data);
+      createGalleryItem(data, selectedFile || undefined);
     }
+    setSelectedFile(null);
   };
 
   const handleEdit = (item: GalleryItem) => {
@@ -356,6 +387,7 @@ export default function AdminGallery() {
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
+                                  setSelectedFile(file);
                                   // Create a URL for the uploaded file
                                   const fileUrl = URL.createObjectURL(file);
                                   field.onChange(fileUrl);

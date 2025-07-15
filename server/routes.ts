@@ -4,8 +4,14 @@ import { storage } from "./storage";
 import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema } from "@shared/schema";
 import bcrypt from "bcryptjs";
 import { initializeGalleryData } from "./init-gallery-data";
+import { uploadSingle } from "./middleware/upload";
+import { db } from "./db";
+import path from "path";
+import express from "express";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve uploaded files statically
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   // Authentication endpoints
   app.post("/api/auth/login", async (req, res) => {
     try {
@@ -169,35 +175,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Company logo upload endpoint
-  app.post("/api/companies/:id/logo", async (req, res) => {
+  app.post("/api/companies/:id/logo", uploadSingle, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      
-      // Handle both FormData and JSON uploads
-      let logoUrl: string;
-      
-      if (req.body.logoUrl) {
-        // JSON upload with logoUrl
-        logoUrl = req.body.logoUrl;
-      } else {
-        // For now, since we're using blob URLs, we need to handle this differently
-        // In a real app, this would process the uploaded file and return a permanent URL
-        return res.status(400).json({ success: false, error: "Logo must be provided as logoUrl in request body" });
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).json({ success: false, error: "No file uploaded" });
       }
-      
-      if (!logoUrl) {
-        return res.status(400).json({ success: false, error: "No logo data provided" });
-      }
-      
+
+      // Create the URL path for the uploaded file
+      const logoUrl = `/uploads/${file.filename}`;
+
+      // Save file metadata to database
+      await db.execute(
+        `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        ['company_logo', id.toString(), file.filename, file.originalname, file.path, file.mimetype, file.size]
+      );
+
       // Update company with the logo URL
       const company = await storage.updateCompany(id, { logoUrl });
-      
+
       if (!company) {
         return res.status(404).json({ success: false, error: "Company not found" });
       }
-      
-      console.log(`Logo uploaded for company ${id}`);
-      
+
+      console.log(`Logo uploaded for company ${id}: ${logoUrl}`);
+
       res.json({ 
         success: true, 
         logoUrl: logoUrl,
@@ -593,9 +598,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/gallery", async (req, res) => {
+  app.post("/api/gallery", uploadSingle, async (req, res) => {
     try {
-      const validation = insertGalleryItemSchema.safeParse(req.body);
+      let galleryData = { ...req.body };
+      
+      // If a file was uploaded, set the imageUrl
+      if (req.file) {
+        const imageUrl = `/uploads/${req.file.filename}`;
+        galleryData.imageUrl = imageUrl;
+        
+        // Save file metadata to database (we'll get the ID after creation)
+        // For now, we'll use a temporary placeholder and update after creation
+      }
+      
+      const validation = insertGalleryItemSchema.safeParse(galleryData);
       
       if (!validation.success) {
         return res.status(400).json({ 
@@ -606,6 +622,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const galleryItem = await storage.createGalleryItem(validation.data);
+      
+      // If a file was uploaded, save the metadata now that we have the gallery item ID
+      if (req.file) {
+        await db.execute(
+          `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          ['gallery_item', galleryItem.id.toString(), req.file.filename, req.file.originalname, req.file.path, req.file.mimetype, req.file.size]
+        );
+      }
+      
       res.json({ success: true, data: galleryItem });
     } catch (error) {
       console.error('Error creating gallery item:', error);
@@ -613,10 +639,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/gallery/:id", async (req, res) => {
+  app.put("/api/gallery/:id", uploadSingle, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const validation = insertGalleryItemSchema.partial().safeParse(req.body);
+      let updateData = { ...req.body };
+      
+      // If a new file was uploaded, update the imageUrl
+      if (req.file) {
+        const imageUrl = `/uploads/${req.file.filename}`;
+        updateData.imageUrl = imageUrl;
+        
+        // Save file metadata to database
+        await db.execute(
+          `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          ['gallery_item', id.toString(), req.file.filename, req.file.originalname, req.file.path, req.file.mimetype, req.file.size]
+        );
+      }
+      
+      const validation = insertGalleryItemSchema.partial().safeParse(updateData);
       
       if (!validation.success) {
         return res.status(400).json({ 
