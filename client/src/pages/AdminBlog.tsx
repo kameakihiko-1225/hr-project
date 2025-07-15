@@ -241,7 +241,7 @@ export default function AdminBlog() {
     if (editingItem) {
       updateGalleryItem(editingItem.id, data, selectedFile || undefined);
     } else {
-      createGalleryItem(data, selectedFile || undefined);
+      createBlogItem(data, selectedFile || undefined);
     }
     setSelectedFile(null);
   };
