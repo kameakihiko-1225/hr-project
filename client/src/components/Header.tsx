@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "wouter";
 import { Menu, X, ChevronDown, Home, Phone, BriefcaseBusiness, Images } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -9,6 +10,7 @@ export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
+  const [location] = useLocation();
 
   // Handle scroll event to change header appearance
   useEffect(() => {
@@ -34,7 +36,7 @@ export const Header = () => {
 
   const { t } = useTranslation();
   
-  // Function to scroll to a section by ID
+  // Function to scroll to a section by ID or navigate to home
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -45,11 +47,26 @@ export const Header = () => {
     }
   };
 
-  const menuItems = [
-    { key: 'home', href: '/', action: () => scrollToSection('hero-section'), icon: Home },
+  // Function to handle logo click - redirect to home or scroll to hero
+  const handleLogoClick = () => {
+    if (location === '/') {
+      scrollToSection("hero-section");
+    } else {
+      window.location.href = '/';
+    }
+  };
+
+  // Filter menu items based on current location
+  const allMenuItems = [
+    { key: 'home', href: '/', action: null, icon: Home },
     { key: 'blog', href: '/blog', action: null, icon: Images },
     { key: 'contact', href: null, action: () => scrollToSection('contact'), icon: Phone },
   ];
+
+  // Hide Home button when on main page
+  const menuItems = location === '/' 
+    ? allMenuItems.filter(item => item.key !== 'home')
+    : allMenuItems;
 
   return (
     <header 
@@ -63,7 +80,7 @@ export const Header = () => {
           <div className="flex-shrink-0">
             <div 
               className="flex items-center cursor-pointer"
-              onClick={() => scrollToSection("hero-section")}
+              onClick={handleLogoClick}
             >
               <img src="/logo%20png.png" alt="Millat Umidi HR Logo" className="h-16 w-16 object-contain mr-3" />
               <span className="text-3xl font-bold tracking-tight" style={{ color: '#222' }}>
