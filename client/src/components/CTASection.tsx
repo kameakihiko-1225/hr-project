@@ -217,21 +217,14 @@ export const CTASection = () => {
           <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 md:mb-6">
             Ready to join these success stories?
           </h3>
-          <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center">
+          <div className="flex justify-center">
             <Button 
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl group"
               onClick={() => scrollToSection("filter-section")}
             >
               Get Started
               <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button 
-              size="lg"
-              variant="outline"
-              className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 rounded-xl"
-            >
-              View Demo
             </Button>
           </div>
         </div>

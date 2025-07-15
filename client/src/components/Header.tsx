@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Menu, X, ChevronDown, Home, Phone, BriefcaseBusiness } from "lucide-react";
+import { Menu, X, ChevronDown, Home, Phone, BriefcaseBusiness, Images } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { LanguageSelector } from './ui/LanguageSelector';
@@ -47,6 +47,7 @@ export const Header = () => {
 
   const menuItems = [
     { key: 'home', href: '/', action: () => scrollToSection('hero-section'), icon: Home },
+    { key: 'gallery', href: '/gallery', action: null, icon: Images },
   ];
 
   return (
@@ -77,8 +78,10 @@ export const Header = () => {
                 <a
                   href={item.href}
                   onClick={(e) => {
-                    e.preventDefault();
-                    if (item.action) item.action();
+                    if (item.action) {
+                      e.preventDefault();
+                      item.action();
+                    }
                   }}
                   className="flex items-center text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
                 >
@@ -152,8 +155,10 @@ export const Header = () => {
                   <a
                     href={item.href}
                     onClick={(e) => {
-                      e.preventDefault();
-                      if (item.action) item.action();
+                      if (item.action) {
+                        e.preventDefault();
+                        item.action();
+                      }
                     }}
                     className="flex items-center px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                   >

@@ -7,6 +7,7 @@ import { AuthProvider } from "@/lib/authContext";
 import { ClickCounterProvider } from "@/contexts/ClickCounterContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
+import Gallery from "./pages/Gallery";
 import NotFound from "./pages/NotFound";
 import { EnvDebug } from "./components/EnvDebug";
 
@@ -31,6 +32,7 @@ const App = () => (
           <Router>
           <Switch>
             <Route path="/" component={Index} />
+            <Route path="/gallery" component={Gallery} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" component={AdminLogin} />
