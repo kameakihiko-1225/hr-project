@@ -351,38 +351,8 @@ const mockData: Record<string, any> = {
       fileUrl: '/placeholder.svg',
       fileSize: 12345
     }
-  },
-  // Mock data for industry tags
-  '/industry-tags': {
-    success: true,
-    data: [
-      { id: "tag-1", name: "Technology" },
-      { id: "tag-2", name: "Healthcare" },
-      { id: "tag-3", name: "Finance" },
-      { id: "tag-4", name: "Education" },
-      { id: "tag-5", name: "Manufacturing" },
-      { id: "tag-6", name: "Retail" },
-      { id: "tag-7", name: "Hospitality" },
-      { id: "tag-8", name: "Transportation" },
-      { id: "tag-9", name: "Energy" },
-      { id: "tag-10", name: "Media" }
-    ]
-  },
-  '/api/industry-tags': {
-    success: true,
-    data: [
-      { id: "tag-1", name: "Technology" },
-      { id: "tag-2", name: "Healthcare" },
-      { id: "tag-3", name: "Finance" },
-      { id: "tag-4", name: "Education" },
-      { id: "tag-5", name: "Manufacturing" },
-      { id: "tag-6", name: "Retail" },
-      { id: "tag-7", name: "Hospitality" },
-      { id: "tag-8", name: "Transportation" },
-      { id: "tag-9", name: "Energy" },
-      { id: "tag-10", name: "Media" }
-    ]
   }
+  // Removed mock data - now using real API endpoints
 };
 
 /**

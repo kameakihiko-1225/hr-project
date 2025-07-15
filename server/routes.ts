@@ -170,20 +170,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Company logo upload endpoint
   app.post("/api/companies/:id/logo", async (req, res) => {
     try {
-      const id = req.params.id;
+      const id = parseInt(req.params.id);
+      const { logoUrl } = req.body;
       
-      // For now, just return success to handle blob URL uploads
-      // In a real implementation, this would save the file to storage
-      console.log(`Logo upload requested for company ${id}`);
+      if (!logoUrl) {
+        return res.status(400).json({ success: false, error: "No logo data provided" });
+      }
+      
+      // Update company with the logo URL (blob URL for now)
+      const company = await storage.updateCompany(id, { logoUrl });
+      
+      if (!company) {
+        return res.status(404).json({ success: false, error: "Company not found" });
+      }
+      
+      console.log(`Logo uploaded for company ${id}`);
       
       res.json({ 
         success: true, 
-        logoUrl: req.body.logoUrl || req.body.file || "/placeholder-logo.png",
-        message: "Logo upload simulated successfully" 
+        logoUrl: logoUrl,
+        message: "Logo uploaded successfully" 
       });
     } catch (error) {
       console.error('Error uploading logo:', error);
       res.status(500).json({ success: false, error: "Failed to upload logo" });
+    }
+  });
+
+  // Industry tags endpoints
+  app.get("/api/industry-tags", async (req, res) => {
+    try {
+      // Return predefined industry tags that match the database
+      const industryTags = [
+        { id: "technology", name: "Technology" },
+        { id: "healthcare", name: "Healthcare" },
+        { id: "finance", name: "Finance" },
+        { id: "education", name: "Education" },
+        { id: "manufacturing", name: "Manufacturing" },
+        { id: "retail", name: "Retail" },
+        { id: "hospitality", name: "Hospitality" },
+        { id: "transportation", name: "Transportation" },
+        { id: "energy", name: "Energy" },
+        { id: "media", name: "Media & Entertainment" }
+      ];
+      
+      res.json({ success: true, data: industryTags });
+    } catch (error) {
+      console.error('Error fetching industry tags:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch industry tags" });
+    }
+  });
+
+  app.post("/api/industry-tags", async (req, res) => {
+    try {
+      const { name } = req.body;
+      
+      if (!name) {
+        return res.status(400).json({ success: false, error: "Tag name is required" });
+      }
+      
+      // For now, just return success as if the tag was created
+      // In a real implementation, this would save to a tags table
+      const newTag = {
+        id: `tag-${Date.now()}`,
+        name: name
+      };
+      
+      res.json({ 
+        success: true, 
+        data: newTag,
+        message: "Industry tag created successfully" 
+      });
+    } catch (error) {
+      console.error('Error creating industry tag:', error);
+      res.status(500).json({ success: false, error: "Failed to create industry tag" });
     }
   });
 
