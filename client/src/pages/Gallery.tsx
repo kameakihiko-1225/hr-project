@@ -36,6 +36,10 @@ export default function Gallery() {
 
   const galleryItems: GalleryItem[] = galleryResponse?.data || [];
 
+  // Debug log to check what we're getting
+  console.log('Gallery items from API:', galleryItems);
+  console.log('Gallery response:', galleryResponse);
+
   const categories = [
     { key: 'all', label: 'All', icon: Target },
     { key: 'teamwork', label: 'Teamwork', icon: Users },
