@@ -143,7 +143,7 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
         <div 
           ref={dropdownRef}
           className="absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto 
-                     bg-white border border-gray-200 rounded-lg shadow-xl z-50 animate-fade-in"
+                     bg-white border border-gray-200 rounded-lg shadow-xl z-[60] animate-fade-in"
           onMouseEnter={handleMouseEnter}
         >
           <div className="sticky top-0 bg-white border-b border-gray-200 p-2 flex justify-between items-center">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { PositionCard } from "@/components/PositionCard";
 import { getPositions } from "@/lib/api";
+import { getDepartments, getCompanies } from "@/lib/api";
 import { Position } from "@/types/position";
 import { AlertCircle, Filter } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -55,9 +56,37 @@ export const OpenPositions = ({
   }, [isMobile]);
 
   // === Filtering ===
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [companies, setCompanies] = useState<any[]>([]);
+
+  // Load departments and companies for filtering
+  useEffect(() => {
+    const fetchFilterData = async () => {
+      try {
+        const [deptData, compData] = await Promise.all([
+          getDepartments(),
+          getCompanies()
+        ]);
+        console.log('Filter data loaded:', { deptData, compData });
+        setDepartments(Array.isArray(deptData) ? deptData : []);
+        
+        // Handle companies data structure (could be wrapped in {success, data} or direct array)
+        const companyArray = compData.data ? compData.data : (Array.isArray(compData) ? compData : []);
+        setCompanies(companyArray);
+      } catch (error) {
+        console.error('Failed to fetch filter data', error);
+      }
+    };
+    fetchFilterData();
+  }, []);
+
   const filteredPositions = allPositions.filter(pos => {
-    const companyName = (pos.company?.name ?? pos.departments?.[0]?.department?.company?.name ?? '').trim();
-    const departmentName = (pos.departments?.[0]?.department?.name ?? '').trim();
+    // Find department and company data for this position
+    const department = departments.find(d => d.id === pos.departmentId);
+    const company = department ? companies.find(c => c.id === department.companyId) : null;
+
+    const companyName = company?.name || '';
+    const departmentName = department?.name || '';
 
     const toLower = (s: string) => s.toLowerCase();
 
@@ -71,12 +100,27 @@ export const OpenPositions = ({
 
     const positionMatch =
       selectedPositions.length === 0 ||
-      selectedPositions.some(sel => pos.title?.toLowerCase().includes(sel.toLowerCase()));
+      selectedPositions.some(sel => toLower(pos.title || '').includes(toLower(sel)));
 
     return companyMatch && departmentMatch && positionMatch;
   });
 
   console.log('🔎 filteredPositions', filteredPositions);
+  
+  // Add detailed filtering debug
+  if (allPositions.length > 0) {
+    const testPos = allPositions[0];
+    const testDept = departments.find(d => d.id === testPos.departmentId);
+    const testComp = testDept ? companies.find(c => c.id === testDept.companyId) : null;
+    
+    console.log('Detailed filter debug:', {
+      position: testPos,
+      department: testDept,
+      company: testComp,
+      departmentId: testPos.departmentId,
+      filters: { selectedCompanies, selectedDepartments, selectedPositions }
+    });
+  }
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredPositions.length / itemsPerPage);
