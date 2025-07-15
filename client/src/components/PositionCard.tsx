@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Position } from '../types/position';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -33,6 +33,28 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const { incrementJobSeekers, incrementApplicants } = useClickCounter();
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
+  const [hasTrackedView, setHasTrackedView] = useState(false);
+
+  // Track position view when card is first rendered
+  useEffect(() => {
+    if (!hasTrackedView) {
+      const trackView = async () => {
+        try {
+          await fetch(`/api/positions/${position.id}/track-click`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ clickType: 'view' }),
+          });
+          setHasTrackedView(true);
+        } catch (error) {
+          console.error('Failed to track position view:', error);
+        }
+      };
+      trackView();
+    }
+  }, [position.id, hasTrackedView]);
 
   // Fetch company and department data with optimized caching
   const { data: companiesResponse, isLoading: companiesLoading } = useQuery({
@@ -87,7 +109,20 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   };
 
   const handleApply = async () => {
-    // Increment counters for any apply button click
+    // Track apply click in database
+    try {
+      await fetch(`/api/positions/${position.id}/track-click`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ clickType: 'apply' }),
+      });
+    } catch (error) {
+      console.error('Failed to track apply click:', error);
+    }
+
+    // Legacy increment for immediate UI feedback (these will be replaced by database counts)
     incrementJobSeekers();
     incrementApplicants();
 

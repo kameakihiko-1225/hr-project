@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 import { eq, and } from "drizzle-orm";
 import dotenv from "dotenv";
 import { 
-  users, companies, departments, positions, candidates, galleryItems, industryTags, companyIndustryTags,
+  users, companies, departments, positions, candidates, galleryItems, industryTags, companyIndustryTags, positionClicks,
   type User, type InsertUser,
   type Company, type InsertCompany,
   type Department, type InsertDepartment,
@@ -11,7 +11,8 @@ import {
   type Candidate, type InsertCandidate,
   type GalleryItem, type InsertGalleryItem,
   type IndustryTag, type InsertIndustryTag,
-  type CompanyIndustryTag, type InsertCompanyIndustryTag
+  type CompanyIndustryTag, type InsertCompanyIndustryTag,
+  type PositionClick, type InsertPositionClick
 } from "@shared/schema";
 
 // Load environment variables
@@ -85,6 +86,11 @@ export interface IStorage {
   addCompanyIndustryTag(companyId: number, industryTagId: number): Promise<void>;
   removeCompanyIndustryTag(companyId: number, industryTagId: number): Promise<void>;
   setCompanyIndustryTags(companyId: number, industryTagIds: number[]): Promise<void>;
+
+  // Position click tracking methods
+  trackPositionClick(positionId: number, clickType: 'view' | 'apply', ipAddress?: string, userAgent?: string): Promise<PositionClick>;
+  getPositionClickStats(positionId?: number): Promise<{ positionId: number; viewCount: number; applyCount: number; }[]>;
+  getDashboardStats(): Promise<{ totalViews: number; totalApplies: number; }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -437,6 +443,81 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error setting company industry tags:', error);
       throw error;
+    }
+  }
+
+  // Position click tracking methods
+  async trackPositionClick(positionId: number, clickType: 'view' | 'apply', ipAddress?: string, userAgent?: string): Promise<PositionClick> {
+    try {
+      const [click] = await db.insert(positionClicks).values({
+        positionId,
+        clickType,
+        ipAddress,
+        userAgent,
+      }).returning();
+      
+      return click;
+    } catch (error) {
+      console.error('Error tracking position click:', error);
+      throw error;
+    }
+  }
+
+  async getPositionClickStats(positionId?: number): Promise<{ positionId: number; viewCount: number; applyCount: number; }[]> {
+    try {
+      const query = db
+        .select({
+          positionId: positionClicks.positionId,
+          clickType: positionClicks.clickType,
+        })
+        .from(positionClicks);
+
+      const results = positionId 
+        ? await query.where(eq(positionClicks.positionId, positionId))
+        : await query;
+
+      // Group by position and count clicks
+      const stats = results.reduce((acc, row) => {
+        const pos = row.positionId;
+        if (!acc[pos]) {
+          acc[pos] = { positionId: pos, viewCount: 0, applyCount: 0 };
+        }
+        if (row.clickType === 'view') {
+          acc[pos].viewCount++;
+        } else if (row.clickType === 'apply') {
+          acc[pos].applyCount++;
+        }
+        return acc;
+      }, {} as Record<number, { positionId: number; viewCount: number; applyCount: number; }>);
+
+      return Object.values(stats);
+    } catch (error) {
+      console.error('Error getting position click stats:', error);
+      return [];
+    }
+  }
+
+  async getDashboardStats(): Promise<{ totalViews: number; totalApplies: number; }> {
+    try {
+      const results = await db
+        .select({
+          clickType: positionClicks.clickType,
+        })
+        .from(positionClicks);
+
+      const stats = results.reduce((acc, row) => {
+        if (row.clickType === 'view') {
+          acc.totalViews++;
+        } else if (row.clickType === 'apply') {
+          acc.totalApplies++;
+        }
+        return acc;
+      }, { totalViews: 0, totalApplies: 0 });
+
+      return stats;
+    } catch (error) {
+      console.error('Error getting dashboard stats:', error);
+      return { totalViews: 0, totalApplies: 0 };
     }
   }
 }

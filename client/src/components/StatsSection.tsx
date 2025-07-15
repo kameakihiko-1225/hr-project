@@ -25,21 +25,30 @@ export const StatsSection = () => {
     { icon: Award, number: "24/7", label: "Apply Anytime", description: "Always available", color: "from-purple-500 to-purple-600" },
   ]);
 
-  // Load live stats
+  // Load live stats from database
   useEffect(() => {
     const loadStats = async () => {
       try {
+        // Load basic entity counts
         const res = await fetch(`${API_BASE_URL}/dashboard/stats`);
         if (!res.ok) return;
         const data = await res.json();
+        
+        // Load position click stats
+        const clickRes = await fetch(`${API_BASE_URL}/dashboard/click-stats`);
+        const clickData = clickRes.ok ? await clickRes.json() : null;
+        
         if (data.success && data.data) {
           const apiStats: StatsApi = data.data;
+          const clickStats = clickData?.success ? clickData.data : { totalViews: 0, totalApplies: 0 };
+          
           setStats(prev => prev.map(item => {
             switch (item.label) {
               case 'Companies':
                 return { ...item, number: apiStats.companies.toString() };
               case 'Job Seekers':
-                return { ...item, number: (apiStats.candidates + jobSeekers).toString() };
+                // Use database-tracked applies + legacy counter for transition period
+                return { ...item, number: (clickStats.totalApplies + applicants).toString() };
               case 'Open Positions':
                 return { ...item, number: apiStats.positions.toString() };
               default:

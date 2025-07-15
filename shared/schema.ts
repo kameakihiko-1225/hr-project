@@ -108,6 +108,16 @@ export const companyIndustryTags = pgTable("company_industry_tags", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Table to track position clicks for analytics
+export const positionClicks = pgTable("position_clicks", {
+  id: serial("id").primaryKey(),
+  positionId: integer("position_id").notNull().references(() => positions.id, { onDelete: "cascade" }),
+  clickType: text("click_type").notNull(), // 'view' or 'apply'
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow().notNull()
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -155,6 +165,11 @@ export const insertCompanyIndustryTagSchema = createInsertSchema(companyIndustry
   createdAt: true,
 });
 
+export const insertPositionClickSchema = createInsertSchema(positionClicks).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -182,3 +197,6 @@ export type IndustryTag = typeof industryTags.$inferSelect;
 
 export type InsertCompanyIndustryTag = z.infer<typeof insertCompanyIndustryTagSchema>;
 export type CompanyIndustryTag = typeof companyIndustryTags.$inferSelect;
+
+export type InsertPositionClick = z.infer<typeof insertPositionClickSchema>;
+export type PositionClick = typeof positionClicks.$inferSelect;

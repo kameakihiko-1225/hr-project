@@ -12,7 +12,8 @@ import {
   User,
   CheckCircle2,
   AlertCircle,
-  Image
+  Image,
+  TrendingUp
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: "Companies", href: "/admin/companies", icon: Building2 },
     { name: "Departments", href: "/admin/departments", icon: LayoutList },
     { name: "Positions", href: "/admin/positions", icon: Briefcase },
+    { name: "Analytics", href: "/admin/analytics", icon: TrendingUp },
     { name: "Blog", href: "/admin/blog", icon: Image },
 
     { name: "Admin Users", href: "/admin/admins", icon: Users },

@@ -917,6 +917,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Position click tracking endpoints
+  app.post("/api/positions/:id/track-click", async (req, res) => {
+    try {
+      const positionId = parseInt(req.params.id);
+      const { clickType } = req.body; // 'view' or 'apply'
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.headers['user-agent'];
+
+      if (!clickType || !['view', 'apply'].includes(clickType)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Invalid click type. Must be 'view' or 'apply'" 
+        });
+      }
+
+      const click = await storage.trackPositionClick(positionId, clickType, ipAddress, userAgent);
+      
+      res.json({ 
+        success: true, 
+        data: click,
+        message: `${clickType} tracked successfully` 
+      });
+    } catch (error) {
+      console.error('Error tracking position click:', error);
+      res.status(500).json({ success: false, error: "Failed to track position click" });
+    }
+  });
+
+  app.get("/api/positions/stats", async (req, res) => {
+    try {
+      const positionId = req.query.positionId ? parseInt(req.query.positionId as string) : undefined;
+      const stats = await storage.getPositionClickStats(positionId);
+      
+      res.json({ 
+        success: true, 
+        data: stats 
+      });
+    } catch (error) {
+      console.error('Error fetching position stats:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch position stats" });
+    }
+  });
+
+  app.get("/api/dashboard/click-stats", async (req, res) => {
+    try {
+      const stats = await storage.getDashboardStats();
+      
+      res.json({ 
+        success: true, 
+        data: stats 
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard click stats:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch dashboard click stats" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // Initialize gallery data on startup
