@@ -29,9 +29,10 @@ export const OpenPositions = ({
   const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // Use direct fetch to completely bypass all caching layers
+  // Use React Query with cache-busting but stable key
+  const [refreshKey, setRefreshKey] = useState(0);
   const { data: positionsResponse, isLoading } = useQuery({
-    queryKey: ['/api/positions', 'fresh', Date.now()], // Unique key to bypass all caches
+    queryKey: ['/api/positions', refreshKey], // Stable key that we can control
     queryFn: async () => {
       const response = await fetch(`/api/positions?_t=${Date.now()}`, {
         method: 'GET',
@@ -46,8 +47,7 @@ export const OpenPositions = ({
     },
     staleTime: 0,
     gcTime: 0, 
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   const allPositions = positionsResponse?.data || [];
@@ -63,6 +63,18 @@ export const OpenPositions = ({
       });
     }
   }, [allPositions]);
+
+  // Refresh positions when coming from admin panel
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'positions_updated') {
+        setRefreshKey(prev => prev + 1);
+        localStorage.removeItem('positions_updated');
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Set view mode based on mobile state
   useEffect(() => {
