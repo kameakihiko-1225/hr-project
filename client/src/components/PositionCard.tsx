@@ -24,7 +24,7 @@ interface PositionCardProps {
   showDepartment?: boolean;
 }
 
-export function PositionCard({ position, onEdit, onDelete, showDepartment = false }: PositionCardProps) {
+export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false }: PositionCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -34,26 +34,21 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
 
-  // Fetch company and department data
+  // Fetch company and department data with optimized caching
   const { data: companies } = useQuery({
     queryKey: ['/api/companies'],
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 30 * 60 * 1000, // 30 minutes - companies don't change often
+    gcTime: 60 * 60 * 1000, // 1 hour cache retention
   });
   
   const { data: departments } = useQuery({
     queryKey: ['/api/departments'],
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 30 * 60 * 1000, // 30 minutes - departments don't change often
+    gcTime: 60 * 60 * 1000, // 1 hour cache retention
   });
   
   const companyFromAPI = companies?.find(c => departments?.find(d => d.id === position.departmentId)?.companyId === c.id);
   const departmentFromAPI = departments?.find(d => d.id === position.departmentId);
-
-  // Debug logging
-  console.log('Companies:', companies);
-  console.log('Departments:', departments);
-  console.log('Position departmentId:', position.departmentId);
-  console.log('Company from API:', companyFromAPI);
-  console.log('Department from API:', departmentFromAPI);
 
   const handleEdit = () => {
     if (onEdit) {
@@ -122,6 +117,8 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
           src={companyLogoUrl} 
           alt={companyName} 
           className="object-contain object-center w-full h-full p-2"
+          loading="lazy"
+          decoding="async"
           onError={handleLogoError} 
         />
       ) : (
@@ -386,4 +383,4 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
       />
     </Card>
   );
-}
+});

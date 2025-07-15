@@ -68,9 +68,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Companies endpoints
+  // Companies endpoints with caching headers
   app.get("/api/companies", async (req, res) => {
     try {
+      // Set cache headers for better performance
+      res.set('Cache-Control', 'public, max-age=1800, s-maxage=3600'); // 30 min client, 1 hour CDN
+      res.set('ETag', `"companies-${Date.now()}"`);
+      
       const companies = await storage.getAllCompanies();
       res.json({ success: true, data: companies });
     } catch (error) {
@@ -421,6 +425,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Departments endpoints
   app.get("/api/departments", async (req, res) => {
     try {
+      // Set cache headers for better performance
+      res.set('Cache-Control', 'public, max-age=1800, s-maxage=3600'); // 30 min client, 1 hour CDN
+      res.set('ETag', `"departments-${Date.now()}"`);
+      
       const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
       const departments = await storage.getAllDepartments(companyId);
       res.json({ success: true, data: departments });
@@ -498,9 +506,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Positions endpoints
+  // Positions endpoints with caching headers
   app.get("/api/positions", async (req, res) => {
     try {
+      // Set cache headers for better performance
+      res.set('Cache-Control', 'public, max-age=900, s-maxage=1800'); // 15 min client, 30 min CDN (positions change more frequently)
+      res.set('ETag', `"positions-${Date.now()}"`);
+      
       const departmentId = req.query.departmentId ? parseInt(req.query.departmentId as string) : undefined;
       const positions = await storage.getAllPositions(departmentId);
       res.json({ success: true, data: positions });

@@ -49,51 +49,45 @@ export default function PositionsPage() {
     'Temporary'
   ];
 
-  // Load positions and departments
+  // Load positions and departments with optimized parallel loading
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Fetch departments first
-        try {
-          const departmentsData = await getDepartments();
-          // Ensure departments is an array
-          if (departmentsData && Array.isArray(departmentsData)) {
-            setDepartments(departmentsData);
-          } else {
-            console.error('Departments data is not an array:', departmentsData);
-            setDepartments([]); // Set empty array as fallback
-            toast({
-              title: 'Warning',
-              description: 'Failed to load departments. Some features may be limited.',
-              variant: 'destructive'
-            });
-          }
-        } catch (error) {
-          console.error('Error fetching departments:', error);
-          setDepartments([]); // Set empty array as fallback
-          toast({
-            title: 'Warning',
-            description: 'Failed to load departments. Some features may be limited.',
-            variant: 'destructive'
-          });
+        // Fetch departments and positions in parallel for better performance
+        const [departmentsData, positionsData] = await Promise.allSettled([
+          getDepartments(),
+          getPositions(selectedDepartmentId !== 'all' ? selectedDepartmentId : undefined)
+        ]);
+
+        // Handle departments
+        if (departmentsData.status === 'fulfilled' && departmentsData.value && Array.isArray(departmentsData.value)) {
+          setDepartments(departmentsData.value);
+        } else {
+          console.error('Failed to load departments:', departmentsData.status === 'rejected' ? departmentsData.reason : 'Invalid data');
+          setDepartments([]);
         }
 
-        // Then fetch positions, filtered by department if selected
-        try {
-          const positionsData = await getPositions(selectedDepartmentId !== 'all' ? selectedDepartmentId : undefined);
-          setPositions(Array.isArray(positionsData) ? positionsData : []);
-        } catch (error) {
-          console.error('Error fetching positions:', error);
+        // Handle positions
+        if (positionsData.status === 'fulfilled' && positionsData.value && Array.isArray(positionsData.value)) {
+          setPositions(positionsData.value);
+        } else {
+          console.error('Failed to load positions:', positionsData.status === 'rejected' ? positionsData.reason : 'Invalid data');
           setPositions([]);
+        }
+        
+        // Only show error toast if both requests failed
+        if (departmentsData.status === 'rejected' && positionsData.status === 'rejected') {
           toast({
             title: 'Error',
-            description: 'Failed to load positions. Please try again.',
+            description: 'Failed to load data. Please try again.',
             variant: 'destructive'
           });
         }
       } catch (error) {
         console.error('Error fetching data:', error);
+        setDepartments([]);
+        setPositions([]);
         toast({
           title: 'Error',
           description: 'Failed to load data. Please try again.',

@@ -22,7 +22,7 @@ interface AdminPositionCardProps {
   showDepartment?: boolean;
 }
 
-export function AdminPositionCard({ position, onEdit, onDelete, showDepartment = false }: AdminPositionCardProps) {
+export const AdminPositionCard = React.memo(function AdminPositionCard({ position, onEdit, onDelete, showDepartment = false }: AdminPositionCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -31,14 +31,18 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
   const [companies, setCompanies] = useState<Company[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
 
-  // Fetch company and department data using direct API calls (same as admin pages)
+  // Fetch company and department data using direct API calls with caching
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchData = async () => {
       try {
         const [companiesData, departmentsData] = await Promise.all([
           getCompanies(),
           getDepartments()
         ]);
+        
+        if (!isMounted) return;
         
         // Extract data properly - companies returns API wrapper, departments returns direct array
         const companiesArray = companiesData?.data || companiesData || [];
@@ -47,6 +51,7 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
         setCompanies(companiesArray);
         setDepartments(departmentsArray);
       } catch (error) {
+        if (!isMounted) return;
         console.error('Error fetching data for AdminPositionCard:', error);
         setCompanies([]);
         setDepartments([]);
@@ -54,6 +59,10 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
     };
 
     fetchData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
   
   const departmentFromAPI = departments?.find(d => d.id === position.departmentId);
@@ -116,6 +125,8 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
           src={inheritedData.logoUrl} 
           alt={inheritedData.companyName} 
           className="object-contain object-center w-full h-full p-2"
+          loading="lazy"
+          decoding="async"
           onError={handleLogoError} 
         />
       ) : (
@@ -342,4 +353,4 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
       />
     </Card>
   );
-}
+});
