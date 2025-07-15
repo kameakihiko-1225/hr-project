@@ -48,6 +48,7 @@ export const Header = () => {
   const menuItems = [
     { key: 'home', href: '/', action: () => scrollToSection('hero-section'), icon: Home },
     { key: 'gallery', href: '/gallery', action: null, icon: Images },
+    { key: 'contact', href: null, action: () => scrollToSection('contact'), icon: Phone },
   ];
 
   return (
@@ -92,7 +93,7 @@ export const Header = () => {
             {/* Contact button */}
             <Button 
               variant="ghost" 
-              onClick={() => scrollToSection("footer")}
+              onClick={() => scrollToSection("contact")}
               className="text-gray-700 hover:text-blue-600 hover:bg-transparent px-3 py-2 text-sm font-medium transition-colors"
             >
               {t('contact')}
@@ -113,7 +114,7 @@ export const Header = () => {
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={() => scrollToSection("footer")}
+              onClick={() => scrollToSection("contact")}
               className="rounded-full h-9 w-9 text-gray-700 hover:text-blue-600 hover:bg-transparent"
               aria-label="Contact"
             >

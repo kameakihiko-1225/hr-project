@@ -19,7 +19,7 @@ export async function initializeGalleryData() {
         title: 'Team Collaboration Session',
         description: 'Our development team working together on innovative educational solutions, showcasing our collaborative approach to building the future of education.',
         category: 'teamwork',
-        imageUrl: '/attached_assets/khan academy_1752572141948.png',
+        imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80',
         tags: ['collaboration', 'development', 'innovation'],
         isActive: true,
         sortOrder: 1
@@ -28,7 +28,7 @@ export async function initializeGalleryData() {
         title: 'Leadership Excellence',
         description: 'Meet our founder and CEO, driving the vision of transforming education across Uzbekistan with cutting-edge technology and passionate leadership.',
         category: 'culture',
-        imageUrl: '/attached_assets/Umidjon_aka-removebg-preview_1752578772239.png',
+        imageUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80',
         tags: ['leadership', 'vision', 'education'],
         isActive: true,
         sortOrder: 2
@@ -37,7 +37,7 @@ export async function initializeGalleryData() {
         title: 'Educational Innovation Hub',
         description: 'Our modern workspace where creativity meets technology, fostering an environment of continuous learning and educational excellence.',
         category: 'workspace',
-        imageUrl: '/attached_assets/Umidjon aka_1752577894019.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
         tags: ['innovation', 'workspace', 'technology'],
         isActive: true,
         sortOrder: 3
@@ -46,7 +46,7 @@ export async function initializeGalleryData() {
         title: 'Team Building Excellence',
         description: 'Celebrating our diverse team of educators, developers, and innovators who work together to create exceptional learning experiences.',
         category: 'culture',
-        imageUrl: '/attached_assets/khan academy_1752572141948.png',
+        imageUrl: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
         tags: ['team', 'diversity', 'culture'],
         isActive: true,
         sortOrder: 4
@@ -55,7 +55,7 @@ export async function initializeGalleryData() {
         title: 'Product Development Workshop',
         description: 'Behind-the-scenes look at our product development process, where we design and build educational tools that make learning engaging and effective.',
         category: 'teamwork',
-        imageUrl: '/attached_assets/Umidjon aka_1752577894019.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
         tags: ['product', 'development', 'education'],
         isActive: true,
         sortOrder: 5
@@ -64,7 +64,7 @@ export async function initializeGalleryData() {
         title: 'Innovation Awards Ceremony',
         description: 'Celebrating our achievements in educational technology and recognizing the outstanding contributions of our team members.',
         category: 'events',
-        imageUrl: '/attached_assets/Umidjon_aka-removebg-preview_1752578772239.png',
+        imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
         tags: ['awards', 'recognition', 'achievement'],
         isActive: true,
         sortOrder: 6
