@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Heart, Award, Coffee, Lightbulb, Target, Images, Loader2 } from "lucide-react";
+import { Users, Heart, Award, Coffee, Lightbulb, Target, Images, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { type GalleryItem } from "@shared/schema";
 
 const categoryIcons = {
@@ -28,6 +28,8 @@ export default function Gallery() {
   const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   // Fetch gallery items from API
   const { data: galleryResponse, isLoading, error } = useQuery({
@@ -50,6 +52,16 @@ export default function Gallery() {
   const filteredItems = selectedCategory === 'all' 
     ? galleryItems 
     : galleryItems.filter(item => item.category === selectedCategory);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = filteredItems.slice(startIndex, startIndex + itemsPerPage);
+
+  // Reset to page 1 when category changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
 
   if (isLoading) {
     return (
@@ -125,8 +137,9 @@ export default function Gallery() {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {filteredItems.map((item, index) => {
+                  <>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {paginatedItems.map((item, index) => {
                       const Icon = categoryIcons[item.category as keyof typeof categoryIcons] || Target;
                       return (
                         <Card 
@@ -161,18 +174,53 @@ export default function Gallery() {
                             <p className="text-gray-600 mb-4 line-clamp-3">
                               {item.description}
                             </p>
-                            <div className="flex flex-wrap gap-2">
-                              {item.tags && item.tags.slice(0, 3).map((tag, tagIndex) => (
-                                <Badge key={tagIndex} variant="outline" className="text-xs">
-                                  {tag}
-                                </Badge>
-                              ))}
-                            </div>
                           </CardContent>
                         </Card>
                       );
-                    })}
-                  </div>
+                      })}
+                    </div>
+                    
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-center space-x-2 mt-12">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                          disabled={currentPage === 1}
+                          className="flex items-center space-x-1"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                          <span>Previous</span>
+                        </Button>
+                        
+                        <div className="flex items-center space-x-1">
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <Button
+                              key={page}
+                              variant={currentPage === page ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(page)}
+                              className="min-w-[40px]"
+                            >
+                              {page}
+                            </Button>
+                          ))}
+                        </div>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                          disabled={currentPage === totalPages}
+                          className="flex items-center space-x-1"
+                        >
+                          <span>Next</span>
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </>
                 )}
               </TabsContent>
             </Tabs>
@@ -216,15 +264,6 @@ export default function Gallery() {
               </div>
               <h2 className="text-2xl font-bold mb-3">{selectedImage.title}</h2>
               <p className="text-gray-600 mb-4">{selectedImage.description}</p>
-              {selectedImage.tags && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedImage.tags.map((tag, index) => (
-                    <Badge key={index} variant="outline">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </div>
