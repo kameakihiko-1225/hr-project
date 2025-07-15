@@ -108,10 +108,10 @@ export const Footer = () => {
                 Home
               </a>
               <a
-                href="/gallery"
+                href="/blog"
                 className="block text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors"
               >
-                Gallery
+                Blog
               </a>
               <a
                 href="#contact"

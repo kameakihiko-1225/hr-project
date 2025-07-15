@@ -47,7 +47,7 @@ export const Header = () => {
 
   const menuItems = [
     { key: 'home', href: '/', action: () => scrollToSection('hero-section'), icon: Home },
-    { key: 'gallery', href: '/gallery', action: null, icon: Images },
+    { key: 'blog', href: '/blog', action: null, icon: Images },
     { key: 'contact', href: null, action: () => scrollToSection('contact'), icon: Phone },
   ];
 

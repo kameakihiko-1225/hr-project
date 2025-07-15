@@ -137,6 +137,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 15, 2025 - Gallery to Blog Renaming & Modal Debugging
+- **Gallery to Blog Conversion**: Renamed all "Gallery" references to "Blog" throughout the application including file names, routes, components, and UI text
+- **File Renaming**: Moved Gallery.tsx to Blog.tsx and AdminGallery.tsx to AdminBlog.tsx with updated component names and imports
+- **Route Updates**: Changed /gallery route to /blog, /admin/gallery to /admin/blog in App.tsx, Header.tsx, and Footer.tsx
+- **Modal Button Functionality**: Fixed position card Company and Department info buttons - they now trigger modal state correctly
+- **Search Params Fix**: Resolved admin positions page error by removing undefined setSearchParams usage
+- **Admin Interface**: Updated all admin blog interface text from "Gallery" to "Blog" while maintaining backend API compatibility
+- **Content Updates**: Changed blog page description to focus on "stories and insights" rather than visual journey
+
 ### July 15, 2025 - PostgreSQL File Storage Implementation
 - **File Storage System**: Implemented comprehensive PostgreSQL-based file storage using multer middleware
 - **File Upload Endpoints**: Created `/api/upload` for general file uploads and `/api/companies/:id/logo` for company-specific uploads

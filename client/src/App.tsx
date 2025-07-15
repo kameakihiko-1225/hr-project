@@ -7,7 +7,7 @@ import { AuthProvider } from "@/lib/authContext";
 import { ClickCounterProvider } from "@/contexts/ClickCounterContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
-import Gallery from "./pages/Gallery";
+import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 
 
@@ -17,7 +17,7 @@ import AdminDashboard from "./pages/admin/dashboard/index";
 import AdminCompanies from "./pages/admin/companies/index";
 import AdminDepartments from "./pages/admin/departments/index";
 import AdminPositions from "./pages/admin/positions/index";
-import AdminGallery from "./pages/AdminGallery";
+import AdminBlog from "./pages/AdminBlog";
 
 
 
@@ -33,7 +33,7 @@ const App = () => (
           <Router>
           <Switch>
             <Route path="/" component={Index} />
-            <Route path="/gallery" component={Gallery} />
+            <Route path="/blog" component={Blog} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" component={AdminLogin} />
@@ -59,9 +59,9 @@ const App = () => (
                 <AdminPositions />
               </ProtectedRoute>
             </Route>
-            <Route path="/admin/gallery">
+            <Route path="/admin/blog">
               <ProtectedRoute>
-                <AdminGallery />
+                <AdminBlog />
               </ProtectedRoute>
             </Route>
             

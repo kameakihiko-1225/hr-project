@@ -107,14 +107,14 @@ export default function PositionsPage() {
     fetchData();
   }, [selectedDepartmentId, toast]);
 
-  // Update URL when department filter changes
-  useEffect(() => {
-    if (selectedDepartmentId && selectedDepartmentId !== 'all') {
-      setSearchParams({ departmentId: selectedDepartmentId });
-    } else {
-      setSearchParams({});
-    }
-  }, [selectedDepartmentId, setSearchParams]);
+  // Update URL when department filter changes (commented out - no longer needed)
+  // useEffect(() => {
+  //   if (selectedDepartmentId && selectedDepartmentId !== 'all') {
+  //     setSearchParams({ departmentId: selectedDepartmentId });
+  //   } else {
+  //     setSearchParams({});
+  //   }
+  // }, [selectedDepartmentId, setSearchParams]);
 
   // Add debug logs for data flow
   console.log('[PositionsPage] positions:', positions);

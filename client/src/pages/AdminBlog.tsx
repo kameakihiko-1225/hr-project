@@ -21,34 +21,34 @@ const categories = [
   { value: 'events', label: 'Events' }
 ];
 
-export default function AdminGallery() {
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+export default function AdminBlog() {
+  const [blogItems, setBlogItems] = useState<GalleryItem[]>([]);
   const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // Fetch gallery items
+  // Fetch blog items
   useEffect(() => {
-    const fetchGalleryItems = async () => {
+    const fetchBlogItems = async () => {
       try {
         setIsLoading(true);
         const response = await fetch('/api/gallery');
         const data = await response.json();
         
         if (data.success) {
-          setGalleryItems(data.data);
+          setBlogItems(data.data);
         } else {
           toast({
             title: "Error",
-            description: "Failed to fetch gallery items",
+            description: "Failed to fetch blog items",
             variant: "destructive"
           });
         }
       } catch (error) {
         toast({
           title: "Error",
-          description: "Failed to fetch gallery items",
+          description: "Failed to fetch blog items",
           variant: "destructive"
         });
       } finally {
@@ -56,10 +56,10 @@ export default function AdminGallery() {
       }
     };
 
-    fetchGalleryItems();
+    fetchBlogItems();
   }, [toast]);
 
-  const createGalleryItem = async (data: InsertGalleryItem, file?: File) => {
+  const createBlogItem = async (data: InsertGalleryItem, file?: File) => {
     try {
       const formData = new FormData();
       
@@ -85,23 +85,23 @@ export default function AdminGallery() {
 
       const result = await response.json();
       if (result.success) {
-        setGalleryItems([...galleryItems, result.data]);
+        setBlogItems([...blogItems, result.data]);
         setIsDialogOpen(false);
         toast({
           title: "Success",
-          description: "Gallery item created successfully"
+          description: "Blog item created successfully"
         });
       } else {
         toast({
           title: "Error",
-          description: result.error || "Failed to create gallery item",
+          description: result.error || "Failed to create blog item",
           variant: "destructive"
         });
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to create gallery item",
+        description: "Failed to create blog item",
         variant: "destructive"
       });
     }
@@ -199,12 +199,12 @@ export default function AdminGallery() {
 
       const result = await response.json();
       if (result.success) {
-        setGalleryItems(galleryItems.map(item => 
+        setBlogItems(blogItems.map(item => 
           item.id === id ? { ...item, isActive: !isActive } : item
         ));
         toast({
           title: "Success",
-          description: "Gallery item visibility updated"
+          description: "Blog item visibility updated"
         });
       } else {
         toast({
@@ -309,16 +309,16 @@ export default function AdminGallery() {
                 }}
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Add Gallery Item
+                Add Blog Item
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>
-                  {editingItem ? 'Edit Gallery Item' : 'Add Gallery Item'}
+                  {editingItem ? 'Edit Blog Item' : 'Add Blog Item'}
                 </DialogTitle>
                 <DialogDescription>
-                  {editingItem ? 'Update the gallery item details' : 'Create a new gallery item to showcase team culture'}
+                  {editingItem ? 'Update the blog item details' : 'Create a new blog item to showcase team culture'}
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
@@ -330,7 +330,7 @@ export default function AdminGallery() {
                       <FormItem>
                         <FormLabel>Title</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter gallery item title" />
+                          <Input {...field} placeholder="Enter blog item title" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -343,7 +343,7 @@ export default function AdminGallery() {
                       <FormItem>
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                          <Textarea {...field} placeholder="Enter gallery item description" />
+                          <Textarea {...field} placeholder="Enter blog item description" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -24,20 +24,20 @@ const categoryColors = {
   events: "bg-purple-100 text-purple-700 border-purple-200"
 };
 
-export default function Gallery() {
+export default function Blog() {
   const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Fetch gallery items from API
-  const { data: galleryResponse, isLoading, error } = useQuery({
-    queryKey: ['gallery'],
+  // Fetch blog items from API
+  const { data: blogResponse, isLoading, error } = useQuery({
+    queryKey: ['blog'],
     queryFn: () => fetch('/api/gallery').then(res => res.json()),
   });
 
-  const galleryItems: GalleryItem[] = galleryResponse?.data || [];
+  const blogItems: GalleryItem[] = blogResponse?.data || [];
 
 
 
@@ -50,8 +50,8 @@ export default function Gallery() {
   ];
 
   const filteredItems = selectedCategory === 'all' 
-    ? galleryItems 
-    : galleryItems.filter(item => item.category === selectedCategory);
+    ? blogItems 
+    : blogItems.filter(item => item.category === selectedCategory);
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
@@ -70,7 +70,7 @@ export default function Gallery() {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-            <p className="text-gray-600">Loading gallery...</p>
+            <p className="text-gray-600">Loading blog...</p>
           </div>
         </div>
         <Footer />
@@ -92,10 +92,10 @@ export default function Gallery() {
               </div>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Our Gallery
+              Our Blog
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover the heart of Millat Umidi Group through our visual journey. See how our team collaborates, 
+              Discover the heart of Millat Umidi Group through our stories and insights. Read about how our team collaborates, 
               innovates, and creates exceptional educational experiences together.
             </p>
           </div>
