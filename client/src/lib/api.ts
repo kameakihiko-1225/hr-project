@@ -494,7 +494,7 @@ class ApiClient {
           logger.warn(`API error: ${responseData.error || response.statusText}`);
           
           // Check if we should use mock data
-          if (isBrowser && (response.status === 404 || response.status === 401 || options.useMockData)) {
+          if (isBrowser && !endpoint.includes("/auth/") && (response.status === 404 || response.status === 401 || options.useMockData)) {
             const mockResponse = this.getMockResponse(endpoint);
             if (mockResponse) {
               logger.info(`Using mock data for ${endpoint}`);
@@ -518,7 +518,7 @@ class ApiClient {
         logger.warn(`API error: ${response.statusText}`);
         
         // Check if we should use mock data
-        if (isBrowser && (response.status === 404 || response.status === 401 || options.useMockData)) {
+        if (isBrowser && !endpoint.includes("/auth/") && (response.status === 404 || response.status === 401 || options.useMockData)) {
           const mockResponse = this.getMockResponse(endpoint);
           if (mockResponse) {
             logger.info(`Using mock data for ${endpoint}`);

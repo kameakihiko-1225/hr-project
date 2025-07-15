@@ -10,6 +10,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
+      console.log('Login attempt:', { email, password: password ? '[HIDDEN]' : 'undefined' });
+      
       if (!email || !password) {
         return res.status(400).json({ 
           success: false, 
@@ -20,6 +22,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get user from database
       const user = await storage.getUserByUsername(email);
       
+      console.log('User found:', user ? { id: user.id, username: user.username } : 'null');
+      
       if (!user) {
         return res.status(401).json({ 
           success: false, 
@@ -28,7 +32,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check password
+      console.log('Comparing password with hash...');
       const passwordValid = await bcrypt.compare(password, user.password);
+      
+      console.log('Password valid:', passwordValid);
       
       if (!passwordValid) {
         return res.status(401).json({ 
