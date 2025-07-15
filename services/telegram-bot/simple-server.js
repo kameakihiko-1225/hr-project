@@ -161,7 +161,7 @@ app.post('/webhook', async (req, res) => {
     console.log(`[TELEGRAM-BOT] Full name: "${fullName}", phone_raw: "${phoneRaw}", normalized_phone: "${phone}", age: "${ageRaw}"`);
     const contactFields = {
       NAME: fullName || 'Unknown',
-      PHONE: phone ? [{ VALUE: phone, VALUE_TYPE: 'WORK' }] : [],
+      PHONE: phone ? [{ VALUE: `+${phone}`, VALUE_TYPE: 'WORK' }] : [],
       UF_CRM_1752239621: data.position_uz, // position
       UF_CRM_1752239635: data.city_uzbek,  // city
       UF_CRM_1752239653: data.degree,      // degree
@@ -239,6 +239,7 @@ app.post('/webhook', async (req, res) => {
     contactForm.append('params[REGISTER_SONET_EVENT]', 'Y');
     // Log outgoing FormData fields
     console.log('[TELEGRAM-BOT] Contact FormData fields:', Object.keys(contactFields));
+    console.log('[TELEGRAM-BOT] PHONE field value:', JSON.stringify(contactFields.PHONE));
     
     // Check duplicate by phone and update if exists
     let contactId;
