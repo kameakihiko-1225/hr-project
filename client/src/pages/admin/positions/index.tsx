@@ -12,10 +12,12 @@ import { createPosition, deletePosition, getPositions, getDepartments, updatePos
 import { Position } from '../../../types/position';
 import { Department } from '../../../types/department';
 import { Loader2, Plus, Briefcase, Search } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function PositionsPage() {
   const [location] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const [positions, setPositions] = useState<Position[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -220,6 +222,9 @@ export default function PositionsPage() {
       setPositions(prev => 
         prev.map(pos => pos.id === currentPosition.id ? updatedPosition : pos)
       );
+      
+      // Invalidate React Query cache for positions to refresh data on all pages
+      queryClient.invalidateQueries({ queryKey: ['/api/positions'] });
       
       setIsEditDialogOpen(false);
       resetForm();
