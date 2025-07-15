@@ -76,28 +76,23 @@ export const HeroSection = () => {
         <div className="flex flex-col items-center text-center">
           {/* Content */}
           <div className="animate-fade-in max-w-4xl">
-            <div className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-4">
-              <Briefcase className="h-4 w-4 mr-1.5" />
-              {t('hero_badge')}
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-              {t('hero_title_start')}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Millat Umidi
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 block">
-                {t('hero_title_highlight')}
+                HR Platform
               </span>
             </h1>
             
-            <p className="text-lg text-gray-600 mb-6 leading-relaxed max-w-lg">
-              {t('hero_subtitle')}
+            <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed max-w-4xl mx-auto">
+              Millat Umidi is one of the biggest educational holdings in Uzbekistan. Our projects: Millat Umidi University, Millat Umidi School, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex justify-center mb-8">
               <button 
                 onClick={() => scrollToSection("filter-section")}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600/90 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center group shadow-md"
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600/90 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center group shadow-lg text-lg"
               >
-                {t('hero_cta')}
+                See Open Roles
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
