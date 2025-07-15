@@ -81,6 +81,25 @@ export const galleryItems = pgTable("gallery_items", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const fileAttachments = pgTable("file_attachments", {
+  id: serial("id").primaryKey(),
+  entityType: text("entity_type").notNull(), // 'company', 'gallery_item', etc.
+  entityId: text("entity_id").notNull(),
+  filename: text("filename").notNull(),
+  originalName: text("original_name").notNull(),
+  filepath: text("filepath").notNull(),
+  mimetype: text("mimetype").notNull(),
+  size: integer("size").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const industryTags = pgTable("industry_tags", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -113,6 +132,16 @@ export const insertGalleryItemSchema = createInsertSchema(galleryItems).omit({
   updatedAt: true,
 });
 
+export const insertFileAttachmentSchema = createInsertSchema(fileAttachments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertIndustryTagSchema = createInsertSchema(industryTags).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -131,3 +160,9 @@ export type Candidate = typeof candidates.$inferSelect;
 
 export type InsertGalleryItem = z.infer<typeof insertGalleryItemSchema>;
 export type GalleryItem = typeof galleryItems.$inferSelect;
+
+export type InsertFileAttachment = z.infer<typeof insertFileAttachmentSchema>;
+export type FileAttachment = typeof fileAttachments.$inferSelect;
+
+export type InsertIndustryTag = z.infer<typeof insertIndustryTagSchema>;
+export type IndustryTag = typeof industryTags.$inferSelect;

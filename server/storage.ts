@@ -3,13 +3,14 @@ import { neon } from "@neondatabase/serverless";
 import { eq, and } from "drizzle-orm";
 import dotenv from "dotenv";
 import { 
-  users, companies, departments, positions, candidates, galleryItems,
+  users, companies, departments, positions, candidates, galleryItems, industryTags,
   type User, type InsertUser,
   type Company, type InsertCompany,
   type Department, type InsertDepartment,
   type Position, type InsertPosition,
   type Candidate, type InsertCandidate,
-  type GalleryItem, type InsertGalleryItem
+  type GalleryItem, type InsertGalleryItem,
+  type IndustryTag, type InsertIndustryTag
 } from "@shared/schema";
 
 // Load environment variables
@@ -65,6 +66,13 @@ export interface IStorage {
   createGalleryItem(galleryItem: InsertGalleryItem): Promise<GalleryItem>;
   updateGalleryItem(id: number, galleryItem: Partial<InsertGalleryItem>): Promise<GalleryItem | undefined>;
   deleteGalleryItem(id: number): Promise<boolean>;
+
+  // Industry tag methods
+  getAllIndustryTags(): Promise<IndustryTag[]>;
+  getIndustryTagById(id: number): Promise<IndustryTag | undefined>;
+  createIndustryTag(industryTag: InsertIndustryTag): Promise<IndustryTag>;
+  updateIndustryTag(id: number, industryTag: Partial<InsertIndustryTag>): Promise<IndustryTag | undefined>;
+  deleteIndustryTag(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -266,6 +274,56 @@ export class DatabaseStorage implements IStorage {
       return result.rowCount > 0;
     } catch (error) {
       console.error("Error deleting gallery item:", error);
+      return false;
+    }
+  }
+
+  // Industry tag methods
+  async getAllIndustryTags(): Promise<IndustryTag[]> {
+    try {
+      return await db.select().from(industryTags);
+    } catch (error) {
+      console.error('Error fetching industry tags:', error);
+      return [];
+    }
+  }
+
+  async getIndustryTagById(id: number): Promise<IndustryTag | undefined> {
+    try {
+      const [tag] = await db.select().from(industryTags).where(eq(industryTags.id, id));
+      return tag || undefined;
+    } catch (error) {
+      console.error('Error fetching industry tag:', error);
+      return undefined;
+    }
+  }
+
+  async createIndustryTag(industryTag: InsertIndustryTag): Promise<IndustryTag> {
+    try {
+      const [tag] = await db.insert(industryTags).values(industryTag).returning();
+      return tag;
+    } catch (error) {
+      console.error('Error creating industry tag:', error);
+      throw error;
+    }
+  }
+
+  async updateIndustryTag(id: number, industryTag: Partial<InsertIndustryTag>): Promise<IndustryTag | undefined> {
+    try {
+      const [tag] = await db.update(industryTags).set(industryTag).where(eq(industryTags.id, id)).returning();
+      return tag || undefined;
+    } catch (error) {
+      console.error('Error updating industry tag:', error);
+      return undefined;
+    }
+  }
+
+  async deleteIndustryTag(id: number): Promise<boolean> {
+    try {
+      await db.delete(industryTags).where(eq(industryTags.id, id));
+      return true;
+    } catch (error) {
+      console.error('Error deleting industry tag:', error);
       return false;
     }
   }

@@ -11,6 +11,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { createLogger } from '@/lib/logger';
 import { useClickCounter } from '@/contexts/ClickCounterContext';
+import { CompanyInfoModal } from './CompanyInfoModal';
+import { DepartmentInfoModal } from './DepartmentInfoModal';
+import { useQuery } from '@tanstack/react-query';
 
 const logger = createLogger('positionCard');
 
@@ -28,6 +31,22 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
   const { admin } = useAuth();
   const [isApplying, setIsApplying] = useState(false);
   const { incrementJobSeekers, incrementApplicants } = useClickCounter();
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+  const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
+
+  // Fetch company and department data
+  const { data: companies } = useQuery({
+    queryKey: ['/api/companies'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+  
+  const { data: departments } = useQuery({
+    queryKey: ['/api/departments'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+  
+  const companyFromAPI = companies?.find(c => departments?.find(d => d.id === position.departmentId)?.companyId === c.id);
+  const departmentFromAPI = departments?.find(d => d.id === position.departmentId);
 
   const handleEdit = () => {
     if (onEdit) {
@@ -156,19 +175,41 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
       <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
         <CompanyAvatar />
         <div className="flex-1">
-          <h3 className="font-semibold text-sm leading-tight text-foreground flex items-center gap-2">
-            {companyName}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-sm leading-tight text-foreground">
+              {companyName}
+            </h3>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-6 px-2 text-xs"
+              onClick={() => setIsCompanyModalOpen(true)}
+            >
+              <Building2 className="h-3 w-3 mr-1" />
+              Info
+            </Button>
+          </div>
           {showDepartment && Array.isArray(position.departments) && position.departments.length > 0 && (
-            <p className="text-xs text-muted-foreground line-clamp-1 flex items-center gap-1">
-              <Building2 className="h-3 w-3" />
-              {position.departments.map((dp, idx) => (
-                <span key={dp.department.id} className="flex items-center">
-                  {dp.department.name}
-                  {idx < position.departments.length - 1 && <span className="mx-1">|</span>}
-                </span>
-              ))}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-muted-foreground line-clamp-1 flex items-center gap-1">
+                <Building2 className="h-3 w-3" />
+                {position.departments.map((dp, idx) => (
+                  <span key={dp.department.id} className="flex items-center">
+                    {dp.department.name}
+                    {idx < position.departments.length - 1 && <span className="mx-1">|</span>}
+                  </span>
+                ))}
+              </p>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 px-2 text-xs"
+                onClick={() => setIsDepartmentModalOpen(true)}
+              >
+                <Briefcase className="h-3 w-3 mr-1" />
+                Info
+              </Button>
+            </div>
           )}
         </div>
       </CardHeader>
@@ -307,6 +348,21 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
           </Button>
         )}
       </CardFooter>
+      
+      {/* Company Info Modal */}
+      <CompanyInfoModal 
+        company={companyFromAPI || company}
+        isOpen={isCompanyModalOpen}
+        onClose={() => setIsCompanyModalOpen(false)}
+      />
+      
+      {/* Department Info Modal */}
+      <DepartmentInfoModal 
+        department={departmentFromAPI || (position.departments?.[0]?.department)}
+        company={companyFromAPI || company}
+        isOpen={isDepartmentModalOpen}
+        onClose={() => setIsDepartmentModalOpen(false)}
+      />
     </Card>
   );
 }
