@@ -29,11 +29,23 @@ export const OpenPositions = ({
   const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // Use React Query for positions with NO cache to ensure fresh data
+  // Use direct fetch to completely bypass all caching layers
   const { data: positionsResponse, isLoading } = useQuery({
-    queryKey: ['/api/positions'],
-    staleTime: 0, // No cache - always fetch fresh data 
-    gcTime: 0, // No garbage collection cache
+    queryKey: ['/api/positions', 'fresh', Date.now()], // Unique key to bypass all caches
+    queryFn: async () => {
+      const response = await fetch(`/api/positions?_t=${Date.now()}`, {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+        },
+        cache: 'no-cache', // Disable browser cache
+      });
+      if (!response.ok) throw new Error('Failed to fetch positions');
+      return response.json();
+    },
+    staleTime: 0,
+    gcTime: 0, 
     refetchOnMount: 'always',
     refetchOnWindowFocus: true,
   });
