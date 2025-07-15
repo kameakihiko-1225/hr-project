@@ -72,9 +72,10 @@ export const FounderSection = () => {
               <Button 
                 onClick={scrollToPositions}
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
               >
-                Explore Career Opportunities
+                <span className="hidden sm:inline">Explore Career Opportunities</span>
+                <span className="sm:hidden">Careers</span>
                 <svg 
                   className="ml-2 w-5 h-5" 
                   fill="none" 

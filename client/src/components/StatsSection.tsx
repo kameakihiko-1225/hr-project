@@ -72,7 +72,7 @@ export const StatsSection = () => {
   const renderCompactStat = (stat: any, index: number) => (
     <div 
       key={stat.label}
-      className="bg-white p-3 rounded-lg shadow border border-gray-100 flex items-center gap-3 hover:shadow-md transition-all duration-300"
+      className="bg-white p-3 rounded-lg shadow border border-gray-100 flex items-center gap-3 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       <div className={`flex-shrink-0 w-10 h-10 bg-gradient-to-r ${stat.color} rounded-lg flex items-center justify-center`}>
@@ -95,7 +95,7 @@ export const StatsSection = () => {
   const renderStatCard = (stat: any, index: number) => (
     <div 
       key={stat.label}
-      className="text-center bg-white p-6 rounded-xl shadow border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+      className="text-center bg-white p-6 rounded-xl shadow border border-gray-100 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
       style={{ animationDelay: `${index * 150}ms` }}
     >
       <div className={`w-14 h-14 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mx-auto mb-4`}>

@@ -157,10 +157,11 @@ export const FeaturesSection = () => {
         <div className="text-center mt-12">
           <div 
             onClick={() => scrollToSection("filter-section")}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-indigo-700 transition-colors cursor-pointer shadow-lg hover:shadow-xl"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 cursor-pointer shadow-lg"
           >
             <Bot className="h-5 w-5" />
-            Join us and grow!
+            <span className="hidden sm:inline">Join us and grow!</span>
+            <span className="sm:hidden">Join Us</span>
           </div>
         </div>
       </div>

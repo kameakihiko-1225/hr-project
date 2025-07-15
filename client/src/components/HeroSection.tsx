@@ -93,9 +93,10 @@ export const HeroSection = () => {
             <div className="flex justify-center mb-8">
               <button 
                 onClick={() => scrollToSection("filter-section")}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600/90 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center group shadow-lg text-lg"
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group shadow-lg text-lg"
               >
-                See Open Roles
+                <span className="hidden sm:inline">See Open Roles</span>
+                <span className="sm:hidden">Roles</span>
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>

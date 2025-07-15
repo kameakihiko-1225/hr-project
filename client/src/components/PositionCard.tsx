@@ -207,12 +207,10 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-border bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 ease-out h-[440px] w-full max-w-[480px] flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[480px] w-full max-w-[480px] flex flex-col"
     >
-      {/* glass reflection */}
-      <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      {/* gradient ring on hover */}
-      <span className="absolute inset-0 rounded-[inherit] bg-gradient-to-br from-blue-600/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+      {/* Hover effect overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
       {/* Edit / Delete buttons */}
       {(onEdit || onDelete) && (
@@ -305,32 +303,32 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button 
             variant="outline" 
             size="default" 
-            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ease-out"
+            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
             }}
           >
-            <Building2 className="h-4 w-4" />
-            Company
+            <Building2 className="h-4 w-4 sm:h-3 sm:w-3" />
+            <span className="hidden sm:inline">Company</span>
           </Button>
           <Button 
             variant="outline" 
             size="default" 
-            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ease-out"
+            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
             }}
           >
-            <Briefcase className="h-4 w-4" />
-            Department
+            <Briefcase className="h-4 w-4 sm:h-3 sm:w-3" />
+            <span className="hidden sm:inline">Department</span>
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="default" className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ease-out">
-                <ExternalLink className="h-4 w-4" />
-                Details
+              <Button variant="outline" size="default" className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300">
+                <ExternalLink className="h-4 w-4 sm:h-3 sm:w-3" />
+                <span className="hidden sm:inline">Details</span>
               </Button>
             </DialogTrigger>
           <DialogContent className="max-w-md">
@@ -413,17 +411,24 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         {position.applyLink ? (
           <button
             onClick={handleApply}
-            className="px-8 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-0.5 transition-all duration-300 ease-out flex items-center gap-2 w-full justify-center"
+            className="px-8 py-4 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 w-full justify-center"
           >
-            Apply Now <ExternalLink className="h-4 w-4" />
+            <span className="hidden sm:inline">Apply Now</span>
+            <span className="sm:hidden">Apply</span>
+            <ExternalLink className="h-4 w-4" />
           </button>
         ) : (
           <Button
             onClick={handleApply}
             disabled={isApplying}
-            className="px-8 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-0.5 transition-all duration-300 ease-out flex items-center gap-2 disabled:opacity-60 w-full justify-center"
+            className="px-8 py-4 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 w-full justify-center"
           >
-            {isApplying ? 'Generating…' : 'Apply Now'} <Send className="h-4 w-4" />
+            {isApplying ? 'Generating…' : (
+              <>
+                <span className="hidden sm:inline">Apply Now</span>
+                <span className="sm:hidden">Apply</span>
+              </>
+            )} <Send className="h-4 w-4" />
           </Button>
         )}
       </CardFooter>
