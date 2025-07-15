@@ -116,17 +116,16 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
 
   const CompanyAvatar = () => (
-    <Avatar className="h-10 w-10 ring-2 ring-offset-2 ring-offset-background ring-blue-500/40 group-hover:ring-blue-500/70 transition-shadow duration-300 shadow-lg group-hover:shadow-xl">
+    <Avatar className="h-16 w-16 border-2 border-white/20 shadow-lg">
       {companyLogoUrl && !logoError ? (
         <AvatarImage 
           src={companyLogoUrl} 
           alt={companyName} 
-          decoding="async" 
-          loading="lazy"
+          className="object-cover object-center rounded-full"
           onError={handleLogoError} 
         />
       ) : (
-        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold">
+        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-lg">
           {companyName.charAt(0)}
         </AvatarFallback>
       )}
@@ -140,7 +139,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-border bg-white/60 dark:bg-white/5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.3deg] focus:-translate-y-1 focus:rotate-[0.3deg] transition-transform duration-150 h-[380px] w-full flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-border bg-white/60 dark:bg-white/5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.3deg] focus:-translate-y-1 focus:rotate-[0.3deg] transition-transform duration-150 h-[420px] w-full flex flex-col"
     >
       {/* glass reflection */}
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -182,39 +181,9 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
       <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
         <CompanyAvatar />
         <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-sm leading-tight text-foreground">
-              {companyName}
-            </h3>
-            <div className="flex items-center gap-1">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 px-2 text-xs hover:bg-blue-100 dark:hover:bg-blue-900 border border-blue-200 dark:border-blue-800"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('Company button clicked', companyFromAPI || company);
-                  setIsCompanyModalOpen(true);
-                }}
-              >
-                <Building2 className="h-3 w-3 mr-1" />
-                Company
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 px-2 text-xs hover:bg-green-100 dark:hover:bg-green-900 border border-green-200 dark:border-green-800"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('Department button clicked', departmentFromAPI);
-                  setIsDepartmentModalOpen(true);
-                }}
-              >
-                <Briefcase className="h-3 w-3 mr-1" />
-                Dept
-              </Button>
-            </div>
-          </div>
+          <h3 className="font-semibold text-sm leading-tight text-foreground">
+            {companyName}
+          </h3>
           {showDepartment && Array.isArray(position.departments) && position.departments.length > 0 && (
             <p className="text-xs text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
               <Building2 className="h-3 w-3" />
@@ -264,10 +233,38 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
           <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
         )}
 
-        <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="sm" onClick={() => setIsDetailsDialogOpen(true)}>View Details</Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2 w-full">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-1 flex-1 max-w-[90px]"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsCompanyModalOpen(true);
+            }}
+          >
+            <Building2 className="h-3 w-3" />
+            Company
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-1 flex-1 max-w-[90px]"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDepartmentModalOpen(true);
+            }}
+          >
+            <Briefcase className="h-3 w-3" />
+            Dept
+          </Button>
+          <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="flex items-center gap-1 flex-1 max-w-[90px]">
+                <ExternalLink className="h-3 w-3" />
+                Details
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>{position.title}</DialogTitle>
@@ -347,6 +344,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
 
         {position.applyLink ? (
           <button
