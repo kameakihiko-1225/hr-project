@@ -159,4 +159,35 @@ All colors MUST be HSL.
   .gradient-light-blue {
     background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
   }
+  
+  /* Custom beige neon effects */
+  .neon-beige {
+    box-shadow: 0 0 5px hsl(30, 23%, 62%), 0 0 10px hsl(30, 23%, 62%), 0 0 15px hsl(30, 23%, 62%);
+  }
+  
+  .neon-beige-text {
+    color: hsl(30, 23%, 62%);
+    text-shadow: 0 0 3px hsl(30, 23%, 62%), 0 0 6px hsl(30, 23%, 62%), 0 0 9px hsl(30, 23%, 62%);
+  }
+  
+  .hover-neon-beige:hover {
+    box-shadow: 0 0 8px hsl(30, 23%, 62%), 0 0 16px hsl(30, 23%, 62%), 0 0 24px hsl(30, 23%, 62%);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+  }
+  
+  .hover-neon-beige-text:hover {
+    color: hsl(30, 23%, 62%);
+    text-shadow: 0 0 5px hsl(30, 23%, 62%), 0 0 10px hsl(30, 23%, 62%), 0 0 15px hsl(30, 23%, 62%);
+    transition: all 0.3s ease;
+  }
+  
+  .beige-accent {
+    background: linear-gradient(135deg, hsl(30, 23%, 62%) 0%, hsl(30, 23%, 52%) 100%);
+  }
+  
+  .beige-glow {
+    background: hsl(30, 23%, 62%);
+    box-shadow: 0 0 20px hsl(30, 23%, 62%);
+  }
 }

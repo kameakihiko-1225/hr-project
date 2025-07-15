@@ -22,9 +22,8 @@ export const FounderSection = () => {
               <img
                 src={founderImage}
                 alt="Umidjon Ishmukhamedov"
-                className="w-80 h-80 lg:w-96 lg:h-96 object-cover rounded-2xl shadow-2xl border-4 border-white dark:border-gray-800"
+                className="w-80 h-80 lg:w-96 lg:h-96 object-cover object-top rounded-2xl shadow-2xl border-4 border-white dark:border-gray-800"
               />
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white dark:border-gray-800"></div>
             </div>
             
             <div className="text-center lg:text-left">
@@ -69,7 +68,7 @@ export const FounderSection = () => {
               <Button 
                 onClick={scrollToPositions}
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                className="beige-accent text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 hover-neon-beige"
               >
                 Explore Career Opportunities
                 <svg 
