@@ -92,14 +92,8 @@ export default function DepartmentsPage() {
     fetchData();
   }, [selectedCompanyId, toast]);
 
-  // Update URL when company filter changes
-  useEffect(() => {
-    if (selectedCompanyId && selectedCompanyId !== 'all') {
-      setSearchParams({ companyId: selectedCompanyId });
-    } else {
-      setSearchParams({});
-    }
-  }, [selectedCompanyId, setSearchParams]);
+  // Note: URL parameter updates removed to fix ReferenceError
+  // Company filter state is managed locally
 
   // Filter departments by search term and company
   const filteredDepartments = departments.filter(department => {
