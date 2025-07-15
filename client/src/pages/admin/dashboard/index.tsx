@@ -120,7 +120,7 @@ export default function Dashboard() {
         lastChecked: new Date().toISOString() 
       },
       database: { 
-        status: dbHealthData?.status === 'healthy' ? 'connected' : 'disconnected', 
+        status: dbHealthData?.status === 'connected' ? 'connected' : 'disconnected', 
         lastChecked: new Date().toISOString() 
       }
     }));
