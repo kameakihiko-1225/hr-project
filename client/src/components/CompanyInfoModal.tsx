@@ -27,7 +27,7 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
               <img 
                 src={company.logoUrl} 
                 alt={`${company.name} logo`}
-                className="h-12 w-12 rounded-lg object-cover"
+                className="h-12 w-12 rounded-lg object-contain p-1 border"
               />
             )}
             <div>
@@ -62,17 +62,13 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
 
           {/* Contact Information */}
           <div className="grid grid-cols-1 gap-3">
-            {company.address && (
+            {/* Show only one location - prefer address over city/country, or combine them */}
+            {(company.address || (company.city && company.country)) && (
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span>{company.address}</span>
-              </div>
-            )}
-            
-            {company.city && company.country && (
-              <div className="flex items-center gap-2 text-sm">
-                <Globe className="h-4 w-4 text-muted-foreground" />
-                <span>{company.city}, {company.country}</span>
+                <span>
+                  {company.address || `${company.city}, ${company.country}`}
+                </span>
               </div>
             )}
 

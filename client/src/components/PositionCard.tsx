@@ -55,18 +55,18 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const companyFromAPI = companies?.find(c => c.id === departmentFromAPI?.companyId);
   
   // Debug logging (remove after fix is confirmed)
-  console.log('PositionCard Debug:', {
-    position: position,
-    companiesResponse,
-    departmentsResponse,
-    companies: companies?.length || 0,
-    departments: departments?.length || 0,
-    departmentFromAPI,
-    companyFromAPI,
-    positionDepartmentId: position.departmentId,
-    companiesLoading,
-    departmentsLoading
-  });
+  if (!companyFromAPI || !departmentFromAPI) {
+    console.log('PositionCard Debug - Missing data:', {
+      position: position.id,
+      companies: companies?.length || 0,
+      departments: departments?.length || 0,
+      departmentFromAPI: !!departmentFromAPI,
+      companyFromAPI: !!companyFromAPI,
+      positionDepartmentId: position.departmentId,
+      companiesLoading,
+      departmentsLoading
+    });
+  }
 
   const handleEdit = () => {
     if (onEdit) {
@@ -277,7 +277,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center gap-1 flex-1 justify-center"
+            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
@@ -289,7 +289,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center gap-1 flex-1 justify-center"
+            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
@@ -300,7 +300,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center gap-1 flex-1 justify-center">
+              <Button variant="outline" size="sm" className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium">
                 <ExternalLink className="h-3 w-3" />
                 Details
               </Button>
