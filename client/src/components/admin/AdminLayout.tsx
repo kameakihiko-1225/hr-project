@@ -80,6 +80,8 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   // Get admin initials for avatar
   const getInitials = (email: string): string => {
+    if (!email) return 'AD';
+    
     return email
       .split('@')[0]
       .substring(0, 2)
@@ -205,7 +207,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                       <Button variant="ghost" size="icon" className="rounded-full">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="bg-blue-100 text-blue-600">
-                            {getInitials(admin.email)}
+                            {getInitials(admin.username || admin.email)}
                           </AvatarFallback>
                         </Avatar>
                       </Button>
@@ -213,7 +215,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>
                         <div className="flex flex-col">
-                          <span>{admin.email}</span>
+                          <span>{admin.username || admin.email}</span>
                           <span className="text-xs text-gray-500">
                             {admin.isSuperAdmin ? 'Super Admin' : 'Admin'}
                           </span>
