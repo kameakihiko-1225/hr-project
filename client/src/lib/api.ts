@@ -1064,24 +1064,65 @@ export const deleteCompany = async (id: string) => {
 
 
 export const getBotById = async (botId: string) => {
-  return await api.get(`/bots/${botId}`);
+  try {
+    const response = await fetch(`${API_BASE_URL}/bots/${botId}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch bot');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching bot by ID:', error);
+    throw error;
+  }
 };
 
 export const getBotByAdminId = async (adminId: string) => {
-  return await api.get(`/bots/admin/${adminId}`);
+  try {
+    const response = await fetch(`${API_BASE_URL}/bots/admin/${adminId}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch bot');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching bot by admin ID:', error);
+    throw error;
+  }
 };
 
 export const updateBot = async (id: string, data: any) => {
-  // Update a bot and unwrap the API response
-  const response = await api.put(`/bots/${id}`, data);
-  if (!response.success) {
-    throw new Error(response.error || 'Failed to update bot');
+  try {
+    const response = await fetch(`${API_BASE_URL}/bots/${id}`, {
+      method: 'PUT',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to update bot');
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to update bot');
+    }
+    return result.data;
+  } catch (error) {
+    console.error('Error updating bot:', error);
+    throw error;
   }
-  return response.data;
 };
 
 export const deleteBot = async (id: string) => {
-  return await api.delete(`/bots/${id}`);
+  try {
+    const response = await fetch(`${API_BASE_URL}/bots/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to delete bot');
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting bot:', error);
+    throw error;
+  }
 };
 
 export const setWebhook = async (botId: string, webhookUrl: string) => {
@@ -1185,11 +1226,29 @@ export const getCandidates = async () => {
 };
 
 export const getCandidatesByBotId = async (botId: string) => {
-  return await api.get(`/bots/${botId}/candidates`);
+  try {
+    const response = await fetch(`${API_BASE_URL}/bots/${botId}/candidates`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch candidates');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching candidates by bot ID:', error);
+    throw error;
+  }
 };
 
 export const getCandidateById = async (candidateId: string) => {
-  return await api.get(`/candidates/${candidateId}`);
+  try {
+    const response = await fetch(`${API_BASE_URL}/candidates/${candidateId}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch candidate');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching candidate by ID:', error);
+    throw error;
+  }
 };
 
 // ----------------- Deep-link helper -----------------
@@ -1200,39 +1259,26 @@ export const createCandidateDeepLink = async (
   positionId: string,
   fullName?: string
 ) => {
-  return await api.post(`/bots/${botId}/deeplink`, { positionId, fullName });
+  try {
+    const response = await fetch(`${API_BASE_URL}/bots/${botId}/deeplink`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ positionId, fullName })
+    });
+    if (!response.ok) throw new Error('Failed to create deep link');
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating candidate deep link:', error);
+    throw error;
+  }
 };
 
 
 
-// Add companies endpoints to the API client
-api.companies = {
-  getAll: getCompanies,
-  getById: getCompany,
-  create: createCompany,
-  update: updateCompany,
-  delete: deleteCompany
-};
 
-// Add departments endpoints to the API client
-api.departments = {
-  getAll: getDepartments,
-  getById: getDepartment,
-  getByCompany: (companyId: string) => getDepartments(companyId),
-  create: createDepartment,
-  update: updateDepartment,
-  delete: deleteDepartment
-};
-
-// Add positions endpoints to the API client
-api.positions = {
-  getAll: getPositions,
-  getById: getPosition,
-  getByDepartment: (departmentId: string) => getPositions(departmentId),
-  create: createPosition,
-  update: updatePosition,
-  delete: deletePosition
-};
 
 // Entity Validation API
 export interface EntityValidationApi {
@@ -1502,9 +1548,32 @@ export default api;
 // ----------------- Training / Documents -----------------
 
 export const getDocumentsForPosition = async (positionId: string) => {
-  return api.get(`/positions/${positionId}/documents`);
+  try {
+    const response = await fetch(`${API_BASE_URL}/positions/${positionId}/documents`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch documents');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching documents for position:', error);
+    throw error;
+  }
 };
 
 export const createPositionDeepLink = async (positionId: string, fullName?: string) => {
-  return await api.post(`/positions/${positionId}/deeplink`, { fullName });
+  try {
+    const response = await fetch(`${API_BASE_URL}/positions/${positionId}/deeplink`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ fullName })
+    });
+    if (!response.ok) throw new Error('Failed to create deep link');
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating position deep link:', error);
+    throw error;
+  }
 }; 
