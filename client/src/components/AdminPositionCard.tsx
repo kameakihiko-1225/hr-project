@@ -110,17 +110,19 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
 
   const CompanyAvatar = () => (
-    <Avatar className="h-10 w-10 ring-2 ring-offset-2 ring-offset-background ring-blue-500/40 group-hover:ring-blue-500/70 transition-shadow duration-300 shadow-lg group-hover:shadow-xl">
+    <Avatar className="h-12 w-12 border-2 border-white/20 shadow-lg">
       {inheritedData.logoUrl && !logoError ? (
         <AvatarImage 
           src={inheritedData.logoUrl} 
           alt={inheritedData.companyName} 
-          decoding="async" 
-          loading="lazy"
+          className="object-cover object-center rounded-full"
           onError={handleLogoError} 
         />
       ) : (
-        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold">
+        <AvatarFallback 
+          className="text-white font-semibold text-sm"
+          style={{ backgroundColor: inheritedData.companyColor }}
+        >
           {inheritedData.companyName.charAt(0)}
         </AvatarFallback>
       )}
@@ -171,37 +173,9 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
       <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
         <CompanyAvatar />
         <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-sm leading-tight text-foreground">
-              {inheritedData.companyName}
-            </h3>
-            <div className="flex items-center gap-1">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 px-2 text-xs hover:bg-blue-100 dark:hover:bg-blue-900 border border-blue-200 dark:border-blue-800"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsCompanyModalOpen(true);
-                }}
-              >
-                <Building2 className="h-3 w-3 mr-1" />
-                Company
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 px-2 text-xs hover:bg-green-100 dark:hover:bg-green-900 border border-green-200 dark:border-green-800"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsDepartmentModalOpen(true);
-                }}
-              >
-                <Briefcase className="h-3 w-3 mr-1" />
-                Dept
-              </Button>
-            </div>
-          </div>
+          <h3 className="font-semibold text-sm leading-tight text-foreground">
+            {inheritedData.companyName}
+          </h3>
           {showDepartment && (
             <p className="text-xs text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
               <Building2 className="h-3 w-3" />
