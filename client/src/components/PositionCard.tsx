@@ -207,7 +207,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-border bg-white/60 dark:bg-white/5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-2xl hover:border-blue-200 hover:-translate-y-2 hover:scale-105 focus:-translate-y-2 focus:scale-105 transition-all duration-300 h-[420px] w-full max-w-[480px] flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-border bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 ease-out h-[440px] w-full max-w-[480px] flex flex-col"
     >
       {/* glass reflection */}
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -296,7 +296,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-center gap-2 border-t border-border pt-2 pb-3 relative z-10 mt-auto shrink-0">
+      <CardFooter className="flex flex-col items-center gap-4 border-t border-border pt-4 pb-4 relative z-10 mt-auto shrink-0">
         {postedAgo && (
           <span className="text-sm text-muted-foreground flex items-center gap-1"><Clock className="h-4 w-4" /> {postedAgo}</span>
         )}
@@ -305,7 +305,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button 
             variant="outline" 
             size="default" 
-            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ease-out"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
@@ -317,7 +317,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button 
             variant="outline" 
             size="default" 
-            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ease-out"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
@@ -328,7 +328,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="default" className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 transition-all duration-200">
+              <Button variant="outline" size="default" className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 ease-out">
                 <ExternalLink className="h-4 w-4" />
                 Details
               </Button>
@@ -413,7 +413,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         {position.applyLink ? (
           <button
             onClick={handleApply}
-            className="px-8 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 hover:scale-105 transition-all duration-200 flex items-center gap-2 w-full justify-center"
+            className="px-8 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-0.5 transition-all duration-300 ease-out flex items-center gap-2 w-full justify-center"
           >
             Apply Now <ExternalLink className="h-4 w-4" />
           </button>
@@ -421,7 +421,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button
             onClick={handleApply}
             disabled={isApplying}
-            className="px-8 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-600/90 hover:to-indigo-600/90 hover:scale-105 transition-all duration-200 flex items-center gap-2 disabled:opacity-60 w-full justify-center"
+            className="px-8 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-0.5 transition-all duration-300 ease-out flex items-center gap-2 disabled:opacity-60 w-full justify-center"
           >
             {isApplying ? 'Generating…' : 'Apply Now'} <Send className="h-4 w-4" />
           </Button>

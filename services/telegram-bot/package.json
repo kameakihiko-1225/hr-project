@@ -1,0 +1,28 @@
+{
+  "name": "millat-umidi-telegram-bot-service",
+  "version": "1.0.0",
+  "description": "Telegram bot webhook service for Millat Umidi HR platform",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "start:dev": "tsx src/main.ts",
+    "dev": "tsx watch src/main.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/platform-express": "^10.0.0",
+    "reflect-metadata": "^0.1.13",
+    "form-data": "^4.0.0",
+    "node-fetch": "^3.3.2",
+    "axios": "^1.6.0",
+    "express": "^4.18.0",
+    "dotenv": "^16.0.0",
+    "tsx": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

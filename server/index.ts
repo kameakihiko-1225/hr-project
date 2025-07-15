@@ -3,9 +3,47 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeIndustryTags } from "./init-industry-tags";
+import { spawn } from "child_process";
 
 // Load environment variables
 dotenv.config();
+
+// Function to start Telegram bot service
+function startTelegramBotService() {
+  try {
+    log('[TELEGRAM-BOT] Starting Telegram bot service...');
+    
+    const botProcess = spawn('npx', ['tsx', 'services/telegram-bot/simple-server.ts'], {
+      stdio: 'pipe',
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        TELEGRAM_BOT_PORT: '3001',
+        NODE_ENV: process.env.NODE_ENV || 'development'
+      }
+    });
+
+    botProcess.stdout?.on('data', (data) => {
+      log(`[TELEGRAM-BOT] ${data.toString().trim()}`);
+    });
+
+    botProcess.stderr?.on('data', (data) => {
+      log(`[TELEGRAM-BOT] ERROR: ${data.toString().trim()}`);
+    });
+
+    botProcess.on('close', (code) => {
+      log(`[TELEGRAM-BOT] Service stopped with code ${code}`);
+    });
+
+    botProcess.on('error', (error) => {
+      log(`[TELEGRAM-BOT] Failed to start: ${error.message}`);
+    });
+
+    log('[TELEGRAM-BOT] Service started on port 3001');
+  } catch (error) {
+    log(`[TELEGRAM-BOT] Failed to start service: ${error.message}`);
+  }
+}
 
 const app = express();
 app.use(express.json());
@@ -46,6 +84,9 @@ app.use((req, res, next) => {
   
   // Initialize industry tags
   await initializeIndustryTags();
+  
+  // Start Telegram bot service
+  startTelegramBotService();
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

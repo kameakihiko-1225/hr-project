@@ -142,7 +142,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
 
   return (
     <Card
-      className="animate-fade-in group relative overflow-hidden border border-border bg-white/60 dark:bg-white/5 backdrop-blur-md hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.3deg] transition-transform duration-150 h-[420px] w-full flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-border bg-white dark:bg-gray-900 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out h-[440px] w-full flex flex-col"
     >
       {/* glass reflection */}
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
