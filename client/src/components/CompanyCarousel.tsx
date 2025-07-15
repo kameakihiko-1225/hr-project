@@ -8,6 +8,7 @@ const LOGO_FILES = [
   "mu-logo.png",
   "result.webp",
   "school.png",
+  "khan_academy_logo.png"
 ];
 
 export const CompanyCarousel = () => {
@@ -66,13 +67,13 @@ export const CompanyCarousel = () => {
             {logos.map((file, idx) => (
               <div
                 key={`${file}-${idx}`}
-                className="flex-shrink-0 w-56 h-36 bg-white rounded-2xl shadow-md ring-1 ring-gray-200 flex items-center justify-center px-4 transition-transform hover:shadow-xl hover:-translate-y-1"
+                className="flex-shrink-0 w-56 h-44 bg-white rounded-2xl shadow-md ring-1 ring-gray-200 flex items-center justify-center px-4 transition-transform hover:shadow-xl hover:-translate-y-1"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`/companies/${file}`}
                   alt="Company logo"
-                  className="max-h-28 max-w-full object-contain"
+                  className="max-h-32 max-w-full object-contain"
                 />
               </div>
             ))}

@@ -77,15 +77,13 @@ export const HeroSection = () => {
           {/* Content */}
           <div className="animate-fade-in max-w-4xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Millat Umidi
+              Join
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 block">
-                HR Platform
+                Millat Umidi Group
               </span>
             </h1>
             
-            <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed max-w-4xl mx-auto">
-              Millat Umidi is one of the biggest educational holdings in Uzbekistan. Our projects: Millat Umidi University, Millat Umidi School, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC
-            </p>
+            <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed max-w-4xl mx-auto"> Millat Umidi is one of the biggest educational holdings in Uzbekistan. Our projects: Millat Umidi University, Millat Umidi School, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC </p>
             
             <div className="flex justify-center mb-8">
               <button 
