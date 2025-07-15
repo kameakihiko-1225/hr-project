@@ -47,13 +47,13 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
           )}
 
           {/* Industry Tags */}
-          {company.industryTags && company.industryTags.length > 0 && (
+          {company.industries && company.industries.length > 0 && (
             <div>
               <h3 className="font-medium mb-2">Industry</h3>
               <div className="flex flex-wrap gap-2">
-                {company.industryTags.map((tag, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
-                    {tag}
+                {company.industries.map((industry) => (
+                  <Badge key={industry.id} variant="outline" className="text-xs">
+                    {industry.name}
                   </Badge>
                 ))}
               </div>
