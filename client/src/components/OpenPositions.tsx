@@ -155,7 +155,7 @@ export const OpenPositions = ({
   };
 
   return (
-    <section className="py-16 px-6 bg-white">
+    <section id="open-positions" className="py-16 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">

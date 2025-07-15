@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
+import { FounderSection } from "@/components/FounderSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { StatsSection } from "@/components/StatsSection";
 import { CompanyCarousel } from "@/components/CompanyCarousel";
@@ -50,6 +51,7 @@ const Index = () => {
     <div className="min-h-screen bg-white">
       <Header />
       <HeroSection />
+      <FounderSection />
       <CompanyCarousel />
       <FeaturesSection />
       <StatsSection />
