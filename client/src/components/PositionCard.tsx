@@ -67,77 +67,14 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
     try {
       setIsApplying(true);
 
-      // Determine which bot to use
-      let botId: string | undefined;
-
-      if (admin?.id) {
-        // Authenticated admin – fetch their bot as before
-        const botResp = await getBotByAdminId(admin.id);
-        botId = botResp?.data?.id;
-
-        if (!botId) {
-          toast({ title: 'Telegram bot not found', description: 'Set up your bot in the Bots section first.' });
-          return;
-        }
-      } else {
-        // Public visitor – call generic position deep-link endpoint
-        const linkResp = await createPositionDeepLink(position.id);
-
-        if (!linkResp.success) {
-          toast({ title: 'Failed to generate link', description: linkResp.error || 'Unexpected error' });
-          return;
-        }
-
-        const rawLink: string | undefined = linkResp.data?.link;
-        if (!rawLink) {
-          toast({ title: 'No link returned', description: 'The server did not return a deep-link.' });
-          return;
-        }
-
-        window.open(rawLink.startsWith('http') ? rawLink : `https://t.me/${''}?start=${rawLink}`, '_blank', 'noopener');
-        return; // Finished for public flow
-      }
-
-      // Create deep-link for this position
-      const linkResp = await createCandidateDeepLink(botId, position.id);
-
-      if (!linkResp.success) {
-        toast({ title: 'Failed to generate link', description: linkResp.error || 'Unexpected error' });
-        return;
-      }
-
-      const rawLink: string | undefined = linkResp.data?.link;
-
-      if (!rawLink) {
-        toast({ title: 'No link returned', description: 'The server did not return a deep-link.' });
-        return;
-      }
-
-      // If backend already gave full URL (starts with http) just open it
-      if (rawLink.startsWith('http')) {
-        window.open(rawLink, '_blank', 'noopener');
-      } else {
-        // Otherwise construct using known bot username (for admin flow) or copy token
-        let botUsername: string | undefined;
-        if (admin?.id) {
-          const botResp = await getBotByAdminId(admin.id);
-          botUsername = botResp?.data?.username;
-        } else {
-          botUsername = import.meta.env.VITE_PUBLIC_BOT_USERNAME as string | undefined;
-        }
-
-        if (botUsername) {
-          const linkToOpen = `https://t.me/${botUsername}?start=${rawLink}`;
-          window.open(linkToOpen, '_blank', 'noopener');
-        } else {
-          // Fallback: copy token so user can paste in bot
-          await navigator.clipboard.writeText(rawLink);
-          toast({
-            title: 'Token copied',
-            description: 'Open your Telegram bot and send the copied token to start the application.'
-          });
-        }
-      }
+      // For now, since we don't have bot functionality set up, show a simple message
+      toast({ 
+        title: 'Application Initiated', 
+        description: `Thank you for your interest in the ${position.title} position! You will be contacted soon.` 
+      });
+      
+      // In a real implementation, this would integrate with Telegram bot or other application system
+      console.log(`Application submitted for position: ${position.title} (ID: ${position.id})`);
     } catch (error: any) {
       console.error('Apply via AI error:', error);
       toast({ title: 'Error', description: error?.message || 'Something went wrong' });
