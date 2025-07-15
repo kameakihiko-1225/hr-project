@@ -29,11 +29,13 @@ export const OpenPositions = ({
   const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // Use React Query for positions with shorter cache time to ensure fresh data
+  // Use React Query for positions with NO cache to ensure fresh data
   const { data: positionsResponse, isLoading } = useQuery({
     queryKey: ['/api/positions'],
-    staleTime: 30000, // 30 seconds - shorter cache for public site to get fresh apply links
-    gcTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 0, // No cache - always fetch fresh data 
+    gcTime: 0, // No garbage collection cache
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   const allPositions = positionsResponse?.data || [];
@@ -42,6 +44,7 @@ export const OpenPositions = ({
   useEffect(() => {
     if (allPositions.length > 0) {
       console.log('⇠ positions from API (React Query)', allPositions);
+      console.log('🔄 Cache timestamp:', new Date().toISOString());
       // Log apply links to verify they're current
       allPositions.forEach(pos => {
         console.log(`Position ${pos.id} (${pos.title}) applyLink:`, pos.applyLink);

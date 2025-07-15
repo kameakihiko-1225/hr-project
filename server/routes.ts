@@ -509,9 +509,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Positions endpoints with caching headers
   app.get("/api/positions", async (req, res) => {
     try {
-      // Set cache headers for better performance
-      res.set('Cache-Control', 'public, max-age=900, s-maxage=1800'); // 15 min client, 30 min CDN (positions change more frequently)
-      res.set('ETag', `"positions-${Date.now()}"`);
+      // Disable caching for positions to ensure fresh apply links
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
       
       const departmentId = req.query.departmentId ? parseInt(req.query.departmentId as string) : undefined;
       const positions = await storage.getAllPositions(departmentId);
