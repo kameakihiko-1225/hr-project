@@ -9,7 +9,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
 import NotFound from "./pages/NotFound";
-import { EnvDebug } from "./components/EnvDebug";
+
 
 // Import admin pages
 import AdminLogin from "./pages/admin/login";
@@ -64,20 +64,11 @@ const App = () => (
                 <AdminGallery />
               </ProtectedRoute>
             </Route>
-            <Route path="/admin/gallery">
-              <ProtectedRoute>
-                <AdminGallery />
-              </ProtectedRoute>
-            </Route>
-
             
             {/* Catch-all route for 404 */}
             <Route component={NotFound} />
           </Switch>
           </Router>
-          
-          {/* Debug component for environment variables */}
-          <EnvDebug />
         </ClickCounterProvider>
       </AuthProvider>
     </TooltipProvider>
