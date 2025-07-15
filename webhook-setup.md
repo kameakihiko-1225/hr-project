@@ -5,15 +5,16 @@
 Since Telegram bots cannot send webhooks to localhost, you need a public URL. Here are your options:
 
 ### Option 1: Replit Development URL (RECOMMENDED)
-You're running on Replit! Your service should be automatically accessible at:
+You're running on Replit! Your webhook is accessible through the main domain:
 ```
-https://your-project-name.your-username.replit.dev:3001/webhook
+https://9c851740-b761-4ff0-8625-d5610f45d742-00-2ltxug5vol3ml.worf.replit.dev/webhook
 ```
 
-To find your exact URL:
-1. Look at your browser's address bar
-2. Copy the domain (e.g., `https://abc123.your-username.replit.dev`)
-3. Add `:3001/webhook` to the end
+**IMPORTANT:** Do NOT add `:3001` to the URL! The main app (port 5000) proxies webhook requests to the Telegram service (port 3001) automatically.
+
+Correct webhook URL:
+- ✅ `https://your-replit-domain.replit.dev/webhook`
+- ❌ `https://your-replit-domain.replit.dev:3001/webhook` (causes 301 redirect)
 
 ### Option 2: Use ngrok (Manual Installation)
 1. Download ngrok: https://ngrok.com/download

@@ -12,6 +12,33 @@ import express from "express";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded files statically
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  
+  // Telegram webhook proxy - forwards to port 3001 service
+  app.post('/webhook', async (req, res) => {
+    try {
+      console.log('[WEBHOOK-PROXY] Received webhook request, forwarding to Telegram service...');
+      
+      const response = await fetch('http://localhost:3001/webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(req.body),
+      });
+
+      const data = await response.json();
+      console.log('[WEBHOOK-PROXY] Response from Telegram service:', data);
+      
+      res.status(response.status).json(data);
+    } catch (error) {
+      console.error('[WEBHOOK-PROXY] Error forwarding webhook:', error);
+      res.status(500).json({ 
+        error: 'Webhook proxy error',
+        message: error.message 
+      });
+    }
+  });
+
   // Authentication endpoints
   app.post("/api/auth/login", async (req, res) => {
     try {
