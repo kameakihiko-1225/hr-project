@@ -90,7 +90,7 @@ export const Header = () => {
             <Button 
               variant="ghost" 
               onClick={() => scrollToSection("footer")}
-              className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
+              className="text-gray-700 hover:text-blue-600 hover:bg-transparent px-3 py-2 text-sm font-medium transition-colors"
             >
               {t('contact')}
             </Button>
@@ -111,7 +111,7 @@ export const Header = () => {
               variant="ghost" 
               size="icon"
               onClick={() => scrollToSection("footer")}
-              className="rounded-full h-9 w-9 text-gray-700 hover:text-blue-600"
+              className="rounded-full h-9 w-9 text-gray-700 hover:text-blue-600 hover:bg-transparent"
               aria-label="Contact"
             >
               <Phone className="h-5 w-5" />
