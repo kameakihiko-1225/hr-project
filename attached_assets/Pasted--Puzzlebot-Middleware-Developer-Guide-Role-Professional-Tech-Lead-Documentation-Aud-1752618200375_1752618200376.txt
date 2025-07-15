@@ -1,0 +1,190 @@
+# Puzzlebot Middleware – Developer Guide
+
+> **Role:** Professional Tech-Lead Documentation
+>
+> **Audience:** Backend developers joining the project – after reading this file you should be able to run, extend, and deploy the middleware with confidence.
+
+---
+
+## 0. TL;DR
+
+```
+# 1. Clone repo & install deps
+cd puzzlebot-middleware && npm i
+
+# 2. Provide env vars
+cp .env.example .env   # fill TELEGRAM_BOT_TOKEN etc.
+
+# 3. Start locally (watch mode)
+npm run start:dev
+
+# 4. Expose via ngrok (optional)
+ngrok http 3000   # use the https URL as webhook in Puzzlebot
+```
+
+---
+
+## 1. Purpose & High-Level Flow
+
+```
+Telegram User → Puzzlebot → Webhook (/webhook) → Bitrix24 CRM
+```
+
+1. **Puzzlebot** collects user data (text, files, voice).  
+2. **Puzzlebot** POSTs a JSON payload to `/webhook`.  
+3. **WebhookController** does:
+   1. Validates & logs payload
+   2. Downloads Telegram files (resume, diploma, voice answers)
+   3. Builds a Bitrix24 **Contact** payload
+   4. Creates / updates a Contact (dedupe by phone)
+   5. Builds a Bitrix24 **Deal** payload (one per contact in Category-55)
+   6. Creates / updates the Deal
+4. Responds `200 OK` with created IDs.
+
+---
+
+## 2. Repository Layout
+
+```
+puzzlebot-middleware/
+ ├── src/
+ │   ├── webhook.controller.ts   # main business logic
+ │   ├── file.controller.ts      # /file/:file_id proxy helper (optional)
+ │   ├── app.module.ts           # Nest module wiring
+ │   └── ... standard Nest files
+ ├── .env.example               # sample env vars
+ ├── package.json               # scripts & deps
+ └── DEVELOPER_GUIDE.md         # ← you are here
+```
+
+---
+
+## 3. Environment Variables
+
+| Variable                 | Example                                                          | Purpose                                  |
+|--------------------------|------------------------------------------------------------------|------------------------------------------|
+| `TELEGRAM_BOT_TOKEN`     | `7191717059:AAHIlA-…`                                           | Required to call Telegram Bot API        |
+| `PORT` (optional)        | `3000`                                                           | Listening port (Nest defaults to 3000)   |
+
+Add more Bitrix creds if you move away from the hard-coded `BITRIX_BASE` token.
+
+> **Tip:** keep bot tokens out of Git. Use `.env`.
+
+---
+
+## 4. Key Concepts & Helpers
+
+### 4.1 Duplicate Strategy (Current)
+* **Contact** – dedup by **phone** (digits only). If found → `update`, else `add`.
+* **Deal** – one active deal per contact in Category `55`. Searches latest, updates if found, otherwise creates.
+
+### 4.2 Telegram File Handling
+1. `isTelegramFileId()` – loose heuristic to detect file_id.
+2. `getTelegramFileUrl()` – resolves a file_id → CDN URL.
+3. `getFileBufferFromTelegram()` – tries to download binary (with `node-fetch` fallback). Returns `{buffer,url}`. If download fails → stores link so file is at least referenceable.
+
+### 4.3 Bitrix24 Field Mapping
+| Human Meaning        | Bitrix Field Code            | Type            |
+|----------------------|------------------------------|-----------------|
+| Position             | `UF_CRM_1752239621`          | string          |
+| City                 | `UF_CRM_1752239635`          | string          |
+| Degree               | `UF_CRM_1752239653`          | string          |
+| Resume **link**      | `UF_CRM_1752239677`          | string (URL)    |
+| Diploma **link**     | `UF_CRM_1752239690`          | string (URL)    |
+| Telegram username    | `UF_CRM_CONTACT_1745579971270` | string          |
+| Phase-2 q1 text      | `UF_CRM_1752241370`          | string          |
+| Phase-2 q1 voice     | `UF_CRM_1752245274`          | file link       |
+| *(q2/q3 analogous)*  | see `webhook.controller.ts`  | —               |
+
+> Voice answers are stored as links. Switch to file upload if Bitrix24 file fields are mandatory.
+
+### 4.4 Deal Category / Stage
+* Category `55`  → New deals start at status `C55:NEW`.
+* Title pattern   → `HR BOT – {FullName}`
+* UTM Source      → `hr_telegram_bot`
+
+---
+
+## 5. Running Locally
+
+```bash
+# install deps
+npm i
+
+# run dev (reloads on change)
+npm run start:dev
+
+# run prod build then node dist/main.js
+npm run start
+```
+
+### Webhook Testing
+```bash
+curl -X POST http://localhost:3000/webhook \
+  -H "Content-Type: application/json" \
+  -d @sample-payload.json
+```
+
+### Expose to Internet
+```bash
+npx ngrok http 3000
+# copy https URL → configure in Puzzlebot as webhook target
+```
+
+---
+
+## 6. Deployment
+
+### Netlify / Vercel
+* Convert NestJS to serverless via `@nestjs/serve-static` or `netlify-lambda` adapter.
+* Alternatively deploy to **Render**, **Fly.io**, **Heroku**, or a small VPS.
+
+### Production Checklist
+1. **HTTPS** endpoint (Bitrix24 & Telegram require).
+2. **Rate-limit** and auth-protect webhook if needed.
+3. **Secret rotate** Bot & Bitrix tokens.
+4. **Monitoring** – enable NestJS logs or pipe to Grafana/Loki.
+
+---
+
+## 7. Troubleshooting Cheatsheet
+
+| Symptom                                   | Likely Cause & Fix                                      |
+|-------------------------------------------|---------------------------------------------------------|
+| 404 on file download                      | Invalid/expired file_id, wrong bot token, file too old  |
+| Bitrix error "Name / LastName empty"      | Ensure `NAME` or `LAST_NAME` populated (see code)        |
+| Duplicate contacts                        | Phone format mismatch – ensure `normalizePhone`         |
+| Deal not linked to contact                | Check `CONTACT_ID` in deal payload                      |
+| 400 Bad Request Bitrix (field invalid)    | Array fields must be **JSON-stringified**               |
+
+---
+
+## 8. Extending the Middleware
+
+1. **Add new form fields** – map to Bitrix24 UF_ codes in `contactFields`.
+2. **Change duplicate logic** – modify helper `findContactIdByPhone` or add email dedupe.
+3. **Upload binaries** – if Bitrix24 file fields needed, convert `link` storage to multipart upload (see resume/diploma pattern earlier versions).
+4. **Front-end/dashboard** – spin up a small Next.js admin in a sibling folder.
+
+---
+
+## 9. Contributing Workflow
+
+1. Fork & feature branch.
+2. ESLint + Prettier must pass: `npm run lint && npm run format:check`.
+3. PR description – include **payload example** & **Bitrix screenshots** when relevant.
+4. At least one reviewer approval → merge.
+
+---
+
+## 10. Roadmap Ideas
+
+- 🌐 **GraphQL** wrapper for internal services
+- 📊 **Prometheus metrics** & **Grafana dashboard**
+- 🔄 **Webhook retries** with exponential back-off queue
+- 🔐 **JWT**-signed webhooks for Puzzlebot security
+- 🚀 **Autoscale** on Kubernetes (K8s) with Helm chart
+
+---
+
+Happy coding! If you have questions, ping the tech-lead or check the logs 😉
