@@ -67,7 +67,7 @@ export const OpenPositions = ({
           getDepartments(),
           getCompanies()
         ]);
-        console.log('Filter data loaded:', { deptData, compData });
+        // Filter data loaded successfully
         setDepartments(Array.isArray(deptData) ? deptData : []);
         
         // Handle companies data structure (could be wrapped in {success, data} or direct array)
@@ -105,22 +105,7 @@ export const OpenPositions = ({
     return companyMatch && departmentMatch && positionMatch;
   });
 
-  console.log('🔎 filteredPositions', filteredPositions);
-  
-  // Add detailed filtering debug
-  if (allPositions.length > 0) {
-    const testPos = allPositions[0];
-    const testDept = departments.find(d => d.id === testPos.departmentId);
-    const testComp = testDept ? companies.find(c => c.id === testDept.companyId) : null;
-    
-    console.log('Detailed filter debug:', {
-      position: testPos,
-      department: testDept,
-      company: testComp,
-      departmentId: testPos.departmentId,
-      filters: { selectedCompanies, selectedDepartments, selectedPositions }
-    });
-  }
+  // Filtering is working correctly - removed debug logs
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredPositions.length / itemsPerPage);

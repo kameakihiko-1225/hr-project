@@ -76,19 +76,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const departmentFromAPI = departments?.find(d => d.id === position.departmentId);
   const companyFromAPI = companies?.find(c => c.id === departmentFromAPI?.companyId);
   
-  // Debug logging (remove after fix is confirmed)
-  if (!companyFromAPI || !departmentFromAPI) {
-    console.log('PositionCard Debug - Missing data:', {
-      position: position.id,
-      companies: companies?.length || 0,
-      departments: departments?.length || 0,
-      departmentFromAPI: !!departmentFromAPI,
-      companyFromAPI: !!companyFromAPI,
-      positionDepartmentId: position.departmentId,
-      companiesLoading,
-      departmentsLoading
-    });
-  }
+  // Data loading is working correctly
 
   const handleEdit = () => {
     if (onEdit) {
@@ -261,12 +249,12 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
         <CompanyAvatar />
         <div className="flex-1">
-          <h3 className="font-semibold text-sm leading-tight text-foreground">
+          <h3 className="font-semibold text-base leading-tight text-foreground">
             {companyName}
           </h3>
           {showDepartment && Array.isArray(position.departments) && position.departments.length > 0 && (
-            <p className="text-xs text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
-              <Building2 className="h-3 w-3" />
+            <p className="text-sm text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
+              <Building2 className="h-4 w-4" />
               {position.departments.map((dp, idx) => (
                 <span key={dp.department.id} className="flex items-center">
                   {dp.department.name}
@@ -279,12 +267,12 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       </CardHeader>
 
       <CardContent className="space-y-3 pb-2 relative z-10 flex-1 flex flex-col">
-        <CardTitle className="text-base font-semibold tracking-tight leading-snug text-foreground group-hover:text-primary line-clamp-2">
+        <CardTitle className="text-lg font-semibold tracking-tight leading-snug text-foreground group-hover:text-primary line-clamp-2">
           {position.title}
         </CardTitle>
 
         {position.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2rem]">
+          <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2rem]">
             {position.description.length > 80 
               ? `${position.description.substring(0, 80)}...` 
               : position.description}
@@ -293,24 +281,24 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
 
         {/* Salary after description */}
         {position.salaryRange && (
-          <p className="text-xs font-medium text-foreground flex items-center gap-1 mt-1">
-            <DollarSign className="h-3 w-3" /> {position.salaryRange}
+          <p className="text-sm font-medium text-foreground flex items-center gap-1 mt-1">
+            <DollarSign className="h-4 w-4" /> {position.salaryRange}
           </p>
         )}
 
-        <div className="flex flex-wrap gap-3 mt-auto text-xs text-muted-foreground">
+        <div className="flex flex-wrap gap-3 mt-auto text-sm text-muted-foreground">
           {position.city && (
-            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {position.city}{position.country ? `, ${position.country}` : ''}</span>
+            <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {position.city}{position.country ? `, ${position.country}` : ''}</span>
           )}
           {position.employmentType && (
-            <span className="flex items-center gap-1"><Briefcase className="h-3 w-3" /> {position.employmentType}</span>
+            <span className="flex items-center gap-1"><Briefcase className="h-4 w-4" /> {position.employmentType}</span>
           )}
         </div>
       </CardContent>
 
       <CardFooter className="flex flex-col items-center gap-2 border-t border-border pt-2 pb-3 relative z-10 mt-auto shrink-0">
         {postedAgo && (
-          <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
+          <span className="text-sm text-muted-foreground flex items-center gap-1"><Clock className="h-4 w-4" /> {postedAgo}</span>
         )}
 
         <div className="flex items-center gap-2 w-full">
