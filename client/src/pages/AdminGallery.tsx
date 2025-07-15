@@ -347,12 +347,32 @@ export default function AdminGallery() {
                     name="imageUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Image URL</FormLabel>
+                        <FormLabel>Image</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter image URL" type="url" />
+                          <div className="space-y-2">
+                            <Input 
+                              type="file" 
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  // Create a URL for the uploaded file
+                                  const fileUrl = URL.createObjectURL(file);
+                                  field.onChange(fileUrl);
+                                }
+                              }}
+                            />
+                            <div className="text-sm text-gray-500">Or</div>
+                            <Input 
+                              placeholder="https://example.com/image.jpg" 
+                              value={field.value || ''}
+                              onChange={field.onChange}
+                              type="url"
+                            />
+                          </div>
                         </FormControl>
                         <FormDescription>
-                          Enter the URL of the image for this gallery item
+                          Upload an image file or enter an image URL
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

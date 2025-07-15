@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema } from "@shared/schema";
 import bcrypt from "bcryptjs";
+import { initializeGalleryData } from "./init-gallery-data";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication endpoints
@@ -655,6 +656,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+
+  // Initialize gallery data on startup
+  setTimeout(async () => {
+    try {
+      await initializeGalleryData();
+      console.log("Gallery data initialized successfully");
+    } catch (error) {
+      console.error("Error initializing gallery data:", error);
+    }
+  }, 2000);
 
   return httpServer;
 }

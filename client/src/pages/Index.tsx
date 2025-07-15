@@ -6,6 +6,7 @@ import { FounderSection } from "@/components/FounderSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { StatsSection } from "@/components/StatsSection";
 import { CompanyCarousel } from "@/components/CompanyCarousel";
+import { ContactSection } from "@/components/ContactSection";
 import { CTASection } from "@/components/CTASection";
 import { FilterSection } from "@/components/FilterSection";
 import { OpenPositions } from "@/components/OpenPositions";
@@ -70,6 +71,7 @@ const Index = () => {
         selectedPositions={selectedPositions}
         hasSearched={hasSearched}
       />
+      <ContactSection />
       <CTASection />
       <Footer />
     </div>

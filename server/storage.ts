@@ -191,8 +191,8 @@ export class DatabaseStorage implements IStorage {
 
   async createCandidate(candidate: InsertCandidate): Promise<Candidate> {
     const candidateWithId = {
-      ...candidate,
-      id: candidate.id || `candidate-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      id: `candidate-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      ...candidate
     };
     const result = await db.insert(candidates).values([candidateWithId]).returning();
     return result[0];
