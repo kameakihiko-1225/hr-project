@@ -175,41 +175,47 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
       <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
         <CompanyAvatar />
         <div className="flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between">
             <h3 className="font-semibold text-sm leading-tight text-foreground">
               {companyName}
             </h3>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-6 px-2 text-xs"
-              onClick={() => setIsCompanyModalOpen(true)}
-            >
-              <Building2 className="h-3 w-3 mr-1" />
-              Info
-            </Button>
-          </div>
-          {showDepartment && Array.isArray(position.departments) && position.departments.length > 0 && (
-            <div className="flex items-center gap-2">
-              <p className="text-xs text-muted-foreground line-clamp-1 flex items-center gap-1">
-                <Building2 className="h-3 w-3" />
-                {position.departments.map((dp, idx) => (
-                  <span key={dp.department.id} className="flex items-center">
-                    {dp.department.name}
-                    {idx < position.departments.length - 1 && <span className="mx-1">|</span>}
-                  </span>
-                ))}
-              </p>
+            <div className="flex items-center gap-1">
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-6 px-2 text-xs"
-                onClick={() => setIsDepartmentModalOpen(true)}
+                className="h-6 px-2 text-xs hover:bg-blue-100 dark:hover:bg-blue-900 border border-blue-200 dark:border-blue-800"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsCompanyModalOpen(true);
+                }}
+              >
+                <Building2 className="h-3 w-3 mr-1" />
+                Company
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 px-2 text-xs hover:bg-green-100 dark:hover:bg-green-900 border border-green-200 dark:border-green-800"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDepartmentModalOpen(true);
+                }}
               >
                 <Briefcase className="h-3 w-3 mr-1" />
-                Info
+                Dept
               </Button>
             </div>
+          </div>
+          {showDepartment && Array.isArray(position.departments) && position.departments.length > 0 && (
+            <p className="text-xs text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
+              <Building2 className="h-3 w-3" />
+              {position.departments.map((dp, idx) => (
+                <span key={dp.department.id} className="flex items-center">
+                  {dp.department.name}
+                  {idx < position.departments.length - 1 && <span className="mx-1">|</span>}
+                </span>
+              ))}
+            </p>
           )}
         </div>
       </CardHeader>
@@ -220,8 +226,10 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
         </CardTitle>
 
         {position.description && (
-          <p className="text-xs text-muted-foreground line-clamp-3">
-            {position.description}
+          <p className="text-xs text-muted-foreground line-clamp-2">
+            {position.description.length > 100 
+              ? `${position.description.substring(0, 100)}...` 
+              : position.description}
           </p>
         )}
 
