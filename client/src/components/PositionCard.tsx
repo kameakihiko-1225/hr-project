@@ -116,16 +116,16 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
 
   const CompanyAvatar = () => (
-    <Avatar className="h-16 w-16 border-2 border-white/20 shadow-lg">
+    <Avatar className="h-20 w-20 border-2 border-white/20 shadow-lg">
       {companyLogoUrl && !logoError ? (
         <AvatarImage 
           src={companyLogoUrl} 
           alt={companyName} 
-          className="object-cover object-center rounded-full"
+          className="object-contain object-center w-full h-full p-2"
           onError={handleLogoError} 
         />
       ) : (
-        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-lg">
+        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-xl">
           {companyName.charAt(0)}
         </AvatarFallback>
       )}

@@ -110,17 +110,17 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
 
   const CompanyAvatar = () => (
-    <Avatar className="h-16 w-16 border-2 border-white/20 shadow-lg">
+    <Avatar className="h-20 w-20 border-2 border-white/20 shadow-lg">
       {inheritedData.logoUrl && !logoError ? (
         <AvatarImage 
           src={inheritedData.logoUrl} 
           alt={inheritedData.companyName} 
-          className="object-cover object-center rounded-full"
+          className="object-contain object-center w-full h-full p-2"
           onError={handleLogoError} 
         />
       ) : (
         <AvatarFallback 
-          className="text-white font-semibold text-lg"
+          className="text-white font-semibold text-xl"
           style={{ backgroundColor: inheritedData.companyColor }}
         >
           {inheritedData.companyName.charAt(0)}
@@ -138,37 +138,7 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
       {/* gradient ring on hover */}
       <span className="absolute inset-0 rounded-[inherit] bg-gradient-to-br from-blue-600/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      {/* Edit / Delete buttons */}
-      {(onEdit || onDelete) && (
-        <div className="absolute top-2 right-2 flex gap-1 z-20">
-          {onEdit && (
-            <Button variant="ghost" size="icon" onClick={handleEdit} className="h-7 w-7">
-              <Pencil className="h-4 w-4" />
-            </Button>
-          )}
-          {onDelete && (
-            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Delete Position</DialogTitle>
-                  <DialogDescription>
-                    Are you sure you want to delete the position "{position.title}"? This action cannot be undone.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
-                  <Button variant="destructive" onClick={handleDelete}>Delete</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )}
-        </div>
-      )}
+
 
       <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
         <CompanyAvatar />
