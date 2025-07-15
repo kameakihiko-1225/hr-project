@@ -21,7 +21,31 @@ import AdminBlog from "./pages/AdminBlog";
 
 
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryFn: async ({ queryKey }) => {
+        const [url] = queryKey;
+        const response = await fetch(url as string, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeaders(),
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      },
+    },
+  },
+});
+
+// Helper function for auth headers
+function getAuthHeaders() {
+  const token = localStorage.getItem('token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

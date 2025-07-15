@@ -199,7 +199,7 @@ export const OpenPositions = ({
           {filteredPositions.length > 0 ? (
             <>
               {viewMode === "grid" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
                   {currentPositions.map((pos, index) => (
                     <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in">
                       <PositionCard position={pos} />

@@ -37,7 +37,8 @@ export default function PositionsPage() {
     description: '',
     salaryRange: '',
     employmentType: '',
-    departmentId: ''
+    departmentId: '',
+    applyLink: ''
   });
 
   // Employment type options
@@ -158,7 +159,8 @@ export default function PositionsPage() {
         description: formData.description,
         salaryRange: formData.salaryRange,
         employmentType: formData.employmentType,
-        departmentId: formData.departmentId
+        departmentId: formData.departmentId,
+        applyLink: formData.applyLink
       });
 
       setPositions(prev => [...prev, newPosition]);
@@ -261,7 +263,8 @@ export default function PositionsPage() {
       description: '',
       salaryRange: '',
       employmentType: '',
-      departmentId: ''
+      departmentId: '',
+      applyLink: ''
     });
     setCurrentPosition(null);
   };
@@ -429,6 +432,21 @@ export default function PositionsPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="applyLink" className="text-sm font-medium">
+                Apply Link (Optional)
+              </label>
+              <Input
+                id="applyLink"
+                name="applyLink"
+                placeholder="e.g., https://forms.google.com/apply or mailto:careers@company.com"
+                value={formData.applyLink}
+                onChange={handleInputChange}
+              />
+              <p className="text-xs text-muted-foreground">
+                If provided, the Apply Now button will redirect to this link. Leave empty to use default application flow.
+              </p>
             </div>
           </div>
           <DialogFooter>

@@ -35,20 +35,38 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
 
   // Fetch company and department data with optimized caching
-  const { data: companies } = useQuery({
+  const { data: companiesResponse, isLoading: companiesLoading } = useQuery({
     queryKey: ['/api/companies'],
     staleTime: 30 * 60 * 1000, // 30 minutes - companies don't change often
     gcTime: 60 * 60 * 1000, // 1 hour cache retention
   });
   
-  const { data: departments } = useQuery({
+  const { data: departmentsResponse, isLoading: departmentsLoading } = useQuery({
     queryKey: ['/api/departments'],
     staleTime: 30 * 60 * 1000, // 30 minutes - departments don't change often
     gcTime: 60 * 60 * 1000, // 1 hour cache retention
   });
   
-  const companyFromAPI = companies?.find(c => departments?.find(d => d.id === position.departmentId)?.companyId === c.id);
+  // Extract data properly - both companies and departments return API wrapper format
+  const companies = companiesResponse?.data || [];
+  const departments = departmentsResponse?.data || [];
+  
   const departmentFromAPI = departments?.find(d => d.id === position.departmentId);
+  const companyFromAPI = companies?.find(c => c.id === departmentFromAPI?.companyId);
+  
+  // Debug logging (remove after fix is confirmed)
+  console.log('PositionCard Debug:', {
+    position: position,
+    companiesResponse,
+    departmentsResponse,
+    companies: companies?.length || 0,
+    departments: departments?.length || 0,
+    departmentFromAPI,
+    companyFromAPI,
+    positionDepartmentId: position.departmentId,
+    companiesLoading,
+    departmentsLoading
+  });
 
   const handleEdit = () => {
     if (onEdit) {
@@ -161,7 +179,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-border bg-white/60 dark:bg-white/5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.3deg] focus:-translate-y-1 focus:rotate-[0.3deg] transition-transform duration-150 h-[420px] w-full flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-border bg-white/60 dark:bg-white/5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.3deg] focus:-translate-y-1 focus:rotate-[0.3deg] transition-transform duration-150 h-[420px] w-full max-w-[480px] flex flex-col"
     >
       {/* glass reflection */}
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
