@@ -15,7 +15,7 @@ export const FounderSection = () => {
   return (
     <section className="relative bg-white dark:bg-gray-950 py-20 px-4 overflow-hidden">
       {/* Subtle background decoration - same as hero */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/20 dark:from-blue-950/20 dark:via-transparent dark:to-indigo-950/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       
       <div className="max-w-6xl mx-auto relative">
         <div className="grid lg:grid-cols-2 gap-8 items-start">

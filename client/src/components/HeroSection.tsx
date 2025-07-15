@@ -71,7 +71,7 @@ export const HeroSection = () => {
   return (
     <section id="hero-section" className="relative bg-white dark:bg-gray-950 py-20 md:py-24 overflow-hidden">
       {/* Subtle background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/20 dark:from-blue-950/20 dark:via-transparent dark:to-indigo-950/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       
       {/* Floating elements */}
       <div className="absolute top-20 left-10 w-16 h-16 bg-blue-100 rounded-full opacity-20 animate-pulse"></div>
