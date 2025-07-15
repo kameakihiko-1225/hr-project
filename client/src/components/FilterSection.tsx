@@ -152,7 +152,7 @@ export const FilterSection = ({
         <div className="mb-8 flex flex-wrap justify-center gap-4">
           <Button 
             onClick={handleSearch}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-xl text-lg font-medium"
+            className="bg-blue-600 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 text-white px-8 py-6 rounded-xl text-lg font-medium transition-all duration-300"
             size="lg"
           >
             <Search className="mr-2 h-5 w-5" />
@@ -163,7 +163,7 @@ export const FilterSection = ({
             <Button 
               onClick={clearAllFilters}
               variant="outline"
-              className="border-red-300 hover:bg-red-50 text-red-600 hover:text-red-700 px-6 py-6 rounded-xl text-lg font-medium"
+              className="border-red-300 hover:bg-red-50 hover:shadow-xl hover:shadow-red-100 hover:-translate-y-1 text-red-600 hover:text-red-700 px-6 py-6 rounded-xl text-lg font-medium transition-all duration-300"
               size="lg"
             >
               <X className="mr-2 h-5 w-5" />

@@ -143,19 +143,19 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
         <div 
           ref={dropdownRef}
           className="absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto 
-                     bg-white border border-gray-200 rounded-lg shadow-xl z-[60] animate-fade-in"
+                     bg-white border border-gray-200 rounded-lg shadow-xl z-[60] animate-fade-in min-w-full"
           onMouseEnter={handleMouseEnter}
         >
-          <div className="sticky top-0 bg-white border-b border-gray-200 p-2 flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-700">
-              {selected.length > 0 ? `${selected.length} selected` : 'Select options'}
+          <div className="sticky top-0 bg-white border-b border-gray-200 p-3 flex justify-between items-center">
+            <span className="text-sm font-medium text-gray-700 truncate flex-1 mr-2">
+              {selected.length > 0 ? `${selected.length} selected` : 'Available options'}
             </span>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpen(false);
               }}
-              className="p-1 hover:bg-gray-100 rounded-full"
+              className="p-1 hover:bg-gray-100 rounded-full flex-shrink-0"
               aria-label="Close dropdown"
             >
               <X className="w-4 h-4 text-gray-500" />

@@ -146,7 +146,7 @@ export const CTASection = () => {
             <CarouselContent>
               {testimonials.map((testimonial) => (
                 <CarouselItem key={testimonial.id}>
-                  <Card className="border-0 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-out">
+                  <Card className="border-0 shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300">
                     <CardContent className="p-6 md:p-8">
                       <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
                         {/* Left column with profile */}
@@ -220,7 +220,7 @@ export const CTASection = () => {
           <div className="flex justify-center">
             <Button 
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-0.5 hover:shadow-xl text-white rounded-xl group transition-all duration-300 ease-out"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 text-white rounded-xl group transition-all duration-300"
               onClick={() => scrollToSection("filter-section")}
             >
               Get Started
