@@ -117,8 +117,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyData = req.body;
       }
 
-      const validatedData = insertCompanySchema.parse(companyData);
+      // Extract industry tags from companyData
+      const { industries, ...companyDataWithoutIndustries } = companyData;
+      
+      const validatedData = insertCompanySchema.parse(companyDataWithoutIndustries);
       const company = await storage.createCompany(validatedData);
+      
+      // Handle industry tags if provided
+      if (industries && Array.isArray(industries)) {
+        try {
+          const industryTagIds = industries.map(industry => parseInt(industry.id));
+          await storage.setCompanyIndustryTags(company.id, industryTagIds);
+          console.log(`Company ${company.id} created with ${industryTagIds.length} industry tags`);
+        } catch (dbError) {
+          console.warn('Failed to set company industry tags:', dbError);
+        }
+      }
       
       // If company has a logo URL, link it to the file attachments
       if (company.logoUrl && company.logoUrl.includes('/uploads/')) {
@@ -141,7 +155,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      res.json({ success: true, data: company });
+      // Fetch the company with industry tags for response
+      const companyWithIndustries = await storage.getCompanyById(company.id);
+      res.json({ success: true, data: companyWithIndustries });
     } catch (error) {
       console.error('Error creating company:', error);
       res.status(400).json({ success: false, error: error.message || "Failed to create company" });
@@ -171,15 +187,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData = req.body;
       }
 
-      const company = await storage.updateCompany(id, updateData);
+      // Extract industry tags from updateData
+      const { industries, ...updateDataWithoutIndustries } = updateData;
+      
+      const company = await storage.updateCompany(id, updateDataWithoutIndustries);
       if (!company) {
         return res.status(404).json({ success: false, error: "Company not found" });
       }
 
-      // If logo was updated and is from uploads, link it to file attachments
-      if (updateData.logoUrl && updateData.logoUrl.includes('/uploads/')) {
+      // Handle industry tags if provided
+      if (industries && Array.isArray(industries)) {
         try {
-          const filename = updateData.logoUrl.split('/').pop();
+          const industryTagIds = industries.map(industry => parseInt(industry.id));
+          await storage.setCompanyIndustryTags(id, industryTagIds);
+          console.log(`Company ${id} updated with ${industryTagIds.length} industry tags`);
+        } catch (dbError) {
+          console.warn('Failed to update company industry tags:', dbError);
+        }
+      }
+
+      // If logo was updated and is from uploads, link it to file attachments
+      if (updateDataWithoutIndustries.logoUrl && updateDataWithoutIndustries.logoUrl.includes('/uploads/')) {
+        try {
+          const filename = updateDataWithoutIndustries.logoUrl.split('/').pop();
           if (filename) {
             await db.insert(fileAttachments).values({
               entityType: 'company_logo',
@@ -190,13 +220,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
               mimetype: 'image/*',
               size: 0
             });
-            console.log(`Company ${id} updated with logo: ${updateData.logoUrl}`);
+            console.log(`Company ${id} updated with logo: ${updateDataWithoutIndustries.logoUrl}`);
           }
         } catch (dbError) {
           console.warn('Failed to link updated company logo to file attachments:', dbError);
         }
       }
-      res.json({ success: true, data: company });
+      
+      // Fetch the company with industry tags for response
+      const companyWithIndustries = await storage.getCompanyById(id);
+      res.json({ success: true, data: companyWithIndustries });
     } catch (error) {
       console.error('Error updating company:', error);
       res.status(400).json({ success: false, error: error.message || "Failed to update company" });
@@ -312,7 +345,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Company-industry tag association endpoints
+  app.put("/api/companies/:id/industry-tags", async (req, res) => {
+    try {
+      const companyId = parseInt(req.params.id);
+      const { industryTagIds } = req.body;
+      
+      if (!Array.isArray(industryTagIds)) {
+        return res.status(400).json({ success: false, error: "industryTagIds must be an array" });
+      }
+      
+      await storage.setCompanyIndustryTags(companyId, industryTagIds);
+      
+      res.json({ 
+        success: true, 
+        message: "Company industry tags updated successfully" 
+      });
+    } catch (error) {
+      console.error('Error updating company industry tags:', error);
+      res.status(500).json({ success: false, error: "Failed to update company industry tags" });
+    }
+  });
 
+  app.get("/api/companies/:id/industry-tags", async (req, res) => {
+    try {
+      const companyId = parseInt(req.params.id);
+      const industryTags = await storage.getCompanyIndustryTags(companyId);
+      
+      res.json({ 
+        success: true, 
+        data: industryTags 
+      });
+    } catch (error) {
+      console.error('Error fetching company industry tags:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch company industry tags" });
+    }
+  });
 
   // Industry tags endpoints
   app.get("/api/industry-tags", async (req, res) => {

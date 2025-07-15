@@ -165,4 +165,13 @@ Preferred communication style: Simple, everyday language.
 - **Database Integration**: Fixed all database operations to use Drizzle ORM instead of raw SQL queries
 - **Modal Integration**: Position cards now display comprehensive company logos, industry tags, descriptions, and location data
 
+### July 15, 2025 - Company-Industry Tags Association System
+- **Junction Table**: Created company_industry_tags table for many-to-many relationship between companies and industry tags
+- **Database Schema**: Added CompanyIndustryTag type and extended Company type with CompanyWithIndustries for API responses
+- **Storage Methods**: Implemented getCompanyIndustryTags, setCompanyIndustryTags, addCompanyIndustryTag, and removeCompanyIndustryTag
+- **API Integration**: Added PUT /api/companies/:id/industry-tags and GET /api/companies/:id/industry-tags endpoints
+- **Company CRUD**: Updated company creation and update routes to handle industry tags association during create/update operations
+- **Frontend Integration**: Company creation and editing now properly saves selected industry tags to database
+- **Auto-Loading**: Company lists now automatically include associated industry tags for display in UI components
+
 The architecture emphasizes type safety, developer experience, and scalability while maintaining simplicity for rapid development and deployment.

@@ -3,14 +3,15 @@ import { neon } from "@neondatabase/serverless";
 import { eq, and } from "drizzle-orm";
 import dotenv from "dotenv";
 import { 
-  users, companies, departments, positions, candidates, galleryItems, industryTags,
+  users, companies, departments, positions, candidates, galleryItems, industryTags, companyIndustryTags,
   type User, type InsertUser,
   type Company, type InsertCompany,
   type Department, type InsertDepartment,
   type Position, type InsertPosition,
   type Candidate, type InsertCandidate,
   type GalleryItem, type InsertGalleryItem,
-  type IndustryTag, type InsertIndustryTag
+  type IndustryTag, type InsertIndustryTag,
+  type CompanyIndustryTag, type InsertCompanyIndustryTag
 } from "@shared/schema";
 
 // Load environment variables
@@ -26,6 +27,11 @@ if (!DATABASE_URL) {
 const sql = neon(DATABASE_URL);
 const db = drizzle(sql);
 
+// Extended Company type with industries for API responses
+export type CompanyWithIndustries = Company & {
+  industries: IndustryTag[];
+};
+
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
@@ -33,8 +39,8 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
 
   // Company methods
-  getAllCompanies(): Promise<Company[]>;
-  getCompanyById(id: number): Promise<Company | undefined>;
+  getAllCompanies(): Promise<CompanyWithIndustries[]>;
+  getCompanyById(id: number): Promise<CompanyWithIndustries | undefined>;
   createCompany(company: InsertCompany): Promise<Company>;
   updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined>;
   deleteCompany(id: number): Promise<boolean>;
@@ -73,6 +79,12 @@ export interface IStorage {
   createIndustryTag(industryTag: InsertIndustryTag): Promise<IndustryTag>;
   updateIndustryTag(id: number, industryTag: Partial<InsertIndustryTag>): Promise<IndustryTag | undefined>;
   deleteIndustryTag(id: number): Promise<boolean>;
+
+  // Company-industry tag association methods
+  getCompanyIndustryTags(companyId: number): Promise<IndustryTag[]>;
+  addCompanyIndustryTag(companyId: number, industryTagId: number): Promise<void>;
+  removeCompanyIndustryTag(companyId: number, industryTagId: number): Promise<void>;
+  setCompanyIndustryTags(companyId: number, industryTagIds: number[]): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -93,13 +105,46 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Company methods
-  async getAllCompanies(): Promise<Company[]> {
-    return await db.select().from(companies);
+  async getAllCompanies(): Promise<CompanyWithIndustries[]> {
+    try {
+      const companiesData = await db.select().from(companies);
+      
+      // Fetch industry tags for each company
+      const companiesWithTags = await Promise.all(
+        companiesData.map(async (company) => {
+          const industries = await this.getCompanyIndustryTags(company.id);
+          return {
+            ...company,
+            industries,
+          } as CompanyWithIndustries;
+        })
+      );
+      
+      return companiesWithTags;
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      return [];
+    }
   }
 
-  async getCompanyById(id: number): Promise<Company | undefined> {
-    const result = await db.select().from(companies).where(eq(companies.id, id));
-    return result[0];
+  async getCompanyById(id: number): Promise<CompanyWithIndustries | undefined> {
+    try {
+      const result = await db.select().from(companies).where(eq(companies.id, id));
+      const company = result[0];
+      
+      if (company) {
+        const industries = await this.getCompanyIndustryTags(company.id);
+        return {
+          ...company,
+          industries,
+        } as CompanyWithIndustries;
+      }
+      
+      return undefined;
+    } catch (error) {
+      console.error('Error fetching company by id:', error);
+      return undefined;
+    }
   }
 
   async createCompany(company: InsertCompany): Promise<Company> {
@@ -325,6 +370,73 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error deleting industry tag:', error);
       return false;
+    }
+  }
+
+  // Company-industry tag association methods
+  async getCompanyIndustryTags(companyId: number): Promise<IndustryTag[]> {
+    try {
+      const results = await db
+        .select({
+          id: industryTags.id,
+          name: industryTags.name,
+          description: industryTags.description,
+          createdAt: industryTags.createdAt,
+        })
+        .from(companyIndustryTags)
+        .innerJoin(industryTags, eq(companyIndustryTags.industryTagId, industryTags.id))
+        .where(eq(companyIndustryTags.companyId, companyId));
+      
+      return results;
+    } catch (error) {
+      console.error('Error fetching company industry tags:', error);
+      return [];
+    }
+  }
+
+  async addCompanyIndustryTag(companyId: number, industryTagId: number): Promise<void> {
+    try {
+      await db.insert(companyIndustryTags).values({
+        companyId,
+        industryTagId,
+      });
+    } catch (error) {
+      console.error('Error adding company industry tag:', error);
+      throw error;
+    }
+  }
+
+  async removeCompanyIndustryTag(companyId: number, industryTagId: number): Promise<void> {
+    try {
+      await db.delete(companyIndustryTags).where(
+        and(
+          eq(companyIndustryTags.companyId, companyId),
+          eq(companyIndustryTags.industryTagId, industryTagId)
+        )
+      );
+    } catch (error) {
+      console.error('Error removing company industry tag:', error);
+      throw error;
+    }
+  }
+
+  async setCompanyIndustryTags(companyId: number, industryTagIds: number[]): Promise<void> {
+    try {
+      // Remove all existing associations for this company
+      await db.delete(companyIndustryTags).where(eq(companyIndustryTags.companyId, companyId));
+      
+      // Add new associations
+      if (industryTagIds.length > 0) {
+        await db.insert(companyIndustryTags).values(
+          industryTagIds.map(industryTagId => ({
+            companyId,
+            industryTagId,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error('Error setting company industry tags:', error);
+      throw error;
     }
   }
 }

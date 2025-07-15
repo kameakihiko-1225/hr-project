@@ -100,6 +100,14 @@ export const industryTags = pgTable("industry_tags", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Junction table for many-to-many relationship between companies and industry tags
+export const companyIndustryTags = pgTable("company_industry_tags", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull(),
+  industryTagId: integer("industry_tag_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -142,6 +150,11 @@ export const insertIndustryTagSchema = createInsertSchema(industryTags).omit({
   createdAt: true,
 });
 
+export const insertCompanyIndustryTagSchema = createInsertSchema(companyIndustryTags).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -166,3 +179,6 @@ export type FileAttachment = typeof fileAttachments.$inferSelect;
 
 export type InsertIndustryTag = z.infer<typeof insertIndustryTagSchema>;
 export type IndustryTag = typeof industryTags.$inferSelect;
+
+export type InsertCompanyIndustryTag = z.infer<typeof insertCompanyIndustryTagSchema>;
+export type CompanyIndustryTag = typeof companyIndustryTags.$inferSelect;
