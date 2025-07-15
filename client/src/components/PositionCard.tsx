@@ -104,10 +104,35 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     }
   };
 
-  // ----------------- derive company & helper -----------------
-  const company = position.company ?? position.departments?.[0]?.department?.company;
-  const companyName = company?.name || 'Company';
-  const companyLogoUrl = company?.logoUrl || null;
+  // Data inheritance logic: position -> department -> company (same as AdminPositionCard)
+  const getInheritedData = () => {
+    const basePosition = position;
+    const department = departmentFromAPI;
+    const company = companyFromAPI;
+
+    return {
+      // Logo: use position logo -> company logo -> fallback
+      logoUrl: basePosition.logoUrl || company?.logoUrl || null,
+      
+      // Location: use position location -> department location -> company location
+      city: basePosition.city || department?.city || company?.city || null,
+      country: basePosition.country || department?.country || company?.country || null,
+      
+      // Company info
+      companyName: company?.name || 'Company',
+      companyColor: company?.color || '#b69b83',
+      
+      // Department info
+      departmentName: department?.name || 'Department',
+      
+      // Description inheritance
+      description: basePosition.description || department?.description || company?.description || null,
+    };
+  };
+
+  const inheritedData = getInheritedData();
+  const companyName = inheritedData.companyName;
+  const companyLogoUrl = inheritedData.logoUrl;
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
 
   const CompanyAvatar = () => (
@@ -234,7 +259,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center gap-1 flex-1 max-w-[90px]"
+            className="flex items-center gap-1 flex-1 justify-center"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
@@ -246,18 +271,18 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center gap-1 flex-1 max-w-[90px]"
+            className="flex items-center gap-1 flex-1 justify-center"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
             }}
           >
             <Briefcase className="h-3 w-3" />
-            Dept
+            Department
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center gap-1 flex-1 max-w-[90px]">
+              <Button variant="outline" size="sm" className="flex items-center gap-1 flex-1 justify-center">
                 <ExternalLink className="h-3 w-3" />
                 Details
               </Button>
@@ -271,7 +296,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
               <div>
                 <h4 className="text-sm font-medium mb-2">Description</h4>
                 <p className="text-sm text-muted-foreground">
-                  {position.description || 'No description provided'}
+                  {inheritedData.description || 'No description provided'}
                 </p>
               </div>
               
@@ -295,22 +320,18 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                 </div>
               )}
               
-              {showDepartment && position.department && (
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Department</h4>
-                  <div className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4" />
-                    <span>{position.department.name}</span>
-                  </div>
-                  {position.department.company && (
-                    <div className="flex items-center gap-2 mt-1 ml-6">
-                      <span className="text-sm text-muted-foreground">
-                        {position.department.company.name}
-                      </span>
-                    </div>
-                  )}
+              <div>
+                <h4 className="text-sm font-medium mb-2">Department</h4>
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  <span>{inheritedData.departmentName}</span>
                 </div>
-              )}
+                <div className="flex items-center gap-2 mt-1 ml-6">
+                  <span className="text-sm text-muted-foreground">
+                    {inheritedData.companyName}
+                  </span>
+                </div>
+              </div>
               
               {position.applyLink && (
                 <div>
@@ -363,7 +384,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       
       {/* Company Info Modal */}
       <CompanyInfoModal 
-        company={companyFromAPI || company}
+        company={companyFromAPI}
         isOpen={isCompanyModalOpen}
         onClose={() => {
           console.log('Closing company modal');
@@ -373,8 +394,8 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       
       {/* Department Info Modal */}
       <DepartmentInfoModal 
-        department={departmentFromAPI || (position.departments?.[0]?.department)}
-        company={companyFromAPI || company}
+        department={departmentFromAPI}
+        company={companyFromAPI}
         isOpen={isDepartmentModalOpen}
         onClose={() => {
           console.log('Closing department modal');
