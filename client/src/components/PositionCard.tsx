@@ -91,8 +91,13 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     incrementJobSeekers();
     incrementApplicants();
 
+    // Debug log to check position data
+    console.log('Apply button clicked. Position data:', position);
+    console.log('Apply link value:', position.applyLink);
+
     // If position has a direct apply link, use it
     if (position.applyLink) {
+      console.log('Redirecting to custom apply link:', position.applyLink);
       window.open(position.applyLink, '_blank', 'noopener,noreferrer');
       toast({ 
         title: 'Redirected to Application', 
