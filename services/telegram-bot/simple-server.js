@@ -161,13 +161,21 @@ app.post('/webhook', async (req, res) => {
     console.log(`[TELEGRAM-BOT] Full name: "${fullName}", phone_raw: "${phoneRaw}", normalized_phone: "${phone}", age: "${ageRaw}"`);
     const contactFields = {
       NAME: fullName || 'Unknown',
-      PHONE: phone ? [{ VALUE: `+${phone}`, VALUE_TYPE: 'WORK' }] : [],
       UF_CRM_1752239621: data.position_uz, // position
       UF_CRM_1752239635: data.city_uzbek,  // city
       UF_CRM_1752239653: data.degree,      // degree
       UF_CRM_CONTACT_1745579971270: extractInnerTextFromHtmlLink(data.username), // telegram username
       UF_CRM_1752622669492: ageRaw, // age field
     };
+    
+    // Try multiple phone field formats for Bitrix24
+    if (phone) {
+      // Standard PHONE field with array format
+      contactFields.PHONE = [{ VALUE: `+${phone}`, VALUE_TYPE: 'WORK' }];
+      // Try alternative field names that might work in your Bitrix24
+      contactFields.UF_CRM_PHONE = `+${phone}`;
+      contactFields.HAS_PHONE = 'Y';
+    }
     
     // Resolve resume & diploma links
     const resumeLink = data.resume ? (resumeResult.url || (isTelegramFileId(data.resume) ? await getTelegramFileUrl(data.resume) : null) || data.resume) : null;
@@ -181,8 +189,9 @@ app.post('/webhook', async (req, res) => {
       contactFields['UF_CRM_1752621831'] = diplomaLink; // diploma link field
     }
 
-    // Build Comments with links and age
+    // Build Comments with links, age, and phone
     const commentsParts = [];
+    if (phone) commentsParts.push(`Phone: +${phone}`);
     if (resumeLink) commentsParts.push(`Resume: ${resumeLink}`);
     if (diplomaLink) commentsParts.push(`Diploma: ${diplomaLink}`);
     if (ageRaw) {
@@ -240,6 +249,9 @@ app.post('/webhook', async (req, res) => {
     // Log outgoing FormData fields
     console.log('[TELEGRAM-BOT] Contact FormData fields:', Object.keys(contactFields));
     console.log('[TELEGRAM-BOT] PHONE field value:', JSON.stringify(contactFields.PHONE));
+    
+    // Log all contact field values for debugging
+    console.log('[TELEGRAM-BOT] All contact fields:', JSON.stringify(contactFields, null, 2));
     
     // Check duplicate by phone and update if exists
     let contactId;
