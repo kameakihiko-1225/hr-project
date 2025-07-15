@@ -168,13 +168,12 @@ app.post('/webhook', async (req, res) => {
       UF_CRM_1752622669492: ageRaw, // age field
     };
     
-    // Try multiple phone field formats for Bitrix24
+    // Phone field with proper crm_multifield format for Bitrix24
     if (phone) {
-      // Standard PHONE field with array format
-      contactFields.PHONE = [{ VALUE: `+${phone}`, VALUE_TYPE: 'WORK' }];
-      // Try alternative field names that might work in your Bitrix24
-      contactFields.UF_CRM_PHONE = `+${phone}`;
-      contactFields.HAS_PHONE = 'Y';
+      contactFields.PHONE = [{ 
+        VALUE: `+${phone}`, 
+        VALUE_TYPE: 'WORK'
+      }];
     }
     
     // Resolve resume & diploma links
@@ -189,9 +188,8 @@ app.post('/webhook', async (req, res) => {
       contactFields['UF_CRM_1752621831'] = diplomaLink; // diploma link field
     }
 
-    // Build Comments with links, age, and phone
+    // Build Comments with links and age (phone now handled separately)
     const commentsParts = [];
-    if (phone) commentsParts.push(`Phone: +${phone}`);
     if (resumeLink) commentsParts.push(`Resume: ${resumeLink}`);
     if (diplomaLink) commentsParts.push(`Diploma: ${diplomaLink}`);
     if (ageRaw) {
