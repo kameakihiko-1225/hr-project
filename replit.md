@@ -135,4 +135,15 @@ Preferred communication style: Simple, everyday language.
 
 **Internationalization**: i18next supports the multi-language requirements for Uzbekistan's diverse linguistic landscape.
 
+## Recent Changes: Latest modifications with dates
+
+### July 15, 2025 - PostgreSQL File Storage Implementation
+- **File Storage System**: Implemented comprehensive PostgreSQL-based file storage using multer middleware
+- **File Upload Endpoints**: Created `/api/upload/temp` for temporary uploads and `/api/companies/:id/logo` for company-specific uploads
+- **Database Schema**: Added `file_attachments` table to track uploaded files with metadata (entity_type, entity_id, filename, filepath, etc.)
+- **Gallery Integration**: Updated gallery creation and editing to use proper file uploads instead of blob URLs
+- **Company Logo Upload**: Enhanced company CRUD operations to support file uploads with 50MB size limit
+- **File Serving**: Added static file serving at `/uploads` route for accessing uploaded files
+- **Error Handling**: Added comprehensive error handling and logging for file upload operations
+
 The architecture emphasizes type safety, developer experience, and scalability while maintaining simplicity for rapid development and deployment.

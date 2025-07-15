@@ -77,20 +77,20 @@ export function CompanyLogoUpload({
       const formData = new FormData();
       formData.append('file', file);
       
-      const endpoint = companyId ? `/api/companies/${companyId}/logo` : '/api/companies/logo';
+      const endpoint = companyId ? `/api/companies/${companyId}/logo` : '/api/upload/temp';
       
       const response = await fetch(endpoint, {
         method: 'POST',
         body: formData, // Use FormData instead of JSON
       }).then(res => res.json());
       
-      if (response.success && response.logoUrl) {
+      if (response.success && (response.logoUrl || response.fileUrl)) {
         // Clean up the temporary preview URL
         if (previewUrl) {
           revokeLocalFileUrl(previewUrl);
         }
         
-        const uploadedUrl = response.logoUrl;
+        const uploadedUrl = response.logoUrl || response.fileUrl;
         
         // Set the uploaded URL as the preview
         setLogoPreview(uploadedUrl);
@@ -103,7 +103,7 @@ export function CompanyLogoUpload({
           description: "Logo has been successfully uploaded",
         });
       } else {
-        logger.warn('Upload response not successful or missing logoUrl', response);
+        logger.warn('Upload response not successful or missing logoUrl/fileUrl', response);
         throw new Error(response.error || 'Upload failed');
       }
     } catch (error) {

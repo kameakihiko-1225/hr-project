@@ -181,6 +181,20 @@ export default function CompaniesPage() {
         });
         
         if (response.success) {
+          // If the logo was uploaded temporarily and company exists, link it properly
+          if (newCompany.logoUrl && newCompany.logoUrl.includes('/uploads/')) {
+            try {
+              // Save the logo association to the file_attachments table
+              await fetch(`/api/companies/${newCompany.id}/logo-associate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ logoUrl: newCompany.logoUrl })
+              });
+            } catch (error) {
+              logger.warn('Failed to associate logo with company', error);
+            }
+          }
+          
           // Update the company in the local state
           setCompanies(
             companies.map((company) =>
@@ -229,6 +243,20 @@ export default function CompaniesPage() {
         if (response.success && response.data) {
           // Add the new company to the list
           const newCompanyWithId = response.data;
+          
+          // If a logo was uploaded temporarily, associate it with the new company
+          if (newCompany.logoUrl && newCompany.logoUrl.includes('/uploads/')) {
+            try {
+              await fetch(`/api/companies/${newCompanyWithId.id}/logo-associate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ logoUrl: newCompany.logoUrl })
+              });
+            } catch (error) {
+              logger.warn('Failed to associate logo with new company', error);
+            }
+          }
+          
           setCompanies([...companies, newCompanyWithId]);
           
           toast({

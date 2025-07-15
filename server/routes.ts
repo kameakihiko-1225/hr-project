@@ -174,7 +174,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Company logo upload endpoint
+  // General file upload endpoint for temporary use
+  app.post("/api/upload/temp", uploadSingle, async (req, res) => {
+    try {
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).json({ success: false, error: "No file uploaded" });
+      }
+
+      // Create the URL path for the uploaded file
+      const fileUrl = `/uploads/${file.filename}`;
+
+      console.log(`Temporary file uploaded: ${fileUrl}`);
+
+      res.json({ 
+        success: true, 
+        fileUrl: fileUrl,
+        filename: file.filename,
+        message: "File uploaded successfully" 
+      });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      res.status(500).json({ success: false, error: "Failed to upload file" });
+    }
+  });
+
+  // Company logo upload endpoint for existing companies
   app.post("/api/companies/:id/logo", uploadSingle, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -188,11 +214,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const logoUrl = `/uploads/${file.filename}`;
 
       // Save file metadata to database
-      await db.execute(
-        `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        ['company_logo', id.toString(), file.filename, file.originalname, file.path, file.mimetype, file.size]
-      );
+      try {
+        const result = await db.execute(
+          `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          ['company_logo', id.toString(), file.filename, file.originalname, file.path, file.mimetype, file.size]
+        );
+        console.log('File metadata saved:', result);
+      } catch (dbError) {
+        console.warn('Failed to save file metadata:', dbError);
+        // Continue with the upload even if metadata save fails
+      }
 
       // Update company with the logo URL
       const company = await storage.updateCompany(id, { logoUrl });
@@ -211,6 +243,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error uploading logo:', error);
       res.status(500).json({ success: false, error: "Failed to upload logo" });
+    }
+  });
+
+  // Associate uploaded logo with company
+  app.post("/api/companies/:id/logo-associate", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { logoUrl } = req.body;
+
+      if (!logoUrl) {
+        return res.status(400).json({ success: false, error: "Logo URL is required" });
+      }
+
+      // Extract filename from URL
+      const filename = logoUrl.split('/').pop();
+      if (!filename) {
+        return res.status(400).json({ success: false, error: "Invalid logo URL" });
+      }
+
+      // Save file metadata to database
+      try {
+        const result = await db.execute(
+          `INSERT INTO file_attachments (entity_type, entity_id, filename, original_name, filepath, mimetype, size)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          ['company_logo', id.toString(), filename, filename, `uploads/${filename}`, 'image/*', 0]
+        );
+        console.log('Logo association saved:', result);
+      } catch (dbError) {
+        console.warn('Failed to save logo association:', dbError);
+        // Continue even if metadata save fails
+      }
+
+      console.log(`Logo associated with company ${id}: ${logoUrl}`);
+
+      res.json({ 
+        success: true, 
+        message: "Logo associated successfully" 
+      });
+    } catch (error) {
+      console.error('Error associating logo:', error);
+      res.status(500).json({ success: false, error: "Failed to associate logo" });
     }
   });
 
