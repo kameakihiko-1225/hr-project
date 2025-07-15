@@ -133,7 +133,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-border bg-white/60 dark:bg-white/5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.3deg] focus:-translate-y-1 focus:rotate-[0.3deg] transition-transform duration-150"
+      className="animate-fade-in group relative overflow-hidden border border-border bg-white/60 dark:bg-white/5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.3deg] focus:-translate-y-1 focus:rotate-[0.3deg] transition-transform duration-150 h-[320px] w-full flex flex-col"
     >
       {/* glass reflection */}
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -220,13 +220,13 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3 pb-4 relative z-10">
+      <CardContent className="space-y-3 pb-4 relative z-10 flex-1 flex flex-col">
         <CardTitle className="text-base font-semibold tracking-tight leading-snug text-foreground group-hover:text-primary line-clamp-2">
           {position.title}
         </CardTitle>
 
         {position.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2">
+          <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2.5rem]">
             {position.description.length > 100 
               ? `${position.description.substring(0, 100)}...` 
               : position.description}
@@ -240,7 +240,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
           </p>
         )}
 
-        <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap gap-3 mt-auto text-xs text-muted-foreground">
           {position.city && (
             <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {position.city}{position.country ? `, ${position.country}` : ''}</span>
           )}
@@ -250,7 +250,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-center gap-2 border-t border-border pt-3 relative z-10">
+      <CardFooter className="flex flex-col items-center gap-2 border-t border-border pt-3 relative z-10 mt-auto">
         {postedAgo && (
           <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
         )}
