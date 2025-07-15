@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Position } from '../types/position';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -9,7 +9,9 @@ import { formatDistanceToNow } from 'date-fns';
 import { createLogger } from '@/lib/logger';
 import { CompanyInfoModal } from './CompanyInfoModal';
 import { DepartmentInfoModal } from './DepartmentInfoModal';
-import { useQuery } from '@tanstack/react-query';
+import { getDepartments, getCompanies } from '@/lib/api';
+import { Department } from '../types/department';
+import { Company } from '../types/company';
 
 const logger = createLogger('adminPositionCard');
 
@@ -26,20 +28,40 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
   const [logoError, setLogoError] = useState(false);
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
 
-  // Fetch company and department data
-  const { data: companies } = useQuery({
-    queryKey: ['/api/companies'],
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-  
-  const { data: departments } = useQuery({
-    queryKey: ['/api/departments'],
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+  // Fetch company and department data using direct API calls (same as admin pages)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [companiesData, departmentsData] = await Promise.all([
+          getCompanies(),
+          getDepartments()
+        ]);
+        
+        setCompanies(Array.isArray(companiesData) ? companiesData : []);
+        setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
+      } catch (error) {
+        console.error('Error fetching data for AdminPositionCard:', error);
+        setCompanies([]);
+        setDepartments([]);
+      }
+    };
+
+    fetchData();
+  }, []);
   
   const departmentFromAPI = departments?.find(d => d.id === position.departmentId);
   const companyFromAPI = companies?.find(c => c.id === departmentFromAPI?.companyId);
+
+  // Debug logging
+  console.log('[AdminPositionCard] position.departmentId:', position.departmentId, typeof position.departmentId);
+  console.log('[AdminPositionCard] departments:', departments);
+  console.log('[AdminPositionCard] companies:', companies);
+  console.log('[AdminPositionCard] departmentFromAPI:', departmentFromAPI);
+  console.log('[AdminPositionCard] looking for companyId:', departmentFromAPI?.companyId, typeof departmentFromAPI?.companyId);
+  console.log('[AdminPositionCard] companyFromAPI:', companyFromAPI);
 
   // Data inheritance logic: position -> department -> company
   const getInheritedData = () => {
