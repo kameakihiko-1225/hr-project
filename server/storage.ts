@@ -3,12 +3,13 @@ import { neon } from "@neondatabase/serverless";
 import { eq, and } from "drizzle-orm";
 import dotenv from "dotenv";
 import { 
-  users, companies, departments, positions, candidates,
+  users, companies, departments, positions, candidates, galleryItems,
   type User, type InsertUser,
   type Company, type InsertCompany,
   type Department, type InsertDepartment,
   type Position, type InsertPosition,
-  type Candidate, type InsertCandidate
+  type Candidate, type InsertCandidate,
+  type GalleryItem, type InsertGalleryItem
 } from "@shared/schema";
 
 // Load environment variables
@@ -57,6 +58,13 @@ export interface IStorage {
   createCandidate(candidate: InsertCandidate): Promise<Candidate>;
   updateCandidate(id: string, candidate: Partial<InsertCandidate>): Promise<Candidate | undefined>;
   deleteCandidate(id: string): Promise<boolean>;
+
+  // Gallery item methods
+  getAllGalleryItems(category?: string): Promise<GalleryItem[]>;
+  getGalleryItemById(id: number): Promise<GalleryItem | undefined>;
+  createGalleryItem(galleryItem: InsertGalleryItem): Promise<GalleryItem>;
+  updateGalleryItem(id: number, galleryItem: Partial<InsertGalleryItem>): Promise<GalleryItem | undefined>;
+  deleteGalleryItem(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -182,7 +190,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCandidate(candidate: InsertCandidate): Promise<Candidate> {
-    const result = await db.insert(candidates).values(candidate).returning();
+    const candidateWithId = {
+      ...candidate,
+      id: candidate.id || `candidate-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    };
+    const result = await db.insert(candidates).values([candidateWithId]).returning();
     return result[0];
   }
 
@@ -194,6 +206,68 @@ export class DatabaseStorage implements IStorage {
   async deleteCandidate(id: string): Promise<boolean> {
     const result = await db.delete(candidates).where(eq(candidates.id, id));
     return result.rowCount > 0;
+  }
+
+  // Gallery item methods
+  async getAllGalleryItems(category?: string): Promise<GalleryItem[]> {
+    try {
+      if (category) {
+        return await db.select().from(galleryItems)
+          .where(and(eq(galleryItems.isActive, true), eq(galleryItems.category, category)))
+          .orderBy(galleryItems.sortOrder, galleryItems.createdAt);
+      } else {
+        return await db.select().from(galleryItems)
+          .where(eq(galleryItems.isActive, true))
+          .orderBy(galleryItems.sortOrder, galleryItems.createdAt);
+      }
+    } catch (error) {
+      console.error("Error fetching gallery items:", error);
+      return [];
+    }
+  }
+
+  async getGalleryItemById(id: number): Promise<GalleryItem | undefined> {
+    try {
+      const [item] = await db.select().from(galleryItems).where(eq(galleryItems.id, id));
+      return item || undefined;
+    } catch (error) {
+      console.error("Error fetching gallery item:", error);
+      return undefined;
+    }
+  }
+
+  async createGalleryItem(galleryItem: InsertGalleryItem): Promise<GalleryItem> {
+    try {
+      const [newItem] = await db.insert(galleryItems).values(galleryItem).returning();
+      return newItem;
+    } catch (error) {
+      console.error("Error creating gallery item:", error);
+      throw error;
+    }
+  }
+
+  async updateGalleryItem(id: number, galleryItem: Partial<InsertGalleryItem>): Promise<GalleryItem | undefined> {
+    try {
+      const [updatedItem] = await db
+        .update(galleryItems)
+        .set({ ...galleryItem, updatedAt: new Date() })
+        .where(eq(galleryItems.id, id))
+        .returning();
+      return updatedItem || undefined;
+    } catch (error) {
+      console.error("Error updating gallery item:", error);
+      return undefined;
+    }
+  }
+
+  async deleteGalleryItem(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(galleryItems).where(eq(galleryItems.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting gallery item:", error);
+      return false;
+    }
   }
 }
 

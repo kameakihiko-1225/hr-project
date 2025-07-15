@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema } from "@shared/schema";
+import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema } from "@shared/schema";
 import bcrypt from "bcryptjs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -561,6 +561,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Database health check failed:', error);
       res.json({ success: false, status: "disconnected", error: error.message });
+    }
+  });
+
+  // Gallery endpoints
+  app.get("/api/gallery", async (req, res) => {
+    try {
+      const category = req.query.category as string | undefined;
+      const galleryItems = await storage.getAllGalleryItems(category);
+      res.json({ success: true, data: galleryItems });
+    } catch (error) {
+      console.error('Error fetching gallery items:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch gallery items" });
+    }
+  });
+
+  app.get("/api/gallery/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const galleryItem = await storage.getGalleryItemById(id);
+      
+      if (!galleryItem) {
+        return res.status(404).json({ success: false, error: "Gallery item not found" });
+      }
+      
+      res.json({ success: true, data: galleryItem });
+    } catch (error) {
+      console.error('Error fetching gallery item:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch gallery item" });
+    }
+  });
+
+  app.post("/api/gallery", async (req, res) => {
+    try {
+      const validation = insertGalleryItemSchema.safeParse(req.body);
+      
+      if (!validation.success) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Invalid gallery item data",
+          details: validation.error.errors 
+        });
+      }
+      
+      const galleryItem = await storage.createGalleryItem(validation.data);
+      res.json({ success: true, data: galleryItem });
+    } catch (error) {
+      console.error('Error creating gallery item:', error);
+      res.status(500).json({ success: false, error: "Failed to create gallery item" });
+    }
+  });
+
+  app.put("/api/gallery/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validation = insertGalleryItemSchema.partial().safeParse(req.body);
+      
+      if (!validation.success) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Invalid gallery item data",
+          details: validation.error.errors 
+        });
+      }
+      
+      const galleryItem = await storage.updateGalleryItem(id, validation.data);
+      
+      if (!galleryItem) {
+        return res.status(404).json({ success: false, error: "Gallery item not found" });
+      }
+      
+      res.json({ success: true, data: galleryItem });
+    } catch (error) {
+      console.error('Error updating gallery item:', error);
+      res.status(500).json({ success: false, error: "Failed to update gallery item" });
+    }
+  });
+
+  app.delete("/api/gallery/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteGalleryItem(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ success: false, error: "Gallery item not found" });
+      }
+      
+      res.json({ success: true, message: "Gallery item deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting gallery item:', error);
+      res.status(500).json({ success: false, error: "Failed to delete gallery item" });
     }
   });
 

@@ -17,6 +17,7 @@ import AdminDashboard from "./pages/admin/dashboard/index";
 import AdminCompanies from "./pages/admin/companies/index";
 import AdminDepartments from "./pages/admin/departments/index";
 import AdminPositions from "./pages/admin/positions/index";
+import AdminGallery from "./pages/AdminGallery";
 
 
 
@@ -56,6 +57,16 @@ const App = () => (
             <Route path="/admin/positions">
               <ProtectedRoute>
                 <AdminPositions />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin/gallery">
+              <ProtectedRoute>
+                <AdminGallery />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin/gallery">
+              <ProtectedRoute>
+                <AdminGallery />
               </ProtectedRoute>
             </Route>
 

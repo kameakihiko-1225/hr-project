@@ -68,6 +68,19 @@ export const candidates = pgTable("candidates", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const galleryItems = pgTable("gallery_items", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // 'teamwork' | 'culture' | 'workspace' | 'events'
+  imageUrl: text("image_url").notNull(),
+  tags: text("tags").array().default([]),
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -94,6 +107,12 @@ export const insertCandidateSchema = createInsertSchema(candidates).omit({
   createdAt: true,
 });
 
+export const insertGalleryItemSchema = createInsertSchema(galleryItems).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -109,3 +128,6 @@ export type Position = typeof positions.$inferSelect;
 
 export type InsertCandidate = z.infer<typeof insertCandidateSchema>;
 export type Candidate = typeof candidates.$inferSelect;
+
+export type InsertGalleryItem = z.infer<typeof insertGalleryItemSchema>;
+export type GalleryItem = typeof galleryItems.$inferSelect;
