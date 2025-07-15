@@ -114,7 +114,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-border bg-white/60 dark:bg-white/5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.3deg] focus:-translate-y-1 focus:rotate-[0.3deg] transition-transform duration-150 hover-neon-beige"
+      className="animate-fade-in group relative overflow-hidden border border-border bg-white/60 dark:bg-white/5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.3deg] focus:-translate-y-1 focus:rotate-[0.3deg] transition-transform duration-150"
     >
       {/* glass reflection */}
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -156,7 +156,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
       <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
         <CompanyAvatar />
         <div className="flex-1">
-          <h3 className="font-semibold text-sm leading-tight text-foreground flex items-center gap-2 hover-neon-beige-text">
+          <h3 className="font-semibold text-sm leading-tight text-foreground flex items-center gap-2">
             {companyName}
           </h3>
           {showDepartment && Array.isArray(position.departments) && position.departments.length > 0 && (
@@ -174,7 +174,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
       </CardHeader>
 
       <CardContent className="space-y-3 pb-4 relative z-10">
-        <CardTitle className="text-base font-semibold tracking-tight leading-snug text-foreground group-hover:text-primary line-clamp-2 hover-neon-beige-text">
+        <CardTitle className="text-base font-semibold tracking-tight leading-snug text-foreground group-hover:text-primary line-clamp-2">
           {position.title}
         </CardTitle>
 
@@ -187,16 +187,16 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
         {/* Salary after description */}
         {position.salaryRange && (
           <p className="text-xs font-medium text-foreground flex items-center gap-1 mt-1">
-            <DollarSign className="h-3 w-3 hover-neon-beige-text" /> {position.salaryRange}
+            <DollarSign className="h-3 w-3" /> {position.salaryRange}
           </p>
         )}
 
         <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
           {position.city && (
-            <span className="flex items-center gap-1"><MapPin className="h-3 w-3 hover-neon-beige-text" /> {position.city}{position.country ? `, ${position.country}` : ''}</span>
+            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {position.city}{position.country ? `, ${position.country}` : ''}</span>
           )}
           {position.employmentType && (
-            <span className="flex items-center gap-1"><Briefcase className="h-3 w-3 hover-neon-beige-text" /> {position.employmentType}</span>
+            <span className="flex items-center gap-1"><Briefcase className="h-3 w-3" /> {position.employmentType}</span>
           )}
         </div>
       </CardContent>
@@ -293,7 +293,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
         {position.applyLink ? (
           <button
             onClick={handleApply}
-            className="px-6 py-1.5 text-xs font-medium rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center gap-1 hover-neon-beige"
+            className="px-6 py-1.5 text-xs font-medium rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center gap-1"
           >
             Apply Now <ExternalLink className="h-3 w-3" />
           </button>
@@ -301,7 +301,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
           <Button
             onClick={handleApply}
             disabled={isApplying}
-            className="px-6 py-1.5 text-xs font-medium rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-600/90 hover:to-indigo-600/90 transition-all flex items-center gap-1 disabled:opacity-60 hover-neon-beige"
+            className="px-6 py-1.5 text-xs font-medium rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-600/90 hover:to-indigo-600/90 transition-all flex items-center gap-1 disabled:opacity-60"
           >
             {isApplying ? 'Generating…' : 'Apply Now'} <Send className="h-3 w-3" />
           </Button>

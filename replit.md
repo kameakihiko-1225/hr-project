@@ -8,26 +8,6 @@ This is a full-stack HR platform for Millat Umidi, Uzbekistan's growing educatio
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes
-
-### July 15, 2025 - Founder Section & Beige Neon Theme
-- **Added Founder Section**: Created dedicated section after hero featuring Umidjon Ishmukhamedov
-  - Professional photo display with proper object-top positioning to show full face
-  - Inspirational message about education transformation mission
-  - Call-to-action button with smooth scroll to positions section
-  - Achievement stats and company branding
-- **Implemented Beige Neon Theme**: Added beige color (#b89c83) neon effects throughout
-  - Created custom CSS classes: neon-beige, neon-beige-text, hover-neon-beige, hover-neon-beige-text
-  - Applied neon effects to position cards, buttons, icons, and text elements
-  - Enhanced hover interactions with beige glow effects and smooth transitions
-  - Updated primary color scheme to use beige accents (2-3% usage as requested)
-- **Fixed Logo Upload System**: Resolved database storage issues
-  - Logo uploads now properly save logoUrl to company records
-  - Fixed JSON vs FormData handling in upload endpoints
-- **Enhanced Industry Tags**: Converted from mock to real API endpoints
-  - Added proper POST/GET endpoints for industry tag management
-  - Removed all mock data dependencies from client-side code
-
 ## System Architecture
 
 ### Frontend Architecture

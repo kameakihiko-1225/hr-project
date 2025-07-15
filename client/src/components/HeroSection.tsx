@@ -85,7 +85,7 @@ export const HeroSection = () => {
           <div className="animate-fade-in max-w-4xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               Join
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 block neon-beige-text">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 block">
                 Millat Umidi Group
               </span>
             </h1>
@@ -95,7 +95,7 @@ export const HeroSection = () => {
             <div className="flex justify-center mb-8">
               <button 
                 onClick={() => scrollToSection("filter-section")}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600/90 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center group shadow-lg text-lg hover-neon-beige"
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600/90 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center group shadow-lg text-lg"
               >
                 See Open Roles
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
