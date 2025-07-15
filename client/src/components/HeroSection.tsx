@@ -8,6 +8,7 @@ interface Stats {
   companies: number;
   departments: number;
   positions: number;
+  applicants: number;
 }
 
 export const HeroSection = () => {
@@ -16,7 +17,8 @@ export const HeroSection = () => {
   const [stats, setStats] = useState<Stats>({
     companies: 0,
     departments: 0,
-    positions: 0
+    positions: 0,
+    applicants: 0
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -32,14 +34,16 @@ export const HeroSection = () => {
         setStats({
           companies: companiesData?.data?.length || 0,
           departments: departmentsData?.length || 0,
-          positions: positionsData?.length || 0
+          positions: positionsData?.length || 0,
+          applicants: 42 // TODO: Get actual applicants count from API
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
         setStats({
           companies: 0,
           departments: 0,
-          positions: 0
+          positions: 0,
+          applicants: 0
         });
       } finally {
         setIsLoading(false);
@@ -69,9 +73,9 @@ export const HeroSection = () => {
       <div className="absolute bottom-20 right-20 w-12 h-12 bg-indigo-100 rounded-full opacity-30 animate-pulse" style={{ animationDelay: '1s' }}></div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+        <div className="flex flex-col items-center text-center">
           {/* Content */}
-          <div className="animate-fade-in">
+          <div className="animate-fade-in max-w-4xl">
             <div className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-4">
               <Briefcase className="h-4 w-4 mr-1.5" />
               {t('hero_badge')}
@@ -96,17 +100,10 @@ export const HeroSection = () => {
                 {t('hero_cta')}
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </button>
-              
-              <button 
-                onClick={() => scrollToSection("stats-section")}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300"
-              >
-                {t('hero_secondary_cta')}
-              </button>
             </div>
 
             {/* Statistics */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="text-center">
                 <div className="flex items-center justify-center mb-2">
                   <Building className="h-5 w-5 text-blue-600 mr-1" />
@@ -142,17 +139,18 @@ export const HeroSection = () => {
                 )}
                 <div className="text-sm text-gray-600">{t('positions')}</div>
               </div>
-            </div>
-          </div>
-
-          {/* Right side - Logo or Image */}
-          <div className="relative lg:order-last">
-            <div className="relative mx-auto max-w-md">
-              <img 
-                src="/logo-main.png" 
-                alt="Millat Umidi" 
-                className="w-full h-auto object-contain"
-              />
+              
+              <div className="text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Users className="h-5 w-5 text-orange-600 mr-1" />
+                </div>
+                {isLoading ? (
+                  <Skeleton className="h-8 w-16 mx-auto mb-1" />
+                ) : (
+                  <div className="text-2xl font-bold text-gray-900">{stats.applicants}</div>
+                )}
+                <div className="text-sm text-gray-600">{t('applicants')}</div>
+              </div>
             </div>
           </div>
         </div>

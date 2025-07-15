@@ -123,10 +123,16 @@ export class DatabaseStorage implements IStorage {
 
   // Position methods
   async getAllPositions(departmentId?: number): Promise<Position[]> {
-    if (departmentId) {
-      return await db.select().from(positions).where(eq(positions.departmentId, departmentId));
+    try {
+      if (departmentId) {
+        return await db.select().from(positions).where(eq(positions.departmentId, departmentId));
+      }
+      return await db.select().from(positions);
+    } catch (error) {
+      console.error('Database error in getAllPositions:', error);
+      // Return empty array if there's a database error
+      return [];
     }
-    return await db.select().from(positions);
   }
 
   async getPositionById(id: number): Promise<Position | undefined> {
