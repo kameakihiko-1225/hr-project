@@ -9,9 +9,9 @@ app.use(express.json());
 const BITRIX_BASE = 'https://millatumidi.bitrix24.kz/rest/21/wx0c9lt1mxcwkhz9';
 
 // Telegram file_id patterns vary by file type. Accept any file_id that starts with
-// an uppercase letter/number and is reasonably long ( > 20 chars)
+// an uppercase letter/number and is reasonably long ( > 20 chars) and doesn't contain spaces
 function isTelegramFileId(value) {
-  return typeof value === 'string' && /^[A-Z0-9]/.test(value) && value.length > 20;
+  return typeof value === 'string' && /^[A-Za-z0-9]/.test(value) && value.length > 20 && !value.includes(' ');
 }
 
 function normalizePhone(phone) {
@@ -166,6 +166,7 @@ app.post('/webhook', async (req, res) => {
       UF_CRM_1752239635: data.city_uzbek,  // city
       UF_CRM_1752239653: data.degree,      // degree
       UF_CRM_CONTACT_1745579971270: extractInnerTextFromHtmlLink(data.username), // telegram username
+      UF_CRM_1752622669492: ageRaw, // age field
     };
     
     // Resolve resume & diploma links
@@ -203,14 +204,18 @@ app.post('/webhook', async (req, res) => {
       if (isTelegramFileId(q.val)) {
         const link = await getTelegramFileUrl(q.val);
         if (link) {
-          contactFields[q.voiceField] = link; // Use voice field for file IDs
+          contactFields[q.voiceField] = link; // Use voice field for valid file IDs
           commentsParts.push(`${q.label}: ${link}`);
           phase2Log.push(`${q.label} (voice file link): ${link}`);
         } else {
-          phase2Log.push(`${q.label} file_id unresolved`);
+          // If file ID cannot be resolved, treat as text and use text field
+          contactFields[q.textField] = q.val;
+          commentsParts.push(`${q.label} (text fallback): ${q.val}`);
+          phase2Log.push(`${q.label} (file_id unresolved, saved as text): ${q.val}`);
         }
       } else {
         contactFields[q.textField] = q.val; // Use text field for simple text
+        commentsParts.push(`${q.label} (text): ${q.val}`);
         phase2Log.push(`${q.label} (text): ${q.val}`);
       }
     }
@@ -220,11 +225,14 @@ app.post('/webhook', async (req, res) => {
     const contactForm = new FormData();
     
     Object.entries(contactFields).forEach(([key, value]) => {
-      // Stringify arrays/objects for Bitrix24
-      if (Array.isArray(value) || typeof value === 'object') {
-        contactForm.append(`fields[${key}]`, JSON.stringify(value));
-      } else {
-        contactForm.append(`fields[${key}]`, value || '');
+      // Only skip null/undefined values, allow empty strings and other falsy values
+      if (value !== null && value !== undefined) {
+        // Stringify arrays/objects for Bitrix24
+        if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+          contactForm.append(`fields[${key}]`, JSON.stringify(value));
+        } else {
+          contactForm.append(`fields[${key}]`, String(value));
+        }
       }
     });
     
