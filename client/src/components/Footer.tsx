@@ -28,7 +28,7 @@ export const Footer = () => {
       className="bg-gradient-to-br from-gray-50 to-blue-50/30 dark:from-gray-900 dark:to-gray-800 border-t border-gray-100 dark:border-gray-800"
     >
       <div className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
@@ -152,23 +152,6 @@ export const Footer = () => {
               >
                 <Instagram className="h-5 w-5" />
               </a>
-            </div>
-          </div>
-
-          {/* Map */}
-          <div className="space-y-4 md:col-span-2 lg:col-span-1">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Location</h3>
-            <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2996.249!2d69.194489!3d41.317638!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38ae8b342a4a6c77%3A0x123456789abcdef0!2sChilonzor%2C%20Tashkent%2C%20Uzbekistan!5e0!3m2!1sen!2s!4v1642000000000!5m2!1sen!2s"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Millat Umidi Group Location"
-              />
             </div>
           </div>
         </div>
