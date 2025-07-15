@@ -21,8 +21,11 @@ export default function PositionsPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Get departmentId from URL params
+  const urlParams = new URLSearchParams(window.location.search);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>(
-    searchParams.get('departmentId') || 'all'
+    urlParams.get('departmentId') || 'all'
   );
 
   // Dialog states

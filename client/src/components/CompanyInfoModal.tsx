@@ -11,7 +11,12 @@ interface CompanyInfoModalProps {
 }
 
 export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalProps) {
-  if (!company) return null;
+  console.log('CompanyInfoModal rendered:', { company, isOpen });
+  
+  if (!company) {
+    console.log('No company data provided to modal');
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

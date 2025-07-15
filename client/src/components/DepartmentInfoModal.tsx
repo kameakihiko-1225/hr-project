@@ -12,7 +12,12 @@ interface DepartmentInfoModalProps {
 }
 
 export function DepartmentInfoModal({ department, company, isOpen, onClose }: DepartmentInfoModalProps) {
-  if (!department) return null;
+  console.log('DepartmentInfoModal rendered:', { department, company, isOpen });
+  
+  if (!department) {
+    console.log('No department data provided to modal');
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

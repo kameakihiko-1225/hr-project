@@ -48,6 +48,13 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
   const companyFromAPI = companies?.find(c => departments?.find(d => d.id === position.departmentId)?.companyId === c.id);
   const departmentFromAPI = departments?.find(d => d.id === position.departmentId);
 
+  // Debug logging
+  console.log('Companies:', companies);
+  console.log('Departments:', departments);
+  console.log('Position departmentId:', position.departmentId);
+  console.log('Company from API:', companyFromAPI);
+  console.log('Department from API:', departmentFromAPI);
+
   const handleEdit = () => {
     if (onEdit) {
       onEdit(position);
@@ -186,6 +193,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
                 className="h-6 px-2 text-xs hover:bg-blue-100 dark:hover:bg-blue-900 border border-blue-200 dark:border-blue-800"
                 onClick={(e) => {
                   e.stopPropagation();
+                  console.log('Company button clicked', companyFromAPI || company);
                   setIsCompanyModalOpen(true);
                 }}
               >
@@ -198,6 +206,7 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
                 className="h-6 px-2 text-xs hover:bg-green-100 dark:hover:bg-green-900 border border-green-200 dark:border-green-800"
                 onClick={(e) => {
                   e.stopPropagation();
+                  console.log('Department button clicked', departmentFromAPI);
                   setIsDepartmentModalOpen(true);
                 }}
               >
@@ -361,7 +370,10 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
       <CompanyInfoModal 
         company={companyFromAPI || company}
         isOpen={isCompanyModalOpen}
-        onClose={() => setIsCompanyModalOpen(false)}
+        onClose={() => {
+          console.log('Closing company modal');
+          setIsCompanyModalOpen(false);
+        }}
       />
       
       {/* Department Info Modal */}
@@ -369,7 +381,10 @@ export function PositionCard({ position, onEdit, onDelete, showDepartment = fals
         department={departmentFromAPI || (position.departments?.[0]?.department)}
         company={companyFromAPI || company}
         isOpen={isDepartmentModalOpen}
-        onClose={() => setIsDepartmentModalOpen(false)}
+        onClose={() => {
+          console.log('Closing department modal');
+          setIsDepartmentModalOpen(false);
+        }}
       />
     </Card>
   );
