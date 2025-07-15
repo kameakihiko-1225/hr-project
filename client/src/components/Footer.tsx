@@ -24,9 +24,9 @@ export const Footer = () => {
     <footer className="flex flex-col items-center justify-center py-6 border-t border-border bg-white">
       <img src="/2025-07-14 1.05.36 PM.jpg" alt="Millat Umidi HR Logo" className="h-20 w-20 object-contain mb-2" />
       <span className="text-lg font-semibold" style={{ color: '#222' }}>
-        Millat Umidi HR
+        Millat Umidi Group
       </span>
-      <span className="text-xs text-gray-500 mt-1">&copy; {new Date().getFullYear()} Millat Umidi HR. All rights reserved.</span>
+      <span className="text-xs text-gray-500 mt-1">&copy; {new Date().getFullYear()} Millat Umidi Group. All rights reserved.</span>
     </footer>
   );
 };

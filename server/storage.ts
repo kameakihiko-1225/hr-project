@@ -3,11 +3,12 @@ import { neon } from "@neondatabase/serverless";
 import { eq, and } from "drizzle-orm";
 import dotenv from "dotenv";
 import { 
-  users, companies, departments, positions,
+  users, companies, departments, positions, candidates,
   type User, type InsertUser,
   type Company, type InsertCompany,
   type Department, type InsertDepartment,
-  type Position, type InsertPosition
+  type Position, type InsertPosition,
+  type Candidate, type InsertCandidate
 } from "@shared/schema";
 
 // Load environment variables
@@ -49,6 +50,13 @@ export interface IStorage {
   createPosition(position: InsertPosition): Promise<Position>;
   updatePosition(id: number, position: Partial<InsertPosition>): Promise<Position | undefined>;
   deletePosition(id: number): Promise<boolean>;
+
+  // Candidate methods
+  getAllCandidates(positionId?: string): Promise<Candidate[]>;
+  getCandidateById(id: string): Promise<Candidate | undefined>;
+  createCandidate(candidate: InsertCandidate): Promise<Candidate>;
+  updateCandidate(id: string, candidate: Partial<InsertCandidate>): Promise<Candidate | undefined>;
+  deleteCandidate(id: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -152,6 +160,39 @@ export class DatabaseStorage implements IStorage {
 
   async deletePosition(id: number): Promise<boolean> {
     const result = await db.delete(positions).where(eq(positions.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Candidate methods
+  async getAllCandidates(positionId?: string): Promise<Candidate[]> {
+    try {
+      if (positionId) {
+        return await db.select().from(candidates).where(eq(candidates.positionId, positionId));
+      }
+      return await db.select().from(candidates);
+    } catch (error) {
+      console.error('Database error in getAllCandidates:', error);
+      return [];
+    }
+  }
+
+  async getCandidateById(id: string): Promise<Candidate | undefined> {
+    const result = await db.select().from(candidates).where(eq(candidates.id, id));
+    return result[0];
+  }
+
+  async createCandidate(candidate: InsertCandidate): Promise<Candidate> {
+    const result = await db.insert(candidates).values(candidate).returning();
+    return result[0];
+  }
+
+  async updateCandidate(id: string, candidate: Partial<InsertCandidate>): Promise<Candidate | undefined> {
+    const result = await db.update(candidates).set(candidate).where(eq(candidates.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteCandidate(id: string): Promise<boolean> {
+    const result = await db.delete(candidates).where(eq(candidates.id, id));
     return result.rowCount > 0;
   }
 }

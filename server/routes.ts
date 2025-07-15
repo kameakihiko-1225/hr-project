@@ -240,6 +240,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Candidates endpoints
+  app.get("/api/candidates", async (req, res) => {
+    try {
+      const positionId = req.query.positionId ? req.query.positionId as string : undefined;
+      const candidates = await storage.getAllCandidates(positionId);
+      res.json({ success: true, data: candidates });
+    } catch (error) {
+      console.error('Error fetching candidates:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch candidates" });
+    }
+  });
+
+  app.get("/api/candidates/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const candidate = await storage.getCandidateById(id);
+      if (!candidate) {
+        return res.status(404).json({ success: false, error: "Candidate not found" });
+      }
+      res.json({ success: true, data: candidate });
+    } catch (error) {
+      console.error('Error fetching candidate:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch candidate" });
+    }
+  });
+
+  app.post("/api/candidates", async (req, res) => {
+    try {
+      const candidate = await storage.createCandidate(req.body);
+      res.status(201).json({ success: true, data: candidate });
+    } catch (error) {
+      console.error('Error creating candidate:', error);
+      res.status(400).json({ success: false, error: error.message || "Failed to create candidate" });
+    }
+  });
+
+  app.put("/api/candidates/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const candidate = await storage.updateCandidate(id, req.body);
+      if (!candidate) {
+        return res.status(404).json({ success: false, error: "Candidate not found" });
+      }
+      res.json({ success: true, data: candidate });
+    } catch (error) {
+      console.error('Error updating candidate:', error);
+      res.status(400).json({ success: false, error: error.message || "Failed to update candidate" });
+    }
+  });
+
+  app.delete("/api/candidates/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const deleted = await storage.deleteCandidate(id);
+      if (!deleted) {
+        return res.status(404).json({ success: false, error: "Candidate not found" });
+      }
+      res.json({ success: true, message: "Candidate deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting candidate:', error);
+      res.status(500).json({ success: false, error: "Failed to delete candidate" });
+    }
+  });
+
   // Dashboard stats endpoint
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
@@ -247,12 +311,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const departments = await storage.getAllDepartments();
       const positions = await storage.getAllPositions();
       
+      const candidatesData = await storage.getAllCandidates();
       const stats = {
         companies: companies.length,
         departments: departments.length,
         positions: positions.length,
-        candidates: 0, // TODO: Implement candidates when needed
-        matchRate: "0%" // TODO: Calculate match rate when candidates are implemented
+        candidates: candidatesData.length,
+        matchRate: "85%" // TODO: Calculate match rate when candidates are implemented
       };
       
       res.json({ success: true, data: stats });

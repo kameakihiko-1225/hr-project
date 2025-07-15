@@ -44,8 +44,27 @@ export const positions = pgTable("positions", {
   languageRequirements: text("language_requirements"),
   qualifications: text("qualifications"),
   responsibilities: text("responsibilities"),
-  departmentId: integer("department_id").notNull(),
+  departmentId: integer("departmentid").notNull(),
   applyLink: text("apply_link"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const candidates = pgTable("candidates", {
+  id: text("id").primaryKey(),
+  fullName: text("full_name"),
+  email: text("email"),
+  phone: text("phone"),
+  positionId: text("position_id"),
+  status: text("status").default("applied"),
+  cvUrl: text("cv_url"),
+  telegramId: text("telegram_id"),
+  telegramUsername: text("telegram_username"),
+  salaryExpectation: text("salary_expectation"),
+  workType: text("work_type"),
+  country: text("country"),
+  region: text("region"),
+  englishLevel: text("english_level"),
+  preferredLanguage: text("preferred_language"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -70,6 +89,11 @@ export const insertPositionSchema = createInsertSchema(positions).omit({
   createdAt: true,
 });
 
+export const insertCandidateSchema = createInsertSchema(candidates).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -82,3 +106,6 @@ export type Department = typeof departments.$inferSelect;
 
 export type InsertPosition = z.infer<typeof insertPositionSchema>;
 export type Position = typeof positions.$inferSelect;
+
+export type InsertCandidate = z.infer<typeof insertCandidateSchema>;
+export type Candidate = typeof candidates.$inferSelect;
