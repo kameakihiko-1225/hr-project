@@ -174,10 +174,10 @@ app.post('/webhook', async (req, res) => {
 
     // Add link fields required by Bitrix24
     if (resumeLink) {
-      contactFields['UF_CRM_1752239677'] = resumeLink; // resume link field
+      contactFields['UF_CRM_1752621810'] = resumeLink; // resume link field
     }
     if (diplomaLink) {
-      contactFields['UF_CRM_1752239690'] = diplomaLink; // diploma link field
+      contactFields['UF_CRM_1752621831'] = diplomaLink; // diploma link field
     }
 
     // Build Comments with links and age
@@ -193,9 +193,9 @@ app.post('/webhook', async (req, res) => {
 
     // Handle Phase2 text or voice answers (store as text/link)
     const phase2 = [
-      { val: data.phase2_q_1, textField: 'UF_CRM_1752241370', fileField: 'UF_CRM_1752245274', filename: 'q1.ogg', label: 'phase2_q_1' },
-      { val: data.phase2_q_2, textField: 'UF_CRM_1752241378', fileField: 'UF_CRM_1752245286', filename: 'q2.ogg', label: 'phase2_q_2' },
-      { val: data.phase2_q_3, textField: 'UF_CRM_1752241386', fileField: 'UF_CRM_1752245298', filename: 'q3.ogg', label: 'phase2_q_3' },
+      { val: data.phase2_q_1, textField: 'UF_CRM_1752241370', voiceField: 'UF_CRM_1752621857', filename: 'q1.ogg', label: 'phase2_q_1' },
+      { val: data.phase2_q_2, textField: 'UF_CRM_1752241378', voiceField: 'UF_CRM_1752621874', filename: 'q2.ogg', label: 'phase2_q_2' },
+      { val: data.phase2_q_3, textField: 'UF_CRM_1752241386', voiceField: 'UF_CRM_1752621887', filename: 'q3.ogg', label: 'phase2_q_3' },
     ];
     const phase2Log = [];
     for (const q of phase2) {
@@ -203,14 +203,14 @@ app.post('/webhook', async (req, res) => {
       if (isTelegramFileId(q.val)) {
         const link = await getTelegramFileUrl(q.val);
         if (link) {
-          contactFields[q.textField] = link;
+          contactFields[q.voiceField] = link; // Use voice field for file IDs
           commentsParts.push(`${q.label}: ${link}`);
-          phase2Log.push(`${q.label} (file link): ${link}`);
+          phase2Log.push(`${q.label} (voice file link): ${link}`);
         } else {
           phase2Log.push(`${q.label} file_id unresolved`);
         }
       } else {
-        contactFields[q.textField] = q.val;
+        contactFields[q.textField] = q.val; // Use text field for simple text
         phase2Log.push(`${q.label} (text): ${q.val}`);
       }
     }
