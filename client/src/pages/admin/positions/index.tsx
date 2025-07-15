@@ -7,7 +7,7 @@ import { Textarea } from '../../../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
 import { useToast } from '../../../components/ui/use-toast';
-import { PositionCard } from '../../../components/PositionCard';
+import { AdminPositionCard } from '../../../components/AdminPositionCard';
 import { createPosition, deletePosition, getPositions, getDepartments, updatePosition } from '../../../lib/api';
 import { Position } from '../../../types/position';
 import { Department } from '../../../types/department';
@@ -322,7 +322,7 @@ export default function PositionsPage() {
         ) : filteredPositions.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPositions.map((position) => (
-              <PositionCard
+              <AdminPositionCard
                 key={position.id}
                 position={position}
                 onEdit={handleEditPosition}
