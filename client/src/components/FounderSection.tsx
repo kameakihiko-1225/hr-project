@@ -22,9 +22,8 @@ export const FounderSection = () => {
               <img
                 src={founderImage}
                 alt="Umidjon Ishmukhamedov"
-                className="w-80 h-80 lg:w-96 lg:h-96 object-cover rounded-2xl shadow-2xl border-4 border-white dark:border-gray-800"
+                className="w-80 h-auto lg:w-96 lg:h-auto object-contain rounded-2xl shadow-2xl border-4 border-white dark:border-gray-800 bg-white dark:bg-gray-800"
               />
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white dark:border-gray-800"></div>
             </div>
             
             <div className="text-center lg:text-left">
