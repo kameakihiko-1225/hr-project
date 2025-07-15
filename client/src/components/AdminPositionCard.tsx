@@ -40,8 +40,12 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
           getDepartments()
         ]);
         
-        setCompanies(Array.isArray(companiesData) ? companiesData : []);
-        setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
+        // Extract data properly - companies returns API wrapper, departments returns direct array
+        const companiesArray = companiesData?.data || companiesData || [];
+        const departmentsArray = Array.isArray(departmentsData) ? departmentsData : [];
+        
+        setCompanies(companiesArray);
+        setDepartments(departmentsArray);
       } catch (error) {
         console.error('Error fetching data for AdminPositionCard:', error);
         setCompanies([]);
@@ -55,13 +59,7 @@ export function AdminPositionCard({ position, onEdit, onDelete, showDepartment =
   const departmentFromAPI = departments?.find(d => d.id === position.departmentId);
   const companyFromAPI = companies?.find(c => c.id === departmentFromAPI?.companyId);
 
-  // Debug logging
-  console.log('[AdminPositionCard] position.departmentId:', position.departmentId, typeof position.departmentId);
-  console.log('[AdminPositionCard] departments:', departments);
-  console.log('[AdminPositionCard] companies:', companies);
-  console.log('[AdminPositionCard] departmentFromAPI:', departmentFromAPI);
-  console.log('[AdminPositionCard] looking for companyId:', departmentFromAPI?.companyId, typeof departmentFromAPI?.companyId);
-  console.log('[AdminPositionCard] companyFromAPI:', companyFromAPI);
+
 
   // Data inheritance logic: position -> department -> company
   const getInheritedData = () => {
