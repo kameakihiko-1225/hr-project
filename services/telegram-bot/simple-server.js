@@ -15,7 +15,16 @@ function isTelegramFileId(value) {
 }
 
 function normalizePhone(phone) {
-  return (phone || '').replace(/\D/g, '');
+  if (!phone) return '';
+  // Remove all non-digits
+  const cleaned = phone.replace(/\D/g, '');
+  // Ensure proper E.164 format for Uzbekistan numbers
+  if (cleaned.startsWith('998')) {
+    return `+${cleaned}`;
+  } else if (cleaned.length >= 9) {
+    return `+998${cleaned}`;
+  }
+  return cleaned ? `+998${cleaned}` : '';
 }
 
 function extractInnerTextFromHtmlLink(value) {
@@ -171,11 +180,10 @@ app.post('/webhook', async (req, res) => {
     
     // Add phone field using array format with VALUE/VALUE_TYPE + backup custom field
     if (phone) {
-      const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
-      contactFields.PHONE = [{ VALUE: formattedPhone, VALUE_TYPE: 'WORK' }]; // Array format
-      contactFields.UF_CRM_1747689959 = formattedPhone; // Backup custom field
-      console.log('[TELEGRAM-BOT] Adding phone field (array format):', formattedPhone);
-      console.log('[TELEGRAM-BOT] Phone backup field UF_CRM_1747689959:', formattedPhone);
+      contactFields.PHONE = [{ VALUE: phone, VALUE_TYPE: 'MOBILE' }]; // E.164 format with MOBILE type
+      contactFields.UF_CRM_1747689959 = phone; // Backup custom field
+      console.log('[TELEGRAM-BOT] Adding phone field (E.164 format):', phone);
+      console.log('[TELEGRAM-BOT] Phone backup field UF_CRM_1747689959:', phone);
       console.log('[TELEGRAM-BOT] PHONE array structure:', contactFields.PHONE);
     }
     
@@ -275,6 +283,21 @@ app.post('/webhook', async (req, res) => {
           console.log('[TELEGRAM-BOT] Bitrix24 API Error:', createResp.data.error);
         }
         contactId = createResp.data.result;
+        
+        // Verify phone field was added by fetching the contact back
+        if (contactId && phone) {
+          try {
+            const verifyResp = await axios.get(`${BITRIX_BASE}/crm.contact.get.json?ID=${contactId}`);
+            const contact = verifyResp.data.result;
+            if (contact && contact.PHONE) {
+              console.log('[TELEGRAM-BOT] Phone field verified in contact:', contact.PHONE);
+            } else {
+              console.log('[TELEGRAM-BOT] WARNING: Phone field not found in created contact, backup field should contain:', phone);
+            }
+          } catch (verifyError) {
+            console.log('[TELEGRAM-BOT] Could not verify contact phone field:', verifyError.message);
+          }
+        }
       }
     } else {
       // No phone – always create

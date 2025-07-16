@@ -28,21 +28,22 @@ export const HeroSection = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [positionsData, departmentsData, companiesData, statsResponse] = await Promise.all([
+        const [positionsData, departmentsData, companiesData, clickStatsResponse] = await Promise.all([
           getPositions(),
           getDepartments(),
           getCompanies(),
-          fetch(`${API_BASE_URL}/dashboard/stats`)
+          fetch(`${API_BASE_URL}/dashboard/click-stats`)
         ]);
 
-        const statsData = await statsResponse.json();
-        const candidatesCount = statsData.success && statsData.data ? statsData.data.candidates : 0;
+        const clickStatsData = await clickStatsResponse.json();
+        // Use the total applies count from click stats as applicants data
+        const realApplicantsCount = clickStatsData.success && clickStatsData.data ? clickStatsData.data.totalApplies : 0;
 
         setStats({
           companies: companiesData?.data?.length || 0,
           departments: departmentsData?.length || 0,
           positions: positionsData?.length || 0,
-          applicants: candidatesCount + applicants
+          applicants: realApplicantsCount // Real applicant data from database
         });
       } catch (error) {
         console.error('Error fetching stats:', error);

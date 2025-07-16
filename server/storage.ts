@@ -91,6 +91,7 @@ export interface IStorage {
   trackPositionClick(positionId: number, clickType: 'view' | 'apply', ipAddress?: string, userAgent?: string): Promise<PositionClick>;
   getPositionClickStats(positionId?: number): Promise<{ positionId: number; viewCount: number; applyCount: number; }[]>;
   getDashboardStats(): Promise<{ totalViews: number; totalApplies: number; }>;
+  getPositionApplicantCounts(): Promise<{ positionId: number; applicantCount: number; positionTitle: string; }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -518,6 +519,27 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting dashboard stats:', error);
       return { totalViews: 0, totalApplies: 0 };
+    }
+  }
+
+  // New method to get applicant counts for positions
+  async getPositionApplicantCounts(): Promise<{ positionId: number; applicantCount: number; positionTitle: string; }[]> {
+    try {
+      const results = await db
+        .select({
+          positionId: positionClicks.positionId,
+          applicantCount: sql<number>`cast(count(*) as int)`,
+          positionTitle: positions.title,
+        })
+        .from(positionClicks)
+        .innerJoin(positions, eq(positionClicks.positionId, positions.id))
+        .where(eq(positionClicks.clickType, 'apply'))
+        .groupBy(positionClicks.positionId, positions.title);
+      
+      return results;
+    } catch (error) {
+      console.error('Error getting position applicant counts:', error);
+      return [];
     }
   }
 }

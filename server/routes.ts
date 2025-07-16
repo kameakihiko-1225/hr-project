@@ -1002,6 +1002,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get position applicant counts
+  app.get("/api/positions/applicant-counts", async (req, res) => {
+    try {
+      const applicantCounts = await storage.getPositionApplicantCounts();
+      res.json({ success: true, data: applicantCounts });
+    } catch (error) {
+      console.error('Error getting position applicant counts:', error);
+      res.status(500).json({ success: false, error: "Failed to get position applicant counts" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // Initialize gallery data on startup
