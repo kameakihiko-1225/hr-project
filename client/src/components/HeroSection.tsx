@@ -5,9 +5,6 @@ import { getPositions, getDepartments, getCompanies } from "@/lib/api";
 import { useClickCounter } from "@/contexts/ClickCounterContext";
 import { API_BASE_URL } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PositionCounterCard } from "@/components/PositionCounterCard";
-import { TopAppliedPositions } from "@/components/TopAppliedPositions";
-import { AllAppliedPositionsListing } from "@/components/AllAppliedPositionsListing";
 
 interface Stats {
   companies: number;
@@ -156,11 +153,7 @@ export const HeroSection = () => {
               </div>
             </div>
 
-            {/* Top Applied Positions - Up to 3 counter cards */}
-            <TopAppliedPositions />
-            
-            {/* All Applied Positions Listing - Paginated list */}
-            <AllAppliedPositionsListing />
+
           </div>
         </div>
       </div>

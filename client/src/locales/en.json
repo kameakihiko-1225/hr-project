@@ -169,6 +169,15 @@
     "switch_to_grid": "Switch to Grid View"
   },
 
+  "job_positions": {
+    "section_title": "Job Positions with Applicants",
+    "section_subtitle": "Discover the most popular positions with their current applicant counts",
+    "applicants_label": "Applicants",
+    "view_more": "View More Positions",
+    "view_less": "View Less Positions",
+    "top_badge": "#1"
+  },
+
   "features_cards": {
     "innovation": {
       "title": "Innovation at Heart",

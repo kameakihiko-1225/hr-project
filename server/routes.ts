@@ -764,6 +764,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Job positions with applicants endpoint
+  app.get("/api/job-positions-with-applicants", async (req, res) => {
+    try {
+      const lang = req.query.lang as string || 'en';
+      const acceptLanguage = req.headers['accept-language'] || 'en';
+      
+      // Get all positions with their applicant counts
+      const positionsWithApplicants = await storage.getAllAppliedPositions();
+      
+      // Filter out positions with zero applicants
+      const filteredPositions = positionsWithApplicants.filter(pos => pos.appliedCount > 0);
+      
+      // Get full position details for the filtered positions
+      const positionDetails = await Promise.all(
+        filteredPositions.map(async (pos) => {
+          const position = await storage.getPositionById(pos.positionId);
+          return {
+            position_id: pos.positionId,
+            position_name: {
+              en: position?.title || pos.positionTitle,
+              ru: position?.title || pos.positionTitle, // TODO: Add proper multilingual support
+              uz: position?.title || pos.positionTitle
+            },
+            applied_count: pos.appliedCount
+          };
+        })
+      );
+      
+      // Sort by applied count in descending order
+      const sortedPositions = positionDetails.sort((a, b) => b.applied_count - a.applied_count);
+      
+      res.json({ success: true, data: sortedPositions });
+    } catch (error) {
+      console.error('Error fetching job positions with applicants:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch job positions with applicants" });
+    }
+  });
+
   // Gallery endpoints
   app.get("/api/gallery", async (req, res) => {
     try {
@@ -1043,6 +1081,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error getting all applied positions:', error);
       res.status(500).json({ success: false, error: "Failed to get all applied positions" });
+    }
+  });
+
+  // Job Positions with Applicants endpoint (for JobPositionsListing component)
+  app.get("/api/job-positions-with-applicants", async (req, res) => {
+    try {
+      const positions = await storage.getAllAppliedPositions();
+      
+      // Transform data to match JobPositionsListing component interface
+      const formattedPositions = positions.map(position => ({
+        position_id: position.positionId,
+        position_name: {
+          en: position.positionTitle,
+          ru: position.positionTitle, // For now, use same title
+          uz: position.positionTitle  // For now, use same title
+        },
+        applied_count: position.appliedCount
+      }));
+      
+      res.json({ success: true, data: formattedPositions });
+    } catch (error) {
+      console.error('Error getting job positions with applicants:', error);
+      res.status(500).json({ success: false, error: "Failed to get job positions with applicants" });
     }
   });
 

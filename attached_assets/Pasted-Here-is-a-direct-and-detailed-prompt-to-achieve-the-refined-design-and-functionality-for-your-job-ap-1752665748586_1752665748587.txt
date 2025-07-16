@@ -1,0 +1,213 @@
+Here is a direct and detailed prompt to achieve the refined design and functionality for your job application display. This prompt consolidates the previous requirements and explicitly addresses the new modifications.
+
+-----
+
+## **🤖 AI Code Agent Prompt: Integrated Job Position Listing with Dynamic Applicant Counts & Top-Tier Badging (Localized & Refactored)**
+
+**🎯 OVERARCHING GOAL:** To refactor the job application display by removing dedicated "Top Applied Positions" and "All Applied Positions Listing" components from the hero section. Instead, create a **single, unified "Job Positions Listing" section located *below* the hero section.** Each individual `PositionCard` within this new listing will dynamically display its applicant count and a "\#1" badge if it's a top-applied position.
+
+**📋 CORE REQUIREMENTS SUMMARY:**
+
+1.  **Component Removal:**
+
+      * **Remove** the dedicated "Top Applied Positions" counter card component from the hero section.
+      * **Remove** the "All Applied Positions Listing" component from the hero section.
+      * The hero section should revert to its original content and layout, as if these components were never there.
+
+2.  **New "Job Positions Listing" Section (Below Hero):**
+
+      * Create a **new, distinct section on the page, located *immediately below the entire hero section***.
+      * This section will house all `PositionCard` components.
+      * It will feature a "simplicity with modern view" design, drawing inspiration from `Screenshot 2025-07-16 at 2.51.44 PM.png` for its overall aesthetic and the individual `PositionCard`s.
+      * It will include pagination with an initial limit of 4 positions per page, and "View More/Less" functionality.
+
+3.  **Enhanced `PositionCard` (Individual Listing Item):**
+
+      * Each `PositionCard` will be an individual item within the new "Job Positions Listing" section.
+      * **Content & Layout within `PositionCard` (Left to Right):**
+          * **Numbering:** On the left side of the card (e.g., "1.", "2.", "3.", representing its order in the current paginated list).
+          * **Localized Position Name:** Next to the numbering.
+          * **Applied Count Display:** On the far right side of the card, display the count in the format: **"Applicants: ${number\_of\_applied}"**. The label "Applicants:" must be localized.
+      * **"\#1" Badge for Top Positions:**
+          * **Conditional Display:** If a position is among the **top 3 most applied positions overall** (based on 'apply' clicks), a prominent **"\#1" badge** should be added to its `PositionCard`. The badge should be visually distinct and clearly indicate its top status.
+          * The badge should be integrated aesthetically into the card's "simplicity with modern view" design.
+      * **Design:** The `PositionCard` itself must embody the "simplicity with modern view" aesthetic, with clean lines, balanced spacing, clear typography, and subtle interactive effects (e.g., hover). Resolve any design problems from `Screenshot 2025-07-16 at 3.43.40 PM.png`.
+
+4.  **Data Integrity:**
+
+      * All position data (names) and application counts **MUST be retrieved live from the `position_clicks` database table (where `click_type` is 'apply')**.
+      * **NO MOCK DATA** for position names or counts.
+      * Only positions that have at least one 'apply' click should appear in the listing.
+
+5.  **Pagination & "View More/Less" Functionality:**
+
+      * The "Job Positions Listing" section will initially display **4 `PositionCard`s per page**.
+      * A "View More Positions" button/icon will appear if there are more than 4 positions available.
+      * **"View More" Click:** Expands the list to show *all* remaining `PositionCard`s and changes the button to "View Less Positions".
+      * **"View Less" Click:** Collapses the list back to the initial 4 `PositionCard`s and changes the button to "View More Positions".
+
+6.  **Full Localization:** All user-facing text (UI labels like "Applicants:", "View More/Less Positions", numbering, dynamic position names) must be localized for English (🇺🇸), Uzbek (🇺🇿), and Russian (🇷🇺).
+
+7.  **UI/UX Preservation (Hero Section):** The hero section must remain completely unaffected by these changes, reverting to its original layout and content without any new components added within its boundaries.
+
+8.  **Proper Nouns:** "Millat Umidi" and "Millat Umidi Group" must remain untranslated.
+
+-----
+
+### **SECTION 1: 💾 Database & Backend API Development**
+
+**Instructions for the AI Code Agent:**
+
+1.  **Database Schema Review & Usage:**
+
+      * Confirm `position_clicks` table contains `position_id` and `click_type` ('apply').
+      * Confirm `Positions` table has `id` and multilingual title fields (`title_en`, `title_ru`, `title_uz` or translation table).
+      * Ensure foreign key relationships are correct.
+
+2.  **API Endpoint Implementation:**
+
+      * **Endpoint: `GET /api/job-positions-with-applicants`**
+          * **Purpose:** Provide the *complete list* of positions with their total 'apply' counts and localized names. This single endpoint will serve both the "top 3" logic (handled on frontend) and the full listing.
+          * **Logic:**
+            1.  Group `position_clicks` entries by `position_id`, filtering `click_type: "apply"`.
+            2.  Calculate the total count of 'apply' clicks for each `position_id`.
+            3.  **Filter out any positions with zero 'apply' clicks.**
+            4.  Join with the `Positions` table to retrieve localized position titles.
+            5.  Order results by `applied_count` in descending order (this order is crucial for the frontend to determine top positions).
+          * **Response Format:** An array of objects, ordered by `applied_count` (descending). Example:
+            ```json
+            [
+              {
+                "position_id": 101,
+                "position_name": {"en": "HR Generalist", "ru": "Кадровый аналитик", "uz": "Kadrlar bo'yicha mutaxassis"},
+                "applied_count": 43
+              },
+              {
+                "position_id": 102,
+                "position_name": {"en": "English Teacher", "ru": "Учитель английского", "uz": "Ingliz tili o'qituvchisi"},
+                "applied_count": 28
+              },
+              // ... all other positions with clicks, in descending order
+            ]
+            ```
+          * **Localization:** Position names in the response must be provided for EN, RU, UZ, based on client's `Accept-Language` or `lang` parameter. Implement fallback.
+
+**Deliverables for Section 1:**
+
+  * Refined database schema.
+  * A single, fully functional, and optimized API endpoint: `/api/job-positions-with-applicants`.
+  * Backend logic to accurately count 'apply' clicks from `position_clicks` and retrieve localized position names, ordered by count.
+  * Robust error handling and validation for the API endpoint.
+
+-----
+
+### **SECTION 2: 🎨 Frontend UI & Component Development**
+
+**Instructions for the AI Code Agent:**
+
+1.  **Hero Section Cleanup:**
+
+      * Ensure **all previously added components for "Top Applied Positions" and "All Applied Positions Listing" are completely removed** from the hero section.
+      * Verify the hero section's original layout, content (main heading, image, primary CTA), and styling are fully restored and unaffected.
+
+2.  **New "Job Positions Listing" Section (🇺🇸 🇺🇿 🇷🇺)**
+
+      * **Placement:** Create a **new, dedicated section on the page, positioned *immediately below the entire hero section***.
+      * **Data Fetching:** Fetch data from the single `/api/job-positions-with-applicants` endpoint.
+      * **Overall Design:**
+          * Implement a "simplicity with modern view" aesthetic for this entire section. This includes:
+              * Clean overall layout for the list of cards.
+              * Harmonious use of typography and color palette.
+              * Subtle animations/transitions (e.g., on hover, on list expansion).
+          * The design should be visually appealing and cohesive with the overall website.
+      * **Conditional Rendering:** If the API returns no positions with applicants, this entire "Job Positions Listing" section should **not be rendered**.
+
+3.  **Enhanced `PositionCard` Component (Individual Listing Item):**
+
+      * **Design:**
+          * Each `PositionCard` must embody the "simplicity with modern view" aesthetic (inspired by `Screenshot 2025-07-16 at 2.51.44 PM.png`).
+          * **Crucially, resolve any and all design problems visible in `Screenshot 2025-07-16 at 3.43.40 PM.png`** (e.g., alignment, spacing, typography, visual hierarchy issues).
+          * Apply clean, minimalist styling: appropriate padding, subtle delineation (e.g., soft `box-shadow` or thin light borders), rounded corners.
+          * Implement subtle interactive hover effects.
+      * **Internal Layout (Left to Right):**
+          * **Numbering:** Display the item's sequential number within the *current paginated view* (e.g., "1.", "2."). Use a subtle but readable font style/color.
+          * **Localized Position Name:** This should be the most prominent text (larger `font-size`, bolder `font-weight`).
+          * **"\#1" Badge (Conditional):** If the `PositionCard` corresponds to one of the **top 3 positions** from the API response (i.e., its index in the *ordered* API response is 0, 1, or 2), display a visually distinct and aesthetically integrated "\#1" badge. This badge should be small, perhaps in a corner or next to the numbering/title, using an accent color.
+          * **Applied Count:** On the far right, display **"Applicants: ${number\_of\_applied}"**. The numerical count should be clear, and the "Applicants:" label (which must be localized) can be slightly less prominent. Ensure proper alignment to the far right.
+      * **Responsiveness:** Ensure the `PositionCard`'s internal layout adapts gracefully across screen sizes. On smaller screens, elements might need to adjust `font-size` or potentially stack vertically (e.g., applied count below the name) while maintaining numbering on the left.
+
+4.  **Pagination & "View More/Less" Functionality:**
+
+      * **Initial Display:** The "Job Positions Listing" will initially display only the **first 4 `PositionCard`s** from the fetched data.
+      * **"View More Positions" Button:**
+          * Display this button/icon below the list if the total number of positions with applicants is greater than 4.
+          * **On Click:** Expand the list to show *all* `PositionCard`s. Change button text to "View Less Positions".
+      * **"View Less Positions" Button:**
+          * Display this button after "View More" has been clicked.
+          * **On Click:** Collapse the list back to the initial 4 `PositionCard`s. Change button text to "View More Positions".
+      * **Localization:** Ensure button texts ("View More Positions", "Показать больше позиций", "Ko'proq lavozimlarni ko'rish" / "View Less Positions", "Показать меньше позиций", "Kamroq lavozimlarni ko'rish") are correctly localized.
+      * **Design:** Integrate the pagination controls seamlessly with the "simplicity with modern view" aesthetic of the listing section.
+
+5.  **General Localization Integration:**
+
+      * All new static text (e.g., section titles for "Job Positions Listing", "Applicants:" label, button texts) must be added to the i18n system and correctly displayed in the active language.
+      * Dynamic position names must be rendered in the active language based on API responses.
+      * Validate that text length variations across EN, RU, UZ do not cause layout issues or visual distortion within the `PositionCard` or the overall listing.
+
+**Deliverables for Section 2:**
+
+  * Cleaned-up hero section, free of job listing components.
+  * A new, dedicated "Job Positions Listing" section below the hero.
+  * A highly refined `PositionCard` component that:
+      * Adheres to the "simplicity with modern view" design.
+      * Resolves all design problems from `Screenshot 2025-07-16 at 3.43.40 PM.png`.
+      * Correctly displays numbering, localized position name, and localized "Applicants: ${count}".
+      * Conditionally displays the "\#1" badge for top 3 positions.
+      * Is fully responsive.
+  * Fully functional "View More / View Less" pagination for the listing.
+  * Full localization for all UI text and dynamic content.
+  * Robust frontend data fetching, state management, and error handling.
+
+-----
+
+### **SECTION 3: 🔍 Technical SEO & Testing**
+
+**Instructions for the AI Code Agent:**
+
+1.  **SEO Considerations:**
+
+      * Ensure the new "Job Positions Listing" section is crawlable by search engines. If client-side rendering, consider server-side rendering the initial 4 positions or providing a full list for bots.
+      * Ensure the hero section's SEO integrity is maintained after component removal.
+
+2.  **Automated Testing (Comprehensive):**
+
+      * **Backend:** Verify API endpoint for accurate counting from `position_clicks` (only 'apply' type), correct sorting, and accurate localization. Test edge cases (0, 1, 2, 3 positions with applicants).
+      * **Frontend:**
+          * **Hero Section:** Test that the hero section is clean and restored to its original state.
+          * **New Listing Section:** Test correct placement *below* the hero.
+          * **`PositionCard`:**
+              * Verify correct display of numbering, localized name, and localized "Applicants: ${count}".
+              * Test "\#1" badge visibility for the top 3 positions (and absence for others).
+              * Verify adherence to the "simplicity with modern view" design and resolution of prior design issues.
+              * Test responsiveness.
+          * **Pagination:** Test initial 4-item display, "View More" functionality (expands to all), "View Less" functionality (collapses to 4), and button text changes.
+          * **Localization:** Confirm all dynamic and static text is correctly translated across EN, RU, UZ.
+
+3.  **Manual QA Guidance:**
+
+      * **Visual Inspection:** **CRITICALLY review the new "Job Positions Listing" section in all three languages.**
+          * Confirm the "simplicity with modern view" aesthetic is achieved.
+          * **Verify that all design problems from `Screenshot 2025-07-16 at 3.43.40 PM.png` are completely resolved.**
+          * Check the layout of elements within each `PositionCard` (numbering, name, count, badge).
+          * Confirm the "\#1" badge appears correctly only on the top 3 positions.
+      * **Functionality:** Test "View More Positions" and "View Less Positions" extensively, ensuring correct expansion/collapse and button text changes.
+      * **Data Accuracy:** Confirm all numbers and localized names are accurate and derived *only* from `position_clicks`. Verify no mock data.
+      * **Edge Cases:** Manually test scenarios with 0, 1, 2, 3, 4, and more than 4 positions with 'apply' clicks.
+      * **Hero Section Integrity:** **CRITICAL manual check:** Ensure the hero section is completely clean and its original layout, dimensions, and visual balance are perfectly maintained.
+
+**Deliverables for Section 3:**
+
+  * Updated automated test suite.
+  * Detailed manual QA checklist focusing on all new features, design adherence, localization, and hero section integrity.
+
+-----

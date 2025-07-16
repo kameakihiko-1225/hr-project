@@ -156,6 +156,15 @@
     "switch_to_grid": "Jadval ko'rinishiga o'tish"
   },
 
+  "job_positions": {
+    "section_title": "Nomzodlar bilan lavozimlar",
+    "section_subtitle": "Hozirgi nomzodlar soni bilan eng mashhur lavozimlarni kashf eting",
+    "applicants_label": "Nomzodlar",
+    "view_more": "Ko'proq lavozimlarni ko'rish",
+    "view_less": "Kamroq lavozimlarni ko'rish",
+    "top_badge": "#1"
+  },
+
   "features_cards": {
     "innovation": {
       "title": "Innovatsiya yuragida",
