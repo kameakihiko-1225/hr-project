@@ -457,8 +457,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.set('ETag', `"departments-${Date.now()}"`);
       
       const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
-      const departments = await storage.getAllDepartments(companyId);
-      res.json({ success: true, data: departments });
+      const includePositions = req.query.includePositions === 'true';
+      
+      if (includePositions) {
+        const departments = await storage.getAllDepartmentsWithPositionCounts(companyId);
+        res.json({ success: true, data: departments });
+      } else {
+        const departments = await storage.getAllDepartments(companyId);
+        res.json({ success: true, data: departments });
+      }
     } catch (error) {
       console.error('Error fetching departments:', error);
       res.status(500).json({ success: false, error: "Failed to fetch departments" });

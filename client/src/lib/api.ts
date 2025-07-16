@@ -51,7 +51,7 @@ export interface CompaniesApi {
 }
 
 export interface DepartmentsApi {
-  getAll: (companyId?: string) => Promise<any[]>;
+  getAll: (companyId?: string, includePositions?: boolean) => Promise<any[]>;
   getById: (id: string) => Promise<any>;
   getByCompany: (companyId: string) => Promise<any[]>;
   create: (departmentData: { name: string; description?: string; companyId: string }) => Promise<any>;
@@ -747,8 +747,12 @@ export const getCompanies = async () => {
   return await response.json();
 };
 
-export const getDepartments = async (companyId?: string) => {
-  const url = companyId ? `${API_BASE_URL}/departments?companyId=${companyId}` : `${API_BASE_URL}/departments`;
+export const getDepartments = async (companyId?: string, includePositions?: boolean) => {
+  const params = new URLSearchParams();
+  if (companyId) params.append('companyId', companyId);
+  if (includePositions) params.append('includePositions', 'true');
+  
+  const url = `${API_BASE_URL}/departments${params.toString() ? `?${params.toString()}` : ''}`;
   const response = await fetch(url, {
     headers: getAuthHeaders()
   });
@@ -1387,8 +1391,12 @@ const companies: CompaniesApi = {
 
 // Departments API implementation
 const departments: DepartmentsApi = {
-  getAll: async (companyId?: string) => {
-    const url = companyId ? `${API_BASE_URL}/departments?companyId=${companyId}` : `${API_BASE_URL}/departments`;
+  getAll: async (companyId?: string, includePositions?: boolean) => {
+    const params = new URLSearchParams();
+    if (companyId) params.append('companyId', companyId);
+    if (includePositions) params.append('includePositions', 'true');
+    
+    const url = `${API_BASE_URL}/departments${params.toString() ? `?${params.toString()}` : ''}`;
     const response = await fetch(url, {
       headers: getAuthHeaders()
     });

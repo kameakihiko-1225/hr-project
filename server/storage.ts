@@ -48,6 +48,7 @@ export interface IStorage {
 
   // Department methods
   getAllDepartments(companyId?: number): Promise<Department[]>;
+  getAllDepartmentsWithPositionCounts(companyId?: number): Promise<(Department & { positionCount: number })[]>;
   getDepartmentById(id: number): Promise<Department | undefined>;
   createDepartment(department: InsertDepartment): Promise<Department>;
   updateDepartment(id: number, department: Partial<InsertDepartment>): Promise<Department | undefined>;
@@ -179,6 +180,32 @@ export class DatabaseStorage implements IStorage {
       return await db.select().from(departments).where(eq(departments.companyId, companyId));
     }
     return await db.select().from(departments);
+  }
+
+  async getAllDepartmentsWithPositionCounts(companyId?: number): Promise<(Department & { positionCount: number })[]> {
+    try {
+      let query = db
+        .select({
+          id: departments.id,
+          name: departments.name,
+          description: departments.description,
+          companyId: departments.companyId,
+          createdAt: departments.createdAt,
+          positionCount: count(positions.id)
+        })
+        .from(departments)
+        .leftJoin(positions, eq(departments.id, positions.departmentId))
+        .groupBy(departments.id, departments.name, departments.description, departments.companyId, departments.createdAt);
+      
+      if (companyId) {
+        query = query.where(eq(departments.companyId, companyId));
+      }
+      
+      return await query;
+    } catch (error) {
+      console.error('Database error in getAllDepartmentsWithPositionCounts:', error);
+      return [];
+    }
   }
 
   async getDepartmentById(id: number): Promise<Department | undefined> {

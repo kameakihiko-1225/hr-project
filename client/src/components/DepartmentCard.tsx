@@ -13,7 +13,7 @@ import { createLogger } from '@/lib/logger';
 const logger = createLogger('departmentCard');
 
 interface DepartmentCardProps {
-  department: Department;
+  department: Department & { positionCount?: number };
   onEdit?: (department: Department) => void;
   onDelete?: (department: Department) => void;
   showCompany?: boolean;
@@ -59,7 +59,14 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
 
   const companyInitials = department.company?.name ? getInitials(department.company.name) : '';
 
-  // Best practice: Map department.positions (array of { position }) to get actual Position objects
+  // Use positionCount from backend if available, otherwise fallback to existing positions array
+  const positionCount = department.positionCount !== undefined 
+    ? department.positionCount 
+    : Array.isArray(department.positions) 
+      ? department.positions.map((dp: any) => dp.position).filter(Boolean).length
+      : 0;
+
+  // For modal details, still use the actual positions array if available
   const positions = Array.isArray(department.positions)
     ? department.positions.map((dp: any) => dp.position).filter(Boolean)
     : [];
@@ -127,8 +134,8 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
           <div className="flex items-center gap-2 text-sm">
             <Users className="h-4 w-4 text-muted-foreground" />
             <span className="text-muted-foreground">Positions:</span>
-            <Badge variant="secondary" className="rounded-md">
-              {positions.length}
+            <Badge variant="secondary" className="rounded-md font-medium">
+              {positionCount}
             </Badge>
           </div>
         </div>
