@@ -334,4 +334,20 @@ Preferred communication style: Simple, everyday language.
   - Maintained consistent button heights and spacing throughout the interface
   - Verified proper button visibility on all screen sizes from mobile to desktop
 
+### July 16, 2025 - Multilingual CRUD Forms Fix & Department Position Counter Fix - COMPLETED ✓
+- **Position Form Cleanup**: Removed duplicate legacy form fields that were showing "[object Object]"
+  - Eliminated old position title, description, salary range, and apply link input fields
+  - Kept only the new MultilingualInput components for proper localization support
+  - Fixed form initialization to properly handle LocalizedContent objects vs string values
+  - Employment type field correctly remains as string dropdown (no localization needed)
+- **Department Position Counter Fix**: Resolved issue where department cards showed 0 positions instead of actual count
+  - Updated positions page getDepartments() call to include `includePositions: true` parameter
+  - Backend API was returning correct count (6 positions) but frontend wasn't requesting it
+  - Department cards now properly display actual position counts from database
+- **Form Data Structure**: Corrected multilingual form data handling across all CRUD operations
+  - Position forms now properly use LocalizedContent objects for title, description, salary range, apply link
+  - Department forms already using MultilingualInput components correctly
+  - Company forms already using MultilingualInput components correctly
+  - All forms now display proper language tabs (English, Russian, Uzbek) without "[object Object]" errors
+
 The architecture emphasizes type safety, developer experience, and scalability while maintaining simplicity for rapid development and deployment.

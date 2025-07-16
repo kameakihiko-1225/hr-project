@@ -62,7 +62,7 @@ export default function PositionsPage() {
       try {
         // Fetch departments, positions, and applicant counts in parallel for better performance
         const [departmentsData, positionsData, applicantCountsData] = await Promise.allSettled([
-          getDepartments(),
+          getDepartments(undefined, true), // Include position counts for department cards
           getPositions(), // Always fetch all positions, filter on frontend
           fetch('/api/all-applied-positions').then(res => res.json())
         ]);
@@ -474,78 +474,7 @@ export default function PositionsPage() {
             <p className="text-xs text-muted-foreground">
               If provided, the Apply Now button will redirect to this link. Leave empty to use default application flow.
             </p>
-            <div className="grid gap-2">
-              <label htmlFor="title" className="text-sm font-medium">
-                Position Title
-              </label>
-              <Input
-                id="title"
-                name="title"
-                placeholder="e.g., Software Engineer"
-                value={formData.title}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="description" className="text-sm font-medium">
-                Description
-              </label>
-              <Textarea
-                id="description"
-                name="description"
-                placeholder="Position description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={3}
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="salaryRange" className="text-sm font-medium">
-                Salary Range
-              </label>
-              <Input
-                id="salaryRange"
-                name="salaryRange"
-                placeholder="e.g., $80,000 - $120,000"
-                value={formData.salaryRange}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="employmentType" className="text-sm font-medium">
-                Employment Type
-              </label>
-              <Select
-                value={formData.employmentType}
-                onValueChange={(value) => handleSelectChange('employmentType', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select employment type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {employmentTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="applyLink" className="text-sm font-medium">
-                Apply Link (Optional)
-              </label>
-              <Input
-                id="applyLink"
-                name="applyLink"
-                placeholder="e.g., https://forms.google.com/apply or mailto:careers@company.com"
-                value={formData.applyLink}
-                onChange={handleInputChange}
-              />
-              <p className="text-xs text-muted-foreground">
-                If provided, the Apply Now button will redirect to this link. Leave empty to use default application flow.
-              </p>
-            </div>
+
             </div>
           </div>
           <DialogFooter className="flex-shrink-0">
