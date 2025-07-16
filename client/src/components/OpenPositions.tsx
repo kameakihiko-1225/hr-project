@@ -212,13 +212,13 @@ export const OpenPositions = ({
             {t('positions.available_positions')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Apply instantly and get interviewed with Telegram and go to the main interviews!
+            {t('positions.apply_instantly')}
           </p>
           
           {hasSearched && (
             <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
               <Badge variant="secondary" className="px-3 py-1 text-base">
-                {filteredPositions.length} position{filteredPositions.length !== 1 ? 's' : ''} found
+                {filteredPositions.length} {filteredPositions.length === 1 ? t('positions.position_found') : t('positions.positions_found')}
               </Badge>
               {(selectedCompanies.length > 0 || selectedDepartments.length > 0 || selectedPositions.length > 0) && (
                 <Badge variant="outline" className="px-3 py-1 text-sm">
@@ -237,7 +237,7 @@ export const OpenPositions = ({
                 size="sm"
                 className="text-xs"
               >
-                {viewMode === "grid" ? "Switch to List View" : "Switch to Grid View"}
+{viewMode === "grid" ? t('positions.switch_to_list') : t('positions.switch_to_grid')}
               </Button>
             </div>
           )}
@@ -267,7 +267,7 @@ export const OpenPositions = ({
               {renderPagination()}
               
               <div className="text-center text-gray-500 mt-4">
-                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredPositions.length)} of {filteredPositions.length} positions
+{t('positions.showing')} {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredPositions.length)} {t('positions.of')} {filteredPositions.length} {filteredPositions.length === 1 ? t('positions.position_found') : t('positions.positions_found')}
               </div>
             </>
           ) : (

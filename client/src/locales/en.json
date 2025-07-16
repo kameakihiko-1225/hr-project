@@ -150,17 +150,23 @@
     "applicants": "Job Seekers"
   },
 
+  "stats_descriptions": {
+    "applied_via_platform": "Applied via platform",
+    "using_our_platform": "Using our platform",
+    "available_roles": "Available roles",
+    "apply_anytime": "Apply Anytime",
+    "always_available": "Always available"
+  },
+
   "positions": {
     "available_positions": "Available Positions",
     "apply_instantly": "Apply instantly and get interviewed with Telegram and go to the main interviews!",
     "position_found": "position found",
     "positions_found": "positions found",
     "showing": "Showing",
-    "of": "of"
-  },
-
-  "positions": {
-    "available_positions": "Available Positions"
+    "of": "of",
+    "switch_to_list": "Switch to List View",
+    "switch_to_grid": "Switch to Grid View"
   },
 
   "features_cards": {

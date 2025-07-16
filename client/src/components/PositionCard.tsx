@@ -312,7 +312,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
             }}
           >
             <Building2 className="h-4 w-4 sm:h-3 sm:w-3" />
-            <span className="hidden sm:inline">Company</span>
+            <span className="hidden sm:inline">{t('position_card.company_info')}</span>
           </Button>
           <Button 
             variant="outline" 
@@ -324,13 +324,13 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
             }}
           >
             <Briefcase className="h-4 w-4 sm:h-3 sm:w-3" />
-            <span className="hidden sm:inline">Department</span>
+            <span className="hidden sm:inline">{t('position_card.department_info')}</span>
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="default" className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300">
                 <ExternalLink className="h-4 w-4 sm:h-3 sm:w-3" />
-                <span className="hidden sm:inline">Details</span>
+                <span className="hidden sm:inline">{t('position_card.view_details')}</span>
               </Button>
             </DialogTrigger>
           <DialogContent className="max-w-md">
@@ -415,8 +415,8 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
             onClick={handleApply}
             className="px-8 py-4 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 w-full justify-center"
           >
-            <span className="hidden sm:inline">Apply Now</span>
-            <span className="sm:hidden">Apply</span>
+            <span className="hidden sm:inline">{t('position_card.apply')}</span>
+            <span className="sm:hidden">{t('position_card.apply')}</span>
             <ExternalLink className="h-4 w-4" />
           </button>
         ) : (
@@ -427,8 +427,8 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           >
             {isApplying ? 'Generating…' : (
               <>
-                <span className="hidden sm:inline">Apply Now</span>
-                <span className="sm:hidden">Apply</span>
+                <span className="hidden sm:inline">{t('position_card.apply')}</span>
+                <span className="sm:hidden">{t('position_card.apply')}</span>
               </>
             )} <Send className="h-4 w-4" />
           </Button>

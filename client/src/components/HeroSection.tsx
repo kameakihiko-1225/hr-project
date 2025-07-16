@@ -113,7 +113,7 @@ export const HeroSection = () => {
                 ) : (
                   <div className="text-2xl font-bold text-gray-900">{stats.companies}</div>
                 )}
-                <div className="text-sm text-gray-600">{t('companies')}</div>
+                <div className="text-sm text-gray-600">{t('stats_cards.companies')}</div>
               </div>
               
               <div className="text-center">
@@ -125,7 +125,7 @@ export const HeroSection = () => {
                 ) : (
                   <div className="text-2xl font-bold text-gray-900">{stats.departments}</div>
                 )}
-                <div className="text-sm text-gray-600">{t('departments')}</div>
+                <div className="text-sm text-gray-600">{t('stats_cards.departments')}</div>
               </div>
               
               <div className="text-center">
@@ -137,7 +137,7 @@ export const HeroSection = () => {
                 ) : (
                   <div className="text-2xl font-bold text-gray-900">{stats.positions}</div>
                 )}
-                <div className="text-sm text-gray-600">{t('positions')}</div>
+                <div className="text-sm text-gray-600">{t('stats_cards.positions')}</div>
               </div>
               
               <div className="text-center">
@@ -149,7 +149,7 @@ export const HeroSection = () => {
                 ) : (
                   <div className="text-2xl font-bold text-gray-900">{stats.applicants}</div>
                 )}
-                <div className="text-sm text-gray-600">{t('applicants')}</div>
+                <div className="text-sm text-gray-600">{t('stats_cards.applicants')}</div>
               </div>
             </div>
           </div>

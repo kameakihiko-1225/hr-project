@@ -150,17 +150,23 @@
     "applicants": "Соискатели"
   },
 
+  "stats_descriptions": {
+    "applied_via_platform": "Подали заявки через платформу",
+    "using_our_platform": "Используют нашу платформу",
+    "available_roles": "Доступные вакансии",
+    "apply_anytime": "Подавайте заявки в любое время",
+    "always_available": "Всегда доступно"
+  },
+
   "positions": {
-    "available_positions": "Доступные позиции",
+    "available_positions": "Доступные вакансии",
     "apply_instantly": "Подавайте заявку мгновенно и проходите собеседование через Telegram для основных интервью!",
     "position_found": "позиция найдена",
     "positions_found": "позиций найдено",
     "showing": "Показано",
-    "of": "из"
-  },
-
-  "positions": {
-    "available_positions": "Доступные вакансии"
+    "of": "из",
+    "switch_to_list": "Переключить на список",
+    "switch_to_grid": "Переключить на сетку"
   },
 
   "features_cards": {

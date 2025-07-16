@@ -150,17 +150,23 @@
     "applicants": "Ish izlovchilar"
   },
 
+  "stats_descriptions": {
+    "applied_via_platform": "Platforma orqali ariza berishgan",
+    "using_our_platform": "Bizning platformamizdan foydalanmoqda",
+    "available_roles": "Mavjud lavozimlar",
+    "apply_anytime": "Istalgan vaqtda ariza bering",
+    "always_available": "Doimo mavjud"
+  },
+
   "positions": {
     "available_positions": "Mavjud lavozimlar",
     "apply_instantly": "Darhol ariza bering va asosiy suhbatlarga o'tish uchun Telegram orqali suhbat o'ting!",
     "position_found": "lavozim topildi",
     "positions_found": "lavozim topildi",
     "showing": "Ko'rsatilmoqda",
-    "of": "dan"
-  },
-
-  "positions": {
-    "available_positions": "Mavjud lavozimlar"
+    "of": "dan",
+    "switch_to_list": "Ro'yxat ko'rinishiga o'tish",
+    "switch_to_grid": "Panjara ko'rinishiga o'tish"
   },
 
   "features_cards": {

@@ -19,10 +19,10 @@ export const StatsSection = () => {
   const { jobSeekers, applicants } = useClickCounter();
   
   const [stats, setStats] = useState([
-    { icon: Users, number: "-", label: t('stats_cards.applicants'), description: "Applied via platform", color: "from-blue-500 to-blue-600" },
-    { icon: Building2, number: "-", label: t('stats_cards.companies'), description: "Using our platform", color: "from-indigo-500 to-indigo-600" },
-    { icon: Briefcase, number: "-", label: t('stats_cards.positions'), description: "Available roles", color: "from-green-500 to-green-600" },
-    { icon: Award, number: "24/7", label: "Apply Anytime", description: "Always available", color: "from-purple-500 to-purple-600" },
+    { icon: Users, number: "-", label: t('stats_cards.applicants'), description: t('stats_descriptions.applied_via_platform'), color: "from-blue-500 to-blue-600" },
+    { icon: Building2, number: "-", label: t('stats_cards.companies'), description: t('stats_descriptions.using_our_platform'), color: "from-indigo-500 to-indigo-600" },
+    { icon: Briefcase, number: "-", label: t('stats_cards.positions'), description: t('stats_descriptions.available_roles'), color: "from-green-500 to-green-600" },
+    { icon: Award, number: "24/7", label: t('stats_descriptions.apply_anytime'), description: t('stats_descriptions.always_available'), color: "from-purple-500 to-purple-600" },
   ]);
 
   // Load live stats from database
