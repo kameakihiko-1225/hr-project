@@ -11,32 +11,20 @@ interface AppliedPosition {
   appliedCount: number;
 }
 
-interface PaginatedResponse {
-  data: AppliedPosition[];
-  totalPages: number;
-  currentPage: number;
-  total: number;
-}
-
 export const AllAppliedPositionsListing = () => {
   const { t } = useTranslation();
-  const [positions, setPositions] = useState<AppliedPosition[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+  const [allPositions, setAllPositions] = useState<AppliedPosition[]>([]);
+  const [displayedPositions, setDisplayedPositions] = useState<AppliedPosition[]>([]);
+  const [showAll, setShowAll] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPositions = async (page: number, append = false) => {
+  const fetchPositions = async () => {
     try {
-      if (append) {
-        setIsLoadingMore(true);
-      } else {
-        setIsLoading(true);
-      }
+      setIsLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_BASE_URL}/all-applied-positions?page=${page}&limit=4`);
+      const response = await fetch(`${API_BASE_URL}/all-applied-positions`);
       if (!response.ok) {
         throw new Error('Failed to fetch applied positions');
       }
@@ -44,46 +32,40 @@ export const AllAppliedPositionsListing = () => {
       const result = await response.json();
       console.log('All applied positions API response:', result);
       
-      if (result.success && result.data) {
-        const data: PaginatedResponse = result.data;
-        
-        if (append) {
-          setPositions(prev => [...prev, ...data.data]);
-        } else {
-          setPositions(data.data);
-        }
-        
-        setCurrentPage(data.currentPage);
-        setTotalPages(data.totalPages);
+      if (result.success && result.data && Array.isArray(result.data)) {
+        setAllPositions(result.data);
+        // Initially show only first 4 positions
+        setDisplayedPositions(result.data.slice(0, 4));
       } else {
-        if (!append) {
-          setPositions([]);
-        }
+        setAllPositions([]);
+        setDisplayedPositions([]);
       }
     } catch (err) {
       console.error('Error fetching applied positions:', err);
       setError(t('all_applied_positions.error'));
-      if (!append) {
-        setPositions([]);
-      }
+      setAllPositions([]);
+      setDisplayedPositions([]);
     } finally {
       setIsLoading(false);
-      setIsLoadingMore(false);
     }
   };
 
   useEffect(() => {
-    fetchPositions(1);
+    fetchPositions();
   }, [t]);
 
   const handleViewMore = () => {
-    if (currentPage < totalPages) {
-      fetchPositions(currentPage + 1, true);
-    }
+    setDisplayedPositions(allPositions);
+    setShowAll(true);
+  };
+
+  const handleViewLess = () => {
+    setDisplayedPositions(allPositions.slice(0, 4));
+    setShowAll(false);
   };
 
   // Don't render if no data and not loading
-  if (!isLoading && positions.length === 0 && !error) {
+  if (!isLoading && allPositions.length === 0 && !error) {
     return null;
   }
 
@@ -110,7 +92,7 @@ export const AllAppliedPositionsListing = () => {
     );
   }
 
-  if (error && positions.length === 0) {
+  if (error && allPositions.length === 0) {
     return (
       <div className="mt-8 w-full max-w-6xl mx-auto">
         <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-800">
@@ -134,7 +116,7 @@ export const AllAppliedPositionsListing = () => {
       
       {/* Position Listing with Futuristic Design */}
       <div className="space-y-4">
-        {positions.map((position) => (
+        {displayedPositions.map((position) => (
           <div
             key={position.positionId}
             className="group bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
@@ -167,18 +149,17 @@ export const AllAppliedPositionsListing = () => {
         ))}
       </div>
       
-      {/* View More Button */}
-      {currentPage < totalPages && (
+      {/* View More/Less Button */}
+      {allPositions.length > 4 && (
         <div className="flex justify-center mt-8">
           <Button
-            onClick={handleViewMore}
-            disabled={isLoadingMore}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            onClick={showAll ? handleViewLess : handleViewMore}
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
           >
-            {isLoadingMore ? (
+            {showAll ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {t('all_applied_positions.loading_more')}
+                {t('all_applied_positions.view_less')}
+                <ChevronRight className="h-4 w-4 ml-2 rotate-90 group-hover:-translate-y-1 transition-transform duration-200" />
               </>
             ) : (
               <>

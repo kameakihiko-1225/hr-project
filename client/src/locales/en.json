@@ -283,6 +283,7 @@
     "title": "All Available Positions with Applicants",
     "applied": "Applied",
     "view_more": "View More Positions",
+    "view_less": "View Less Positions",
     "loading": "Loading positions...",
     "error": "Failed to load positions",
     "no_data": "No positions with applications",

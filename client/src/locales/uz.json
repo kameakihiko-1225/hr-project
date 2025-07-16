@@ -262,6 +262,7 @@
     "title": "Nomzodlari bor barcha mavjud lavozimlar",
     "applied": "Ariza topshirildi",
     "view_more": "Ko'proq lavozimlarni ko'rish",
+    "view_less": "Kamroq lavozimlarni ko'rish",
     "loading": "Lavozimlar yuklanmoqda...",
     "error": "Lavozimlarni yuklab bo'lmadi",
     "no_data": "Arizalar bilan lavozimlar yo'q",

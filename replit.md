@@ -287,4 +287,28 @@ Preferred communication style: Simple, everyday language.
   - Maintained proper noun preservation for "Millat Umidi Group" and related brand names
   - Enhanced testimonials translation data with authentic Uzbek quotes from team members
 
+### July 16, 2025 - Real Database Integration & View More/Less Functionality Implementation - COMPLETED ✓
+- **Real Data Integration**: Successfully migrated from demo data to actual `position_clicks` database queries
+  - Updated storage methods to use real Drizzle ORM queries counting `click_type: 'apply'` entries
+  - Implemented proper JOIN operations between `position_clicks` and `positions` tables
+  - Added required imports: `eq`, `desc`, `count` from drizzle-orm for database operations
+  - Verified live data functionality showing actual HR Generalist position with 24 apply clicks
+- **API Endpoint Updates**: Modified backend APIs to return real application data
+  - `/api/top-applied-positions`: Returns actual top 3 positions ordered by apply click count
+  - `/api/all-applied-positions`: Returns complete list without pagination for frontend control
+  - Removed pagination from backend; frontend now handles "View More/Less" display logic
+- **Frontend View More/Less Implementation**: Complete interactive functionality for All Applied Positions Listing
+  - Initially displays first 4 positions from full dataset
+  - "View More Positions" button expands to show complete list when more than 4 positions exist
+  - "View Less Positions" button collapses back to initial 4-item view
+  - State management tracks `showAll` boolean and manages `displayedPositions` array accordingly
+- **Enhanced Localization**: Added "view_less" translation keys across all languages
+  - English: "View Less Positions"
+  - Russian: "Показать меньше позиций"  
+  - Uzbek: "Kamroq lavozimlarni ko'rish"
+- **Database Verification**: Confirmed real click tracking data integration
+  - Position ID 7 (HR Generalist) shows 24 actual apply clicks from database
+  - No mock data remaining; all counters use live `position_clicks` table queries
+  - APIs returning accurate position titles and click counts from database relationships
+
 The architecture emphasizes type safety, developer experience, and scalability while maintaining simplicity for rapid development and deployment.

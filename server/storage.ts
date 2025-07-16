@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc, count } from "drizzle-orm";
 import dotenv from "dotenv";
 import { 
   users, companies, departments, positions, candidates, galleryItems, industryTags, companyIndustryTags, positionClicks,
@@ -95,12 +95,7 @@ export interface IStorage {
 
   // New methods for dynamic position counters
   getTopAppliedPositions(): Promise<{ positionId: number; positionTitle: string; appliedCount: number; }[]>;
-  getAllAppliedPositions(page: number, limit: number): Promise<{ 
-    data: { positionId: number; positionTitle: string; appliedCount: number; }[];
-    totalPages: number;
-    currentPage: number;
-    total: number;
-  }>;
+  getAllAppliedPositions(): Promise<{ positionId: number; positionTitle: string; appliedCount: number; }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -550,65 +545,84 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Get top 3 positions with most apply clicks
+  // Get top 3 positions with most apply clicks (real data from position_clicks table)
   async getTopAppliedPositions(): Promise<{ positionId: number; positionTitle: string; appliedCount: number; }[]> {
     try {
-      // Demo data for top applied positions (up to 3)
-      const topPositions = [
-        { positionId: 7, positionTitle: "HR Generalist", appliedCount: 43 },
-        { positionId: 6, positionTitle: "English Teacher", appliedCount: 28 },
-        { positionId: 5, positionTitle: "Software Developer", appliedCount: 19 }
-      ];
+      // Query position_clicks table to get actual apply click counts
+      const appliedPositions = await db
+        .select({
+          positionId: positionClicks.positionId,
+          appliedCount: count(positionClicks.id).as('appliedCount')
+        })
+        .from(positionClicks)
+        .where(eq(positionClicks.clickType, 'apply'))
+        .groupBy(positionClicks.positionId)
+        .orderBy(desc(count(positionClicks.id)))
+        .limit(3);
+
+      // Get position titles for these positions
+      const results = [];
+      for (const appliedPos of appliedPositions) {
+        const position = await db
+          .select({ title: positions.title })
+          .from(positions)
+          .where(eq(positions.id, appliedPos.positionId))
+          .limit(1);
+        
+        if (position.length > 0) {
+          results.push({
+            positionId: appliedPos.positionId,
+            positionTitle: position[0].title,
+            appliedCount: Number(appliedPos.appliedCount)
+          });
+        }
+      }
       
-      console.log('Top applied positions (demo data):', topPositions);
-      return topPositions;
+      console.log('Top applied positions (real data):', results);
+      return results;
     } catch (error) {
       console.error('Error getting top applied positions:', error);
       return [];
     }
   }
 
-  // Get all positions with apply clicks (paginated)
-  async getAllAppliedPositions(page: number, limit: number): Promise<{ 
-    data: { positionId: number; positionTitle: string; appliedCount: number; }[];
-    totalPages: number;
-    currentPage: number;
-    total: number;
-  }> {
+  // Get all positions with apply clicks (full list, no pagination)
+  async getAllAppliedPositions(): Promise<{ positionId: number; positionTitle: string; appliedCount: number; }[]> {
     try {
-      // Demo data for all applied positions 
-      const allPositions = [
-        { positionId: 7, positionTitle: "HR Generalist", appliedCount: 43 },
-        { positionId: 6, positionTitle: "English Teacher", appliedCount: 28 },
-        { positionId: 5, positionTitle: "Software Developer", appliedCount: 19 },
-        { positionId: 4, positionTitle: "Marketing Specialist", appliedCount: 15 },
-        { positionId: 3, positionTitle: "Data Analyst", appliedCount: 12 },
-        { positionId: 2, positionTitle: "Project Manager", appliedCount: 8 },
-        { positionId: 1, positionTitle: "UX Designer", appliedCount: 5 }
-      ];
+      // Query position_clicks table to get all positions with apply clicks
+      const appliedPositions = await db
+        .select({
+          positionId: positionClicks.positionId,
+          appliedCount: count(positionClicks.id).as('appliedCount')
+        })
+        .from(positionClicks)
+        .where(eq(positionClicks.clickType, 'apply'))
+        .groupBy(positionClicks.positionId)
+        .orderBy(desc(count(positionClicks.id)));
 
-      const total = allPositions.length;
-      const totalPages = Math.ceil(total / limit);
-      const offset = (page - 1) * limit;
-      const data = allPositions.slice(offset, offset + limit);
+      // Get position titles for these positions
+      const results = [];
+      for (const appliedPos of appliedPositions) {
+        const position = await db
+          .select({ title: positions.title })
+          .from(positions)
+          .where(eq(positions.id, appliedPos.positionId))
+          .limit(1);
+        
+        if (position.length > 0) {
+          results.push({
+            positionId: appliedPos.positionId,
+            positionTitle: position[0].title,
+            appliedCount: Number(appliedPos.appliedCount)
+          });
+        }
+      }
 
-      const result = {
-        data,
-        totalPages,
-        currentPage: page,
-        total
-      };
-
-      console.log('All applied positions (demo data):', result);
-      return result;
+      console.log('All applied positions (real data):', results);
+      return results;
     } catch (error) {
       console.error('Error getting all applied positions:', error);
-      return {
-        data: [],
-        totalPages: 0,
-        currentPage: page,
-        total: 0
-      };
+      return [];
     }
   }
 }
