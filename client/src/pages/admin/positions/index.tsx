@@ -133,11 +133,10 @@ export default function PositionsPage() {
     const matchesSearch = position.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (position.description && position.description.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    // If 'all', show all; otherwise, check if any related department matches
+    // If 'all', show all; otherwise, check if departmentId matches
     const matchesDepartment =
       selectedDepartmentId === 'all' ||
-      (Array.isArray(position.departments) &&
-        position.departments.some(dp => dp.department.id === selectedDepartmentId));
+      position.departmentId.toString() === selectedDepartmentId;
 
     return matchesSearch && matchesDepartment;
   });

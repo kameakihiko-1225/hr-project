@@ -753,11 +753,14 @@ export const getDepartments = async (companyId?: string, includePositions?: bool
   if (includePositions) params.append('includePositions', 'true');
   
   const url = `${API_BASE_URL}/departments${params.toString() ? `?${params.toString()}` : ''}`;
+  console.log('[getDepartments] URL:', url, 'includePositions:', includePositions);
+  
   const response = await fetch(url, {
     headers: getAuthHeaders()
   });
   if (!response.ok) throw new Error('Failed to fetch departments');
   const data = await response.json();
+  console.log('[getDepartments] Response data:', data.data);
   return data.data || [];
 };
 
