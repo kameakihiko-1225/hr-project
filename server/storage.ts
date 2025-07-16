@@ -184,6 +184,8 @@ export class DatabaseStorage implements IStorage {
 
   async getAllDepartmentsWithPositionCounts(companyId?: number): Promise<(Department & { positionCount: number })[]> {
     try {
+      console.log('Executing getAllDepartmentsWithPositionCounts with companyId:', companyId);
+      
       let query = db
         .select({
           id: departments.id,
@@ -201,10 +203,14 @@ export class DatabaseStorage implements IStorage {
         query = query.where(eq(departments.companyId, companyId));
       }
       
-      return await query;
+      const result = await query;
+      console.log('getAllDepartmentsWithPositionCounts result:', result);
+      return result;
     } catch (error) {
       console.error('Database error in getAllDepartmentsWithPositionCounts:', error);
-      return [];
+      // Return regular departments if position count query fails
+      console.log('Falling back to regular getAllDepartments due to error');
+      return await this.getAllDepartments(companyId) as (Department & { positionCount: number })[];
     }
   }
 

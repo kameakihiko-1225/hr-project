@@ -459,11 +459,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
       const includePositions = req.query.includePositions === 'true';
       
+      console.log('[Departments API] Request params:', { companyId, includePositions, query: req.query });
+      
       if (includePositions) {
+        console.log('[Departments API] Fetching departments with position counts');
         const departments = await storage.getAllDepartmentsWithPositionCounts(companyId);
+        console.log('[Departments API] Returning departments with counts:', departments);
         res.json({ success: true, data: departments });
       } else {
+        console.log('[Departments API] Fetching departments without position counts');
         const departments = await storage.getAllDepartments(companyId);
+        console.log('[Departments API] Returning departments without counts:', departments);
         res.json({ success: true, data: departments });
       }
     } catch (error) {
