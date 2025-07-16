@@ -1084,28 +1084,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Job Positions with Applicants endpoint (for JobPositionsListing component)
-  app.get("/api/job-positions-with-applicants", async (req, res) => {
-    try {
-      const positions = await storage.getAllAppliedPositions();
-      
-      // Transform data to match JobPositionsListing component interface
-      const formattedPositions = positions.map(position => ({
-        position_id: position.positionId,
-        position_name: {
-          en: position.positionTitle,
-          ru: position.positionTitle, // For now, use same title
-          uz: position.positionTitle  // For now, use same title
-        },
-        applied_count: position.appliedCount
-      }));
-      
-      res.json({ success: true, data: formattedPositions });
-    } catch (error) {
-      console.error('Error getting job positions with applicants:', error);
-      res.status(500).json({ success: false, error: "Failed to get job positions with applicants" });
-    }
-  });
+
 
   const httpServer = createServer(app);
 
