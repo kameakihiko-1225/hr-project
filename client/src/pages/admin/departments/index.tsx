@@ -65,8 +65,9 @@ export default function DepartmentsPage() {
 
         // Then fetch departments, filtered by company if selected
         try {
-          // Always request positions for admin/department page
+          // Always request position counts for admin/department page
           const departmentsData = await getDepartments(selectedCompanyId !== 'all' ? selectedCompanyId : undefined, true);
+          console.log('[DepartmentsPage] departmentsData with position counts:', departmentsData);
           setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
         } catch (error) {
           console.error('Error fetching departments:', error);
