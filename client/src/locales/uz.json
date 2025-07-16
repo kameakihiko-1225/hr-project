@@ -203,7 +203,34 @@
   },
 
   "cta": {
+    "testimonials": {
+      "title": "Jamoamiz fikrlari",
+      "subtitle": "Millat Umidi'dagi tajribalarimiz haqida malakali mutaxassislarimizdan eshiting"
+    },
     "ready_to_join": "Ushbu muvaffaqiyat hikoyalariga qo'shilishga tayyormisiz?",
-    "get_started": "Boshlash"
+    "get_started": "Boshlash",
+    "testimonials_data": {
+      "ziyoda": {
+        "quote": "Millat Umidi menga nafaqat yaxshi ish o'rnini, balki o'z ustimda ishlash va o'sish uchun kuchli muhit yaratdi. Dars berish jarayoni zamonaviy texnologiyalar bilan integratsiyalashgan, bu esa bizga va o'quvchilarga ko'proq imkoniyatlar yaratadi."
+      },
+      "ulugbek": {
+        "quote": "Tashkilotda har bir g'oya qadrlanadi. Millat Umidi universitetida ishlash – bu faqat maosh emas, balki o'z missiyangni topganing degani. Bu yerda haqiqiy jamoaviy ruh mavjud."
+      },
+      "jamshid": {
+        "quote": "Millat Umidi menga fan va ta'lim sohasida global yondashuv bilan ishlash imkonini berdi. Har bir loyiha – yangi tajriba. Har bir o'qituvchi – o'sish yo'lidagi hamrohingiz."
+      },
+      "dilorom": {
+        "quote": "Biz har bir nomzodga individual yondashamiz. Ishga olish jarayonlari tez, tushunarli va insoniy. Bu kompaniyada ishlash — qadriyatlar asosida jamoa bo'lish demak."
+      },
+      "mohira": {
+        "quote": "Men har kuni bolalarning o'sishiga bevosita hissa qo'shayotganimni his qilaman. Maktabdagi ijobiy muhit va pedagogik yondashuv o'quvchilar bilan ishlashni ilhomlantiradi."
+      },
+      "shaxzod": {
+        "quote": "Millat Umidi har bir xodimni o'stirishga sodiq. Treninglar, ustozlik tizimi va doimiy qo'llab-quvvatlash orqali biz o'qituvchilarning yutuqlariga zamin yaratamiz."
+      },
+      "umidjon": {
+        "quote": "Millat Umidi — bu nafaqat ta'lim tashkiloti, balki kelajak avlodining taqdiriga mas'ul bo'lgan jamoaning uyidir. Har bir xodimimiz bizning umumiy missiyamiz — O'zbekistonda sifatli ta'limni rivojlantirishda muhim rol o'ynaydi."
+      }
+    }
   }
 }

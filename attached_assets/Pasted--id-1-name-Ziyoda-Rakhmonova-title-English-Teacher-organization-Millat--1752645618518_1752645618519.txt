@@ -1,0 +1,70 @@
+{
+    id: 1,
+    name: "Ziyoda Rakhmonova",
+    title: "English Teacher",
+    organization: "Millat Umidi Private School",
+    image: "/testimonial-profile.svg",
+    quote:
+      "\u201CMillat Umidi menga nafaqat yaxshi ish o'rnini, balki o'z ustimda ishlash va o'sish uchun kuchli muhit yaratdi. Dars berish jarayoni zamonaviy texnologiyalar bilan integratsiyalashgan, bu esa bizga va o'quvchilarga ko'proq imkoniyatlar yaratadi.\u201D",
+    rating: 4.9,
+  },
+  {
+    id: 2,
+    name: "Ulug'bek Mamadaliyev",
+    title: "Head of Student Affairs",
+    organization: "Millat Umidi University",
+    image: "/testimonial-profile.svg",
+    quote:
+      "\u201CTashkilotda har bir g'oya qadrlanadi. Millat Umidi universitetida ishlash – bu faqat maosh emas, balki o'z missiyangni topganing degani. Bu yerda haqiqiy jamoaviy ruh mavjud.\u201D",
+    rating: 4.7,
+  },
+  {
+    id: 3,
+    name: "Jamshid Qodirov",
+    title: "STEM Fanlari Koordinatori",
+    organization: "Millat Umidi School System",
+    image: "/testimonial-profile.svg",
+    quote:
+      "\u201CMillat Umidi menga fan va ta'lim sohasida global yondashuv bilan ishlash imkonini berdi. Har bir loyiha – yangi tajriba. Har bir o'qituvchi – o'sish yo'lidagi hamrohingiz.\u201D",
+    rating: 4.8,
+  },
+  {
+    id: 4,
+    name: "Dilorom Karimova",
+    title: "HR Menedjeri",
+    organization: "Millat Umidi Group",
+    image: "/testimonial-profile.svg",
+    quote:
+      "\u201CBiz har bir nomzodga individual yondashamiz. Ishga olish jarayonlari tez, tushunarli va insoniy. Bu kompaniyada ishlash — qadriyatlar asosida jamoa bo'lish demak.\u201D",
+    rating: 4.9,
+  },
+  {
+    id: 5,
+    name: "Mohira Toshpulatova",
+    title: "Maktab Psixologi",
+    organization: "Millat Umidi School",
+    image: "/testimonial-profile.svg",
+    quote:
+      "\u201CMen har kuni bolalarning o'sishiga bevosita hissa qo'shayotganimni his qilaman. Maktabdagi ijobiy muhit va pedagogik yondashuv o'quvchilar bilan ishlashni ilhomlantiradi.\u201D",
+    rating: 5.0,
+  },
+  {
+    id: 6,
+    name: "Shaxzod Xolmatov",
+    title: "Professional Development Coordinator",
+    organization: "Millat Umidi HR",
+    image: "/testimonial-profile.svg",
+    quote:
+      "\u201CMillat Umidi har bir xodimni o'stirishga sodiq. Treninglar, ustozlik tizimi va doimiy qo'llab-quvvatlash orqali biz o'qituvchilarning yutuqlariga zamin yaratamiz.\u201D",
+    rating: 4.8,
+  },
+  {
+    id: 7,
+    name: "Umidjon Ishmukhamedov",
+    title: "Founder",
+    organization: "Millat Umidi Group",
+    image: "/testimonial-profile.svg",
+    quote:
+      "\u201CMillat Umidi — bu nafaqat ta'lim tashkiloti, balki kelajak avlodining taqdiriga mas'ul bo'lgan jamoaning uyidir. Har bir xodimimiz bizning umumiy missiyamiz — O'zbekistonda sifatli ta'limni rivojlantirishda muhim rol o'ynaydi.\u201D",
+    rating: 5.0,
+  },

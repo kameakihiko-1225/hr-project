@@ -90,7 +90,7 @@ export const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden md:flex items-center space-x-8">
             {menuItems.map((item) => (
               <div key={item.key} className="relative">
                 <a
@@ -101,7 +101,7 @@ export const Header = () => {
                       item.action();
                     }
                   }}
-                  className="flex items-center text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
+                  className="flex items-center text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-colors hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 rounded-md"
                 >
                   {t(item.key)}
                 </a>
@@ -110,12 +110,12 @@ export const Header = () => {
             {/* Apply Now button */}
             <Button 
               onClick={() => scrollToSection("filter-section")}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 ml-2"
             >
               {t('apply_now')}
             </Button>
             {/* Language Selector */}
-            <LanguageSelector className="ml-4" />
+            <LanguageSelector className="ml-6" />
           </nav>
 
           {/* Mobile menu button */}

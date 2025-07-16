@@ -1,0 +1,49 @@
+Improve the visual appearance and spacing of the header navigation buttons, specifically "Blog", "Get in Touch", "Apply Now", and the language switcher "EN".
+
+Constraints to Reiterate (from previous prompts):
+
+PRESERVE EXISTING UI/UX DESIGN (Overall Layout): No fundamental changes to the header's overall structure, logo placement, or the order of elements. The improvements are strictly confined to the buttons themselves and the space between them.
+
+PRESERVE PROPER NOUNS: "Millat Umidi Group" should remain untranslated.
+
+Functional Language Switcher: The "EN" button is part of the language switcher and its functionality for switching languages should be maintained.
+
+Instructions for the AI Code Agent:
+
+Uniform Spacing Between Buttons:
+
+Increase the horizontal spacing between all adjacent navigation buttons in the header ("Blog", "Get in Touch", "Apply Now", "EN").
+
+Ensure this spacing is consistent across all pairs of buttons to create a clean, uncrowded look. Aim for a visually balanced distribution of space.
+
+Adjust Button Padding (if needed):
+
+Review the internal padding (top, bottom, left, right) of each button ("Blog", "Get in Touch", "Apply Now", "EN").
+
+Adjust padding to ensure text inside the buttons doesn't feel cramped, and the buttons have a consistent and comfortable visual size, while staying true to their current overall shape/design (e.g., if they are currently rounded rectangles, they should remain so).
+
+Review "Apply Now" Button:
+
+Ensure the "Apply Now" button's blue color and its current dimensions (width/height) are maintained, unless minor adjustments are necessary for better padding. The primary focus is on its spacing relative to other elements.
+
+Review "EN" (Language Switcher) Button:
+
+Ensure the "EN" button maintains its current border and background style. Focus on its spacing relative to "Apply Now" and its internal padding.
+
+Confirm its functionality as a language switcher remains active.
+
+Maintain Vertical Alignment:
+
+Verify that all buttons and the "Millat Umidi Group" logo remain perfectly vertically aligned within the header. No vertical shifts should occur.
+
+Responsive Check:
+
+After adjustments, ensure the header navigation remains visually appealing and functional on various screen sizes (responsive design). Buttons should not overlap or break layout on smaller screens.
+
+Deliverables:
+
+Updated CSS/styling for header navigation buttons to implement improved, consistent spacing.
+
+Adjusted button padding for better visual comfort, if necessary.
+
+Confirmation that the header layout remains stable and aligned across different screen sizes.
