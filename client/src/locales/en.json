@@ -194,5 +194,16 @@
       "title": "Shared Mission",
       "description": "Work alongside passionate educators and innovators who share your commitment to excellence."
     }
+  },
+
+  "testimonials": {
+    "title": "Success Stories",
+    "subtitle": "Our team members share their thoughts and experiences about Millat Umidi HR",
+    "go_to_testimonial": "Go to testimonial"
+  },
+
+  "cta": {
+    "ready_to_join": "Ready to join these success stories?",
+    "get_started": "Get Started"
   }
 }

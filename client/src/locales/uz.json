@@ -194,5 +194,16 @@
       "title": "Umumiy missiya",
       "description": "Mukammallikka intilishingizni baham ko'radigan ishtiyoqli pedagog va innovatorlar bilan birga ishlang."
     }
+  },
+
+  "testimonials": {
+    "title": "Muvaffaqiyat tarixi",
+    "subtitle": "Jamoamiz a'zolari Millat Umidi HR haqida o'z fikr va tajribalari bilan o'rtoqlashmoqda",
+    "go_to_testimonial": "Guvohlikka o'tish"
+  },
+
+  "cta": {
+    "ready_to_join": "Ushbu muvaffaqiyat hikoyalariga qo'shilishga tayyormisiz?",
+    "get_started": "Boshlash"
   }
 }

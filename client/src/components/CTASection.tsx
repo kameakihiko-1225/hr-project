@@ -27,17 +27,17 @@ const testimonials: Testimonial[] = [
     organization: "Millat Umidi Private School",
     image: "/testimonial-profile.svg",
     quote:
-      "\u201CMillat Umidi menga nafaqat yaxshi ish o‘rnini, balki o‘z ustimda ishlash va o‘sish uchun kuchli muhit yaratdi. Dars berish jarayoni zamonaviy texnologiyalar bilan integratsiyalashgan, bu esa bizga va o‘quvchilarga ko‘proq imkoniyatlar yaratadi.\u201D",
+      "\u201CMillat Umidi menga nafaqat yaxshi ish o'rnini, balki o'z ustimda ishlash va o'sish uchun kuchli muhit yaratdi. Dars berish jarayoni zamonaviy texnologiyalar bilan integratsiyalashgan, bu esa bizga va o'quvchilarga ko'proq imkoniyatlar yaratadi.\u201D",
     rating: 4.9,
   },
   {
     id: 2,
-    name: "Ulug‘bek Mamadaliyev",
+    name: "Ulug'bek Mamadaliyev",
     title: "Head of Student Affairs",
     organization: "Millat Umidi University",
     image: "/testimonial-profile.svg",
     quote:
-      "\u201CTashkilotda har bir g‘oya qadrlanadi. Millat Umidi universitetida ishlash – bu faqat maosh emas, balki o‘z missiyangni topganing degani. Bu yerda haqiqiy jamoaviy ruh mavjud.\u201D",
+      "\u201CTashkilotda har bir g'oya qadrlanadi. Millat Umidi universitetida ishlash – bu faqat maosh emas, balki o'z missiyangni topganing degani. Bu yerda haqiqiy jamoaviy ruh mavjud.\u201D",
     rating: 4.7,
   },
   {
@@ -47,7 +47,7 @@ const testimonials: Testimonial[] = [
     organization: "Millat Umidi School System",
     image: "/testimonial-profile.svg",
     quote:
-      "\u201CMillat Umidi menga fan va ta’lim sohasida global yondashuv bilan ishlash imkonini berdi. Har bir loyiha – yangi tajriba. Har bir o‘qituvchi – o‘sish yo‘lidagi hamrohingiz.\u201D",
+      "\u201CMillat Umidi menga fan va ta'lim sohasida global yondashuv bilan ishlash imkonini berdi. Har bir loyiha – yangi tajriba. Har bir o'qituvchi – o'sish yo'lidagi hamrohingiz.\u201D",
     rating: 4.8,
   },
   {
@@ -57,7 +57,7 @@ const testimonials: Testimonial[] = [
     organization: "Millat Umidi Group",
     image: "/testimonial-profile.svg",
     quote:
-      "\u201CBiz har bir nomzodga individual yondashamiz. Ishga olish jarayonlari tez, tushunarli va insoniy. Bu kompaniyada ishlash — qadriyatlar asosida jamoa bo‘lish demak.\u201D",
+      "\u201CBiz har bir nomzodga individual yondashamiz. Ishga olish jarayonlari tez, tushunarli va insoniy. Bu kompaniyada ishlash — qadriyatlar asosida jamoa bo'lish demak.\u201D",
     rating: 4.9,
   },
   {
@@ -67,7 +67,7 @@ const testimonials: Testimonial[] = [
     organization: "Millat Umidi School",
     image: "/testimonial-profile.svg",
     quote:
-      "\u201CMen har kuni bolalarning o‘sishiga bevosita hissa qo‘shayotganimni his qilaman. Maktabdagi ijobiy muhit va pedagogik yondashuv o‘quvchilar bilan ishlashni ilhomlantiradi.\u201D",
+      "\u201CMen har kuni bolalarning o'sishiga bevosita hissa qo'shayotganimni his qilaman. Maktabdagi ijobiy muhit va pedagogik yondashuv o'quvchilar bilan ishlashni ilhomlantiradi.\u201D",
     rating: 5.0,
   },
   {
@@ -77,8 +77,18 @@ const testimonials: Testimonial[] = [
     organization: "Millat Umidi HR",
     image: "/testimonial-profile.svg",
     quote:
-      "\u201CMillat Umidi har bir xodimni o‘stirishga sodiq. Treninglar, ustozlik tizimi va doimiy qo‘llab-quvvatlash orqali biz o‘qituvchilarning yutuqlariga zamin yaratamiz.\u201D",
+      "\u201CMillat Umidi har bir xodimni o'stirishga sodiq. Treninglar, ustozlik tizimi va doimiy qo'llab-quvvatlash orqali biz o'qituvchilarning yutuqlariga zamin yaratamiz.\u201D",
     rating: 4.8,
+  },
+  {
+    id: 7,
+    name: "Umidjon Ishmukhamedov",
+    title: "Founder",
+    organization: "Millat Umidi Group",
+    image: "/testimonial-profile.svg",
+    quote:
+      "\u201CMillat Umidi — bu nafaqat ta'lim tashkiloti, balki kelajak avlodining taqdiriga mas'ul bo'lgan jamoaning uyidir. Har bir xodimimiz bizning umumiy missiyamiz — O'zbekistonda sifatli ta'limni rivojlantirishda muhim rol o'ynaydi.\u201D",
+    rating: 5.0,
   },
 ];
 
@@ -128,10 +138,10 @@ export const CTASection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-4xl md:text-5xl lg:text-7xl font-bold text-gray-900 mb-4 md:mb-6">
-{t('cta.testimonials.title')}<span className="text-blue-600">.</span>
+            {t('cta.testimonials.title')}<span className="text-blue-600">.</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            Jamoamiz a’zolari Millat Umidi HR haqida o’z fikr va tajribalari bilan o’rtoqlashmoqda.
+            {t('cta.testimonials.subtitle')}
           </p>
         </div>
 
@@ -209,7 +219,7 @@ export const CTASection = () => {
               className={`h-1.5 md:h-2 rounded-full transition-all ${
                 index === current - 1 ? 'bg-blue-600 w-6 md:w-8' : 'bg-gray-300 w-1.5 md:w-2'
               }`}
-              aria-label={`Go to testimonial ${index + 1}`}
+              aria-label={`${t('cta.testimonials.go_to_testimonial')} ${index + 1}`}
             />
           ))}
         </div>
@@ -217,7 +227,7 @@ export const CTASection = () => {
         {/* CTA Section */}
         <div className="mt-16 md:mt-20 text-center">
           <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 md:mb-6">
-            Ready to join these success stories?
+            {t('cta.ready_to_join')}
           </h3>
           <div className="flex justify-center">
             <Button 
@@ -225,7 +235,7 @@ export const CTASection = () => {
               className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 text-white rounded-xl group transition-all duration-300"
               onClick={() => scrollToSection("filter-section")}
             >
-              Get Started
+              {t('cta.get_started')}
               <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
