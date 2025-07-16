@@ -169,16 +169,13 @@ app.post('/webhook', async (req, res) => {
       UF_CRM_1752622669492: ageRaw, // age field
     };
     
-    // Add phone field directly to contact creation with proper crm_multifield format
+    // Add phone field directly to contact creation with proper crm_multifield format (no + sign)
+    contactFields.PHONE = phone ? [{ VALUE: phone, VALUE_TYPE: 'WORK' }] : [];
     if (phone) {
-      console.log('[TELEGRAM-BOT] Adding phone field to contactFields:', `+${phone}`);
-      contactFields.PHONE = [{ 
-        VALUE: `+${phone}`, 
-        VALUE_TYPE: 'WORK'
-      }];
+      console.log('[TELEGRAM-BOT] Adding phone field to contactFields:', phone);
       console.log('[TELEGRAM-BOT] contactFields.PHONE after assignment:', contactFields.PHONE);
     } else {
-      console.log('[TELEGRAM-BOT] No phone number provided');
+      console.log('[TELEGRAM-BOT] No phone number provided, using empty array');
     }
     
     // Resolve resume & diploma links
