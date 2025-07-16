@@ -12,8 +12,10 @@ import {
   type GalleryItem, type InsertGalleryItem,
   type IndustryTag, type InsertIndustryTag,
   type CompanyIndustryTag, type InsertCompanyIndustryTag,
-  type PositionClick, type InsertPositionClick
+  type PositionClick, type InsertPositionClick,
+  type LocalizedContent, type SupportedLanguage, getLocalizedContent
 } from "@shared/schema";
+import { localizeEntity } from "@shared/localization";
 
 // Load environment variables
 dotenv.config();
@@ -39,24 +41,24 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
 
-  // Company methods
-  getAllCompanies(): Promise<CompanyWithIndustries[]>;
-  getCompanyById(id: number): Promise<CompanyWithIndustries | undefined>;
+  // Company methods with localization support
+  getAllCompanies(language?: SupportedLanguage): Promise<CompanyWithIndustries[]>;
+  getCompanyById(id: number, language?: SupportedLanguage): Promise<CompanyWithIndustries | undefined>;
   createCompany(company: InsertCompany): Promise<Company>;
   updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined>;
   deleteCompany(id: number): Promise<boolean>;
 
-  // Department methods
-  getAllDepartments(companyId?: number): Promise<Department[]>;
-  getAllDepartmentsWithPositionCounts(companyId?: number): Promise<(Department & { positionCount: number })[]>;
-  getDepartmentById(id: number): Promise<Department | undefined>;
+  // Department methods with localization support
+  getAllDepartments(companyId?: number, language?: SupportedLanguage): Promise<Department[]>;
+  getAllDepartmentsWithPositionCounts(companyId?: number, language?: SupportedLanguage): Promise<(Department & { positionCount: number })[]>;
+  getDepartmentById(id: number, language?: SupportedLanguage): Promise<Department | undefined>;
   createDepartment(department: InsertDepartment): Promise<Department>;
   updateDepartment(id: number, department: Partial<InsertDepartment>): Promise<Department | undefined>;
   deleteDepartment(id: number): Promise<boolean>;
 
-  // Position methods
-  getAllPositions(departmentId?: number): Promise<Position[]>;
-  getPositionById(id: number): Promise<Position | undefined>;
+  // Position methods with localization support
+  getAllPositions(departmentId?: number, language?: SupportedLanguage): Promise<Position[]>;
+  getPositionById(id: number, language?: SupportedLanguage): Promise<Position | undefined>;
   createPosition(position: InsertPosition): Promise<Position>;
   updatePosition(id: number, position: Partial<InsertPosition>): Promise<Position | undefined>;
   deletePosition(id: number): Promise<boolean>;
@@ -68,16 +70,16 @@ export interface IStorage {
   updateCandidate(id: string, candidate: Partial<InsertCandidate>): Promise<Candidate | undefined>;
   deleteCandidate(id: string): Promise<boolean>;
 
-  // Gallery item methods
-  getAllGalleryItems(category?: string): Promise<GalleryItem[]>;
-  getGalleryItemById(id: number): Promise<GalleryItem | undefined>;
+  // Gallery item methods with localization support
+  getAllGalleryItems(category?: string, language?: SupportedLanguage): Promise<GalleryItem[]>;
+  getGalleryItemById(id: number, language?: SupportedLanguage): Promise<GalleryItem | undefined>;
   createGalleryItem(galleryItem: InsertGalleryItem): Promise<GalleryItem>;
   updateGalleryItem(id: number, galleryItem: Partial<InsertGalleryItem>): Promise<GalleryItem | undefined>;
   deleteGalleryItem(id: number): Promise<boolean>;
 
-  // Industry tag methods
-  getAllIndustryTags(): Promise<IndustryTag[]>;
-  getIndustryTagById(id: number): Promise<IndustryTag | undefined>;
+  // Industry tag methods with localization support
+  getAllIndustryTags(language?: SupportedLanguage): Promise<IndustryTag[]>;
+  getIndustryTagById(id: number, language?: SupportedLanguage): Promise<IndustryTag | undefined>;
   createIndustryTag(industryTag: InsertIndustryTag): Promise<IndustryTag>;
   updateIndustryTag(id: number, industryTag: Partial<InsertIndustryTag>): Promise<IndustryTag | undefined>;
   deleteIndustryTag(id: number): Promise<boolean>;
@@ -117,18 +119,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Company methods
-  async getAllCompanies(): Promise<CompanyWithIndustries[]> {
+  async getAllCompanies(language: SupportedLanguage = 'en'): Promise<CompanyWithIndustries[]> {
     try {
       const companiesData = await db.select().from(companies);
       
-      // Fetch industry tags for each company
+      // Fetch industry tags and localize each company
       const companiesWithTags = await Promise.all(
         companiesData.map(async (company) => {
-          const industries = await this.getCompanyIndustryTags(company.id);
-          return {
+          const industries = await this.getCompanyIndustryTags(company.id, language);
+          
+          // Localize company fields while preserving original structure
+          const localizedCompany = {
             ...company,
+            name: getLocalizedContent(company.name, language),
+            description: getLocalizedContent(company.description, language),
+            address: getLocalizedContent(company.address, language),
+            city: getLocalizedContent(company.city, language),
+            country: getLocalizedContent(company.country, language),
             industries,
-          } as CompanyWithIndustries;
+          };
+          
+          return localizedCompany as CompanyWithIndustries;
         })
       );
       
@@ -139,17 +150,26 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getCompanyById(id: number): Promise<CompanyWithIndustries | undefined> {
+  async getCompanyById(id: number, language: SupportedLanguage = 'en'): Promise<CompanyWithIndustries | undefined> {
     try {
       const result = await db.select().from(companies).where(eq(companies.id, id));
       const company = result[0];
       
       if (company) {
-        const industries = await this.getCompanyIndustryTags(company.id);
-        return {
+        const industries = await this.getCompanyIndustryTags(company.id, language);
+        
+        // Localize company fields
+        const localizedCompany = {
           ...company,
+          name: getLocalizedContent(company.name, language),
+          description: getLocalizedContent(company.description, language),
+          address: getLocalizedContent(company.address, language),
+          city: getLocalizedContent(company.city, language),
+          country: getLocalizedContent(company.country, language),
           industries,
-        } as CompanyWithIndustries;
+        };
+        
+        return localizedCompany as CompanyWithIndustries;
       }
       
       return undefined;
@@ -175,14 +195,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Department methods
-  async getAllDepartments(companyId?: number): Promise<Department[]> {
+  async getAllDepartments(companyId?: number, language: SupportedLanguage = 'en'): Promise<Department[]> {
+    let result;
     if (companyId) {
-      return await db.select().from(departments).where(eq(departments.companyId, companyId));
+      result = await db.select().from(departments).where(eq(departments.companyId, companyId));
+    } else {
+      result = await db.select().from(departments);
     }
-    return await db.select().from(departments);
+    
+    // Localize department fields
+    return result.map(department => ({
+      ...department,
+      name: getLocalizedContent(department.name, language),
+      description: getLocalizedContent(department.description, language),
+    }));
   }
 
-  async getAllDepartmentsWithPositionCounts(companyId?: number): Promise<(Department & { positionCount: number })[]> {
+  async getAllDepartmentsWithPositionCounts(companyId?: number, language: SupportedLanguage = 'en'): Promise<(Department & { positionCount: number })[]> {
     try {
       console.log('Executing getAllDepartmentsWithPositionCounts with companyId:', companyId);
       
@@ -205,18 +234,34 @@ export class DatabaseStorage implements IStorage {
       
       const result = await query;
       console.log('getAllDepartmentsWithPositionCounts result:', result);
-      return result;
+      
+      // Localize department fields
+      const localizedResult = result.map(department => ({
+        ...department,
+        name: getLocalizedContent(department.name, language),
+        description: getLocalizedContent(department.description, language),
+      }));
+      
+      return localizedResult;
     } catch (error) {
       console.error('Database error in getAllDepartmentsWithPositionCounts:', error);
       // Return regular departments if position count query fails
       console.log('Falling back to regular getAllDepartments due to error');
-      return await this.getAllDepartments(companyId) as (Department & { positionCount: number })[];
+      return await this.getAllDepartments(companyId, language) as (Department & { positionCount: number })[];
     }
   }
 
-  async getDepartmentById(id: number): Promise<Department | undefined> {
+  async getDepartmentById(id: number, language: SupportedLanguage = 'en'): Promise<Department | undefined> {
     const result = await db.select().from(departments).where(eq(departments.id, id));
-    return result[0];
+    if (result[0]) {
+      // Localize department fields
+      return {
+        ...result[0],
+        name: getLocalizedContent(result[0].name, language),
+        description: getLocalizedContent(result[0].description, language),
+      };
+    }
+    return undefined;
   }
 
   async createDepartment(department: InsertDepartment): Promise<Department> {
@@ -235,12 +280,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Position methods
-  async getAllPositions(departmentId?: number): Promise<Position[]> {
+  async getAllPositions(departmentId?: number, language: SupportedLanguage = 'en'): Promise<Position[]> {
     try {
+      let result;
       if (departmentId) {
-        return await db.select().from(positions).where(eq(positions.departmentId, departmentId));
+        result = await db.select().from(positions).where(eq(positions.departmentId, departmentId));
+      } else {
+        result = await db.select().from(positions);
       }
-      return await db.select().from(positions);
+      
+      // Localize position fields
+      return result.map(position => ({
+        ...position,
+        title: getLocalizedContent(position.title, language),
+        description: getLocalizedContent(position.description, language),
+        location: getLocalizedContent(position.location, language),
+        city: getLocalizedContent(position.city, language),
+        country: getLocalizedContent(position.country, language),
+        salaryRange: getLocalizedContent(position.salaryRange, language),
+        employmentType: getLocalizedContent(position.employmentType, language),
+        languageRequirements: getLocalizedContent(position.languageRequirements, language),
+        qualifications: getLocalizedContent(position.qualifications, language),
+        responsibilities: getLocalizedContent(position.responsibilities, language),
+      }));
     } catch (error) {
       console.error('Database error in getAllPositions:', error);
       // Return empty array if there's a database error
@@ -248,9 +310,25 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getPositionById(id: number): Promise<Position | undefined> {
+  async getPositionById(id: number, language: SupportedLanguage = 'en'): Promise<Position | undefined> {
     const result = await db.select().from(positions).where(eq(positions.id, id));
-    return result[0];
+    if (result[0]) {
+      // Localize position fields
+      return {
+        ...result[0],
+        title: getLocalizedContent(result[0].title, language),
+        description: getLocalizedContent(result[0].description, language),
+        location: getLocalizedContent(result[0].location, language),
+        city: getLocalizedContent(result[0].city, language),
+        country: getLocalizedContent(result[0].country, language),
+        salaryRange: getLocalizedContent(result[0].salaryRange, language),
+        employmentType: getLocalizedContent(result[0].employmentType, language),
+        languageRequirements: getLocalizedContent(result[0].languageRequirements, language),
+        qualifications: getLocalizedContent(result[0].qualifications, language),
+        responsibilities: getLocalizedContent(result[0].responsibilities, language),
+      };
+    }
+    return undefined;
   }
 
   async createPosition(position: InsertPosition): Promise<Position> {
@@ -306,7 +384,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Gallery item methods
-  async getAllGalleryItems(category?: string): Promise<GalleryItem[]> {
+  async getAllGalleryItems(category?: string, language: SupportedLanguage = 'en'): Promise<GalleryItem[]> {
     try {
       if (category) {
         return await db.select().from(galleryItems)
@@ -323,7 +401,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getGalleryItemById(id: number): Promise<GalleryItem | undefined> {
+  async getGalleryItemById(id: number, language: SupportedLanguage = 'en'): Promise<GalleryItem | undefined> {
     try {
       const [item] = await db.select().from(galleryItems).where(eq(galleryItems.id, id));
       return item || undefined;
@@ -368,7 +446,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Industry tag methods
-  async getAllIndustryTags(): Promise<IndustryTag[]> {
+  async getAllIndustryTags(language: SupportedLanguage = 'en'): Promise<IndustryTag[]> {
     try {
       return await db.select().from(industryTags);
     } catch (error) {
@@ -377,7 +455,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getIndustryTagById(id: number): Promise<IndustryTag | undefined> {
+  async getIndustryTagById(id: number, language: SupportedLanguage = 'en'): Promise<IndustryTag | undefined> {
     try {
       const [tag] = await db.select().from(industryTags).where(eq(industryTags.id, id));
       return tag || undefined;
@@ -418,7 +496,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Company-industry tag association methods
-  async getCompanyIndustryTags(companyId: number): Promise<IndustryTag[]> {
+  async getCompanyIndustryTags(companyId: number, language: SupportedLanguage = 'en'): Promise<IndustryTag[]> {
     try {
       const results = await db
         .select({
@@ -431,7 +509,12 @@ export class DatabaseStorage implements IStorage {
         .innerJoin(industryTags, eq(companyIndustryTags.industryTagId, industryTags.id))
         .where(eq(companyIndustryTags.companyId, companyId));
       
-      return results;
+      // Localize industry tag fields
+      return results.map(tag => ({
+        ...tag,
+        name: getLocalizedContent(tag.name, language),
+        description: getLocalizedContent(tag.description, language),
+      }));
     } catch (error) {
       console.error('Error fetching company industry tags:', error);
       return [];

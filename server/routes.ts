@@ -102,7 +102,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.set('Cache-Control', 'public, max-age=1800, s-maxage=3600'); // 30 min client, 1 hour CDN
       res.set('ETag', `"companies-${Date.now()}"`);
       
-      const companies = await storage.getAllCompanies();
+      const language = req.query.language as string || 'en';
+      const companies = await storage.getAllCompanies(language);
       res.json({ success: true, data: companies });
     } catch (error) {
       console.error('Error fetching companies:', error);
@@ -113,7 +114,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/companies/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const company = await storage.getCompanyById(id);
+      const language = req.query.language as string || 'en';
+      const company = await storage.getCompanyById(id, language);
       if (!company) {
         return res.status(404).json({ success: false, error: "Company not found" });
       }
@@ -187,7 +189,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Fetch the company with industry tags for response
-      const companyWithIndustries = await storage.getCompanyById(company.id);
+      const language = req.query.language as string || 'en';
+      const companyWithIndustries = await storage.getCompanyById(company.id, language);
       res.json({ success: true, data: companyWithIndustries });
     } catch (error) {
       console.error('Error creating company:', error);
@@ -259,7 +262,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Fetch the company with industry tags for response
-      const companyWithIndustries = await storage.getCompanyById(id);
+      const language = req.query.language as string || 'en';
+      const companyWithIndustries = await storage.getCompanyById(id, language);
       res.json({ success: true, data: companyWithIndustries });
     } catch (error) {
       console.error('Error updating company:', error);
@@ -458,17 +462,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
       const includePositions = req.query.includePositions === 'true';
+      const language = req.query.language as string || 'en';
       
-      console.log('[Departments API] Request params:', { companyId, includePositions, query: req.query });
+      console.log('[Departments API] Request params:', { companyId, includePositions, language, query: req.query });
       
       if (includePositions) {
         console.log('[Departments API] Fetching departments with position counts');
-        const departments = await storage.getAllDepartmentsWithPositionCounts(companyId);
+        const departments = await storage.getAllDepartmentsWithPositionCounts(companyId, language);
         console.log('[Departments API] Returning departments with counts:', departments);
         res.json({ success: true, data: departments });
       } else {
         console.log('[Departments API] Fetching departments without position counts');
-        const departments = await storage.getAllDepartments(companyId);
+        const departments = await storage.getAllDepartments(companyId, language);
         console.log('[Departments API] Returning departments without counts:', departments);
         res.json({ success: true, data: departments });
       }
@@ -481,7 +486,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/departments/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const department = await storage.getDepartmentById(id);
+      const language = req.query.language as string || 'en';
+      const department = await storage.getDepartmentById(id, language);
       if (!department) {
         return res.status(404).json({ success: false, error: "Department not found" });
       }
@@ -555,7 +561,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.set('Expires', '0');
       
       const departmentId = req.query.departmentId ? parseInt(req.query.departmentId as string) : undefined;
-      const positions = await storage.getAllPositions(departmentId);
+      const language = req.query.language as string || 'en';
+      const positions = await storage.getAllPositions(departmentId, language);
       res.json({ success: true, data: positions });
     } catch (error) {
       console.error('Error fetching positions:', error);
@@ -566,7 +573,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/positions/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const position = await storage.getPositionById(id);
+      const language = req.query.language as string || 'en';
+      const position = await storage.getPositionById(id, language);
       if (!position) {
         return res.status(404).json({ success: false, error: "Position not found" });
       }
@@ -583,7 +591,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Inherit fields from department if not provided
       if (positionData.departmentId && (!positionData.city || !positionData.country)) {
-        const department = await storage.getDepartmentById(parseInt(positionData.departmentId));
+        const department = await storage.getDepartmentById(parseInt(positionData.departmentId), 'en');
         if (department) {
           positionData = {
             ...positionData,
@@ -594,7 +602,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // If department doesn't have location, inherit from company
           if (department.companyId && (!positionData.city || !positionData.country)) {
-            const company = await storage.getCompanyById(department.companyId);
+            const company = await storage.getCompanyById(department.companyId, 'en');
             if (company) {
               positionData = {
                 ...positionData,

@@ -1,6 +1,33 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Supported languages
+export const SUPPORTED_LANGUAGES = ['en', 'ru', 'uz'] as const;
+export type SupportedLanguage = typeof SUPPORTED_LANGUAGES[number];
+
+// Localized content interface
+export interface LocalizedContent {
+  en?: string;
+  ru?: string;
+  uz?: string;
+}
+
+// Helper function to get localized content with fallback
+export function getLocalizedContent(content: LocalizedContent | string | null, language: SupportedLanguage = 'en'): string {
+  if (!content) return '';
+  if (typeof content === 'string') return content;
+  
+  // Try requested language first
+  if (content[language]) return content[language];
+  
+  // Fallback order: en -> ru -> uz -> first available
+  for (const fallbackLang of ['en', 'ru', 'uz'] as const) {
+    if (content[fallbackLang]) return content[fallbackLang];
+  }
+  
+  return '';
+}
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -10,40 +37,40 @@ export const users = pgTable("users", {
 
 export const companies = pgTable("companies", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description"),
+  name: json("name").$type<LocalizedContent>().notNull(), // Localized company name
+  description: json("description").$type<LocalizedContent>(), // Localized description
   logoUrl: text("logo_url"),
   color: text("color"),
-  address: text("address"),
+  address: json("address").$type<LocalizedContent>(), // Localized address
   phone: text("phone"),
   email: text("email"),
-  city: text("city"),
-  country: text("country"),
+  city: json("city").$type<LocalizedContent>(), // Localized city
+  country: json("country").$type<LocalizedContent>(), // Localized country
   adminId: text("admin_id"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const departments = pgTable("departments", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description"),
+  name: json("name").$type<LocalizedContent>().notNull(), // Localized department name
+  description: json("description").$type<LocalizedContent>(), // Localized description
   companyId: integer("company_id").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const positions = pgTable("positions", {
   id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  description: text("description"),
-  location: text("location"),
-  city: text("city"),
-  country: text("country"),
-  salaryRange: text("salary_range"),
-  employmentType: text("employment_type"),
+  title: json("title").$type<LocalizedContent>().notNull(), // Localized position title
+  description: json("description").$type<LocalizedContent>(), // Localized description
+  location: json("location").$type<LocalizedContent>(), // Localized location
+  city: json("city").$type<LocalizedContent>(), // Localized city
+  country: json("country").$type<LocalizedContent>(), // Localized country
+  salaryRange: json("salary_range").$type<LocalizedContent>(), // Localized salary range
+  employmentType: json("employment_type").$type<LocalizedContent>(), // Localized employment type
   expectedStartDate: text("expected_start_date"),
-  languageRequirements: text("language_requirements"),
-  qualifications: text("qualifications"),
-  responsibilities: text("responsibilities"),
+  languageRequirements: json("language_requirements").$type<LocalizedContent>(), // Localized language requirements
+  qualifications: json("qualifications").$type<LocalizedContent>(), // Localized qualifications
+  responsibilities: json("responsibilities").$type<LocalizedContent>(), // Localized responsibilities
   departmentId: integer("departmentid").notNull(),
   applyLink: text("applyLink"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -70,8 +97,8 @@ export const candidates = pgTable("candidates", {
 
 export const galleryItems = pgTable("gallery_items", {
   id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  description: text("description").notNull(),
+  title: json("title").$type<LocalizedContent>().notNull(), // Localized blog title
+  description: json("description").$type<LocalizedContent>().notNull(), // Localized blog description
   category: text("category").notNull(), // 'teamwork' | 'culture' | 'workspace' | 'events'
   imageUrl: text("image_url").notNull(),
   tags: text("tags").array().default([]),
@@ -95,8 +122,8 @@ export const fileAttachments = pgTable("file_attachments", {
 
 export const industryTags = pgTable("industry_tags", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull().unique(),
-  description: text("description"),
+  name: json("name").$type<LocalizedContent>().notNull(), // Localized industry tag name
+  description: json("description").$type<LocalizedContent>(), // Localized description
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -118,25 +145,55 @@ export const positionClicks = pgTable("position_clicks", {
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
-// Insert schemas
+// Validation schemas for localized content
+const localizedContentSchema = z.object({
+  en: z.string().optional(),
+  ru: z.string().optional(),
+  uz: z.string().optional(),
+}).refine(
+  (data) => data.en || data.ru || data.uz,
+  { message: "At least one language must be provided" }
+);
+
+// Insert schemas with localization support
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
 });
 
-export const insertCompanySchema = createInsertSchema(companies).omit({
-  id: true,
-  createdAt: true,
+export const insertCompanySchema = z.object({
+  name: localizedContentSchema,
+  description: localizedContentSchema.optional(),
+  logoUrl: z.string().optional(),
+  color: z.string().optional(),
+  address: localizedContentSchema.optional(),
+  phone: z.string().optional(),
+  email: z.string().optional(),
+  city: localizedContentSchema.optional(),
+  country: localizedContentSchema.optional(),
+  adminId: z.string().optional(),
 });
 
-export const insertDepartmentSchema = createInsertSchema(departments).omit({
-  id: true,
-  createdAt: true,
+export const insertDepartmentSchema = z.object({
+  name: localizedContentSchema,
+  description: localizedContentSchema.optional(),
+  companyId: z.number(),
 });
 
-export const insertPositionSchema = createInsertSchema(positions).omit({
-  id: true,
-  createdAt: true,
+export const insertPositionSchema = z.object({
+  title: localizedContentSchema,
+  description: localizedContentSchema.optional(),
+  location: localizedContentSchema.optional(),
+  city: localizedContentSchema.optional(),
+  country: localizedContentSchema.optional(),
+  salaryRange: localizedContentSchema.optional(),
+  employmentType: localizedContentSchema.optional(),
+  expectedStartDate: z.string().optional(),
+  languageRequirements: localizedContentSchema.optional(),
+  qualifications: localizedContentSchema.optional(),
+  responsibilities: localizedContentSchema.optional(),
+  departmentId: z.number(),
+  applyLink: z.string().optional(),
 });
 
 export const insertCandidateSchema = createInsertSchema(candidates).omit({
@@ -144,10 +201,14 @@ export const insertCandidateSchema = createInsertSchema(candidates).omit({
   createdAt: true,
 });
 
-export const insertGalleryItemSchema = createInsertSchema(galleryItems).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
+export const insertGalleryItemSchema = z.object({
+  title: localizedContentSchema,
+  description: localizedContentSchema,
+  category: z.string(),
+  imageUrl: z.string(),
+  tags: z.array(z.string()).default([]),
+  isActive: z.boolean().default(true),
+  sortOrder: z.number().default(0),
 });
 
 export const insertFileAttachmentSchema = createInsertSchema(fileAttachments).omit({
@@ -155,9 +216,9 @@ export const insertFileAttachmentSchema = createInsertSchema(fileAttachments).om
   createdAt: true,
 });
 
-export const insertIndustryTagSchema = createInsertSchema(industryTags).omit({
-  id: true,
-  createdAt: true,
+export const insertIndustryTagSchema = z.object({
+  name: localizedContentSchema,
+  description: localizedContentSchema.optional(),
 });
 
 export const insertCompanyIndustryTagSchema = createInsertSchema(companyIndustryTags).omit({

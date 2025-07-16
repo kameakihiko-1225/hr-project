@@ -61,7 +61,7 @@ export default function PositionsPage() {
         // Fetch departments, positions, and applicant counts in parallel for better performance
         const [departmentsData, positionsData, applicantCountsData] = await Promise.allSettled([
           getDepartments(),
-          getPositions(selectedDepartmentId !== 'all' ? selectedDepartmentId : undefined),
+          getPositions(), // Always fetch all positions, filter on frontend
           fetch('/api/all-applied-positions').then(res => res.json())
         ]);
 

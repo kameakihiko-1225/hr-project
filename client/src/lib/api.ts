@@ -1392,20 +1392,11 @@ const companies: CompaniesApi = {
   }
 };
 
-// Departments API implementation
+// Departments API implementation  
 const departments: DepartmentsApi = {
   getAll: async (companyId?: string, includePositions?: boolean) => {
-    const params = new URLSearchParams();
-    if (companyId) params.append('companyId', companyId);
-    if (includePositions) params.append('includePositions', 'true');
-    
-    const url = `${API_BASE_URL}/departments${params.toString() ? `?${params.toString()}` : ''}`;
-    const response = await fetch(url, {
-      headers: getAuthHeaders()
-    });
-    if (!response.ok) throw new Error('Failed to fetch departments');
-    const data = await response.json();
-    return data.data || [];
+    // Use the updated getDepartments function to ensure consistency
+    return await getDepartments(companyId, includePositions);
   },
   getById: async (id: string) => {
     const response = await fetch(`${API_BASE_URL}/departments/${id}`, {
