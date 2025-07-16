@@ -158,7 +158,7 @@ export const FilterSection = ({
             size="lg"
           >
             <Search className="mr-2 h-5 w-5" />
-            Search Positions
+{t('filter.search_positions')}
           </Button>
           
           {hasActiveFilters && (
@@ -178,7 +178,7 @@ export const FilterSection = ({
           <CardContent className="pt-6">
             <div className="flex items-center mb-6">
               <Filter className="h-5 w-5 text-blue-600 mr-2" />
-              <h3 className="text-lg font-medium text-gray-800">Filter Options</h3>
+              <h3 className="text-lg font-medium text-gray-800">{t('filter.filter_options')}</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

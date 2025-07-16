@@ -76,7 +76,8 @@
     "copyright": "All rights reserved."
   },
   
-  "contact": {
+  "contact": "Get in Touch",
+  "contact_details": {
     "title": "Get in Touch",
     "subtitle": "Ready to start your journey with Millat Umidi Group? We're here to help you find your perfect opportunity.",
     "company_description": "Building the future of education in Uzbekistan",
@@ -99,9 +100,11 @@
     "subtitle": "Ready to make an impact? We're looking for passionate individuals to join our mission.",
     "cta_full": "Join us and grow",
     "cta_short": "Join",
+    "ready_to_join": "Ready to join these success stories?",
+    "get_started": "Get Started",
     "testimonials": {
-      "title": "What Our Team Says",
-      "subtitle": "Hear from our employees about their experience at Millat Umidi"
+      "title": "Stories",
+      "subtitle": "Our team members share their thoughts and experiences about Millat Umidi HR."
     }
   },
 
@@ -120,6 +123,8 @@
       "loading": "Loading..."
     },
     "search": "Search Jobs",
+    "search_positions": "Search Positions",
+    "filter_options": "Filter Options",
     "clear": "Clear All Filters"
   },
 
@@ -143,6 +148,19 @@
     "departments": "Departments", 
     "positions": "Open Positions",
     "applicants": "Job Seekers"
+  },
+
+  "positions": {
+    "available_positions": "Available Positions",
+    "apply_instantly": "Apply instantly and get interviewed with Telegram and go to the main interviews!",
+    "position_found": "position found",
+    "positions_found": "positions found",
+    "showing": "Showing",
+    "of": "of"
+  },
+
+  "positions": {
+    "available_positions": "Available Positions"
   },
 
   "features_cards": {

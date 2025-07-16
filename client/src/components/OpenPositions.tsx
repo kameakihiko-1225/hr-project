@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from 'react-i18next';
 
 interface OpenPositionsProps {
   selectedCompanies: string[];
@@ -24,6 +25,7 @@ export const OpenPositions = ({
   selectedPositions,
   hasSearched
 }: OpenPositionsProps) => {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const isMobile = useIsMobile();
@@ -207,7 +209,7 @@ export const OpenPositions = ({
       <div className="max-w-7xl mx-auto relative">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Available Positions
+            {t('positions.available_positions')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Apply instantly and get interviewed with Telegram and go to the main interviews!

@@ -76,7 +76,8 @@
     "copyright": "Barcha huquqlar himoyalangan."
   },
   
-  "contact": {
+  "contact": "Biz bilan bog'laning",
+  "contact_details": {
     "title": "Biz bilan bog'laning",
     "subtitle": "Millat Umidi Group bilan sayohatingizni boshlashga tayyormisiz? Biz sizga mukammal imkoniyat topishda yordam berishga tayyormiz.",
     "company_description": "O'zbekistonda ta'limning kelajagini quramiz",
@@ -99,9 +100,11 @@
     "subtitle": "Ta'sir qilishga tayyormisiz? Biz missiyamizga ishtiyoqli shaxslarni qidiryapmiz.",
     "cta_full": "Bizga qo'shiling va o'sing",
     "cta_short": "Qo'shilish",
+    "ready_to_join": "Ushbu muvaffaqiyat hikoyalariga qo'shilishga tayyormisiz?",
+    "get_started": "Boshlash",
     "testimonials": {
-      "title": "Jamoamiz nima deydi",
-      "subtitle": "Xodimlarimizdan Millat Umidi dagi tajribalari haqida eshiting"
+      "title": "Hikoyalar",
+      "subtitle": "Jamoamiz a'zolari Millat Umidi HR haqida o'z fikr va tajribalari bilan o'rtoqlashmoqda."
     }
   },
 
@@ -120,6 +123,8 @@
       "loading": "Yuklanmoqda..."
     },
     "search": "Ish qidirish",
+    "search_positions": "Lavozimlarni qidirish", 
+    "filter_options": "Filtr sozlamalari",
     "clear": "Barcha filtrlarni tozalash"
   },
 
@@ -143,6 +148,19 @@
     "departments": "Bo'limlar", 
     "positions": "Ochiq lavozimlar",
     "applicants": "Ish izlovchilar"
+  },
+
+  "positions": {
+    "available_positions": "Mavjud lavozimlar",
+    "apply_instantly": "Darhol ariza bering va asosiy suhbatlarga o'tish uchun Telegram orqali suhbat o'ting!",
+    "position_found": "lavozim topildi",
+    "positions_found": "lavozim topildi",
+    "showing": "Ko'rsatilmoqda",
+    "of": "dan"
+  },
+
+  "positions": {
+    "available_positions": "Mavjud lavozimlar"
   },
 
   "features_cards": {
