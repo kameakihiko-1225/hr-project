@@ -85,20 +85,35 @@ export const OpenPositions = ({
 
   // Use React Query for departments and companies with proper caching
   const { data: departmentsResponse } = useQuery({
-    queryKey: ['/api/departments'],
+    queryKey: ['/api/departments', i18n.language],
+    queryFn: async () => {
+      const response = await fetch(`/api/departments?language=${i18n.language}`);
+      if (!response.ok) throw new Error('Failed to fetch departments');
+      return response.json();
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const { data: companiesResponse } = useQuery({
-    queryKey: ['/api/companies'],
+    queryKey: ['/api/companies', i18n.language],
+    queryFn: async () => {
+      const response = await fetch(`/api/companies?language=${i18n.language}`);
+      if (!response.ok) throw new Error('Failed to fetch companies');
+      return response.json();
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes 
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   // Fetch applicant counts for positions
   const { data: applicantCountsResponse } = useQuery({
-    queryKey: ['/api/all-applied-positions'],
+    queryKey: ['/api/all-applied-positions', i18n.language],
+    queryFn: async () => {
+      const response = await fetch(`/api/all-applied-positions?language=${i18n.language}`);
+      if (!response.ok) throw new Error('Failed to fetch applied positions');
+      return response.json();
+    },
     staleTime: 60 * 1000, // 1 minute (shorter cache for dynamic data)
     gcTime: 5 * 60 * 1000, // 5 minutes
   });

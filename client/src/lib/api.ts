@@ -739,21 +739,26 @@ class ApiClient {
 
 
 // Legacy exports for backward compatibility
-export const getCompanies = async () => {
-  const response = await fetch(`${API_BASE_URL}/companies`, {
+export const getCompanies = async (language?: string) => {
+  const params = new URLSearchParams();
+  if (language) params.append('language', language);
+  
+  const url = `${API_BASE_URL}/companies${params.toString() ? `?${params.toString()}` : ''}`;
+  const response = await fetch(url, {
     headers: getAuthHeaders()
   });
   if (!response.ok) throw new Error('Failed to fetch companies');
   return await response.json();
 };
 
-export const getDepartments = async (companyId?: string, includePositions?: boolean) => {
+export const getDepartments = async (companyId?: string, includePositions?: boolean, language?: string) => {
   const params = new URLSearchParams();
   if (companyId) params.append('companyId', companyId);
   if (includePositions) params.append('includePositions', 'true');
+  if (language) params.append('language', language);
   
   const url = `${API_BASE_URL}/departments${params.toString() ? `?${params.toString()}` : ''}`;
-  console.log('[getDepartments] URL:', url, 'includePositions:', includePositions);
+  console.log('[getDepartments] URL:', url, 'includePositions:', includePositions, 'language:', language);
   
   const response = await fetch(url, {
     headers: getAuthHeaders()
@@ -764,8 +769,12 @@ export const getDepartments = async (companyId?: string, includePositions?: bool
   return data.data || [];
 };
 
-export const getPositions = async (departmentId?: string) => {
-  const url = departmentId ? `${API_BASE_URL}/positions?departmentId=${departmentId}` : `${API_BASE_URL}/positions`;
+export const getPositions = async (departmentId?: string, language?: string) => {
+  const params = new URLSearchParams();
+  if (departmentId) params.append('departmentId', departmentId);
+  if (language) params.append('language', language);
+  
+  const url = `${API_BASE_URL}/positions${params.toString() ? `?${params.toString()}` : ''}`;
   const response = await fetch(url, {
     headers: getAuthHeaders()
   });

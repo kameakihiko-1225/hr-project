@@ -31,7 +31,7 @@ export const FilterSection = ({
   setSelectedPositions,
   onFilterComplete
 }: FilterSectionProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>([]);
   const [departmentOptions, setDepartmentOptions] = useState<DepartmentOption[]>([]);
   const [positionOptions, setPositionOptions] = useState<PositionOption[]>([]);
@@ -40,12 +40,12 @@ export const FilterSection = ({
   const [isLoadingDepartments, setIsLoadingDepartments] = useState(false);
   const [isLoadingPositions, setIsLoadingPositions] = useState(false);
 
-  // === Load companies on mount ===
+  // === Load companies on mount and language change ===
   useEffect(() => {
     const loadCompanies = async () => {
       setIsLoadingCompanies(true);
       try {
-        const res = await getCompanies();
+        const res = await getCompanies(i18n.language);
         if (res.success && Array.isArray(res.data)) {
           setCompanyOptions(res.data as any);
         }
@@ -56,7 +56,7 @@ export const FilterSection = ({
       }
     };
     loadCompanies();
-  }, []);
+  }, [i18n.language]);
 
   // === Load departments when companies change ===
   useEffect(() => {
@@ -71,7 +71,7 @@ export const FilterSection = ({
         for (const companyName of selectedCompanies) {
           const company = companyOptions.find(c => c.name === companyName);
           if (!company) continue;
-          const deps = await getDepartments(company.id);
+          const deps = await getDepartments(company.id, false, i18n.language);
           if (Array.isArray(deps)) {
             allDeps.push(...(deps as any));
           }
@@ -88,7 +88,7 @@ export const FilterSection = ({
     // Clear downstream selections when company changes
     setSelectedDepartments([]);
     setSelectedPositions([]);
-  }, [selectedCompanies]);
+  }, [selectedCompanies, i18n.language]);
 
   // === Load positions when departments change ===
   useEffect(() => {
@@ -103,7 +103,7 @@ export const FilterSection = ({
         for (const deptName of selectedDepartments) {
           const dept = departmentOptions.find(d => d.name === deptName);
           if (!dept) continue;
-          const positions = await getPositions(dept.id);
+          const positions = await getPositions(dept.id, i18n.language);
           if (Array.isArray(positions)) {
             allPositions.push(...(positions as any));
           }
@@ -118,7 +118,7 @@ export const FilterSection = ({
 
     loadPositions();
     setSelectedPositions([]);
-  }, [selectedDepartments]);
+  }, [selectedDepartments, i18n.language]);
 
   // Ensure unique values to avoid duplicate keys in lists
   const availableCompanies = Array.from(new Set(companyOptions.map(c => c.name)));
