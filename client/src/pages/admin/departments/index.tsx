@@ -100,8 +100,11 @@ export default function DepartmentsPage() {
 
   // Filter departments by search term and company
   const filteredDepartments = departments.filter(department => {
-    const matchesSearch = department.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (department.description && department.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const name = typeof department.name === 'string' ? department.name : department.name?.en || '';
+    const description = typeof department.description === 'string' ? department.description : department.description?.en || '';
+    
+    const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (description && description.toLowerCase().includes(searchTerm.toLowerCase()));
     
     // If selectedCompanyId is 'all', show all departments
     const matchesCompany = selectedCompanyId === 'all' || department.companyId === selectedCompanyId;
@@ -323,14 +326,15 @@ export default function DepartmentsPage() {
 
       {/* Create Department Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>Create Department</DialogTitle>
             <DialogDescription>
               Add a new department to your organization.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="flex-1 overflow-y-auto px-1">
+            <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <label htmlFor="company" className="text-sm font-medium">
                 Company
@@ -376,8 +380,9 @@ export default function DepartmentsPage() {
                 rows={3}
               />
             </div>
+            </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-shrink-0">
             <Button variant="outline" onClick={() => {
               setIsCreateDialogOpen(false);
               resetForm();
@@ -391,14 +396,15 @@ export default function DepartmentsPage() {
 
       {/* Edit Department Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>Edit Department</DialogTitle>
             <DialogDescription>
               Update department information.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="flex-1 overflow-y-auto px-1">
+            <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <label htmlFor="name" className="text-sm font-medium">
                 Department Name
@@ -438,8 +444,9 @@ export default function DepartmentsPage() {
                 </p>
               </div>
             )}
+            </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-shrink-0">
             <Button variant="outline" onClick={() => {
               setIsEditDialogOpen(false);
               resetForm();

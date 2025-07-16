@@ -132,8 +132,11 @@ export default function PositionsPage() {
   // Filter positions by search term and department
   const filteredPositions = positions.filter(position => {
     console.log('[Filter] position:', position);
-    const matchesSearch = position.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (position.description && position.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const title = typeof position.title === 'string' ? position.title : position.title?.en || '';
+    const description = typeof position.description === 'string' ? position.description : position.description?.en || '';
+    
+    const matchesSearch = title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (description && description.toLowerCase().includes(searchTerm.toLowerCase()));
 
     // If 'all', show all; otherwise, check if departmentId matches
     const matchesDepartment =
@@ -388,14 +391,15 @@ export default function PositionsPage() {
 
       {/* Create Position Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>Create Position</DialogTitle>
             <DialogDescription>
               Add a new job position to your organization.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="flex-1 overflow-y-auto px-1">
+            <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <label htmlFor="department" className="text-sm font-medium">
                 Department
@@ -488,8 +492,9 @@ export default function PositionsPage() {
                 If provided, the Apply Now button will redirect to this link. Leave empty to use default application flow.
               </p>
             </div>
+            </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-shrink-0">
             <Button variant="outline" onClick={() => {
               setIsCreateDialogOpen(false);
               resetForm();
@@ -503,14 +508,15 @@ export default function PositionsPage() {
 
       {/* Edit Position Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>Edit Position</DialogTitle>
             <DialogDescription>
               Update position information.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="flex-1 overflow-y-auto px-1">
+            <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <label htmlFor="title" className="text-sm font-medium">
                 Position Title
@@ -604,8 +610,9 @@ export default function PositionsPage() {
                 </p>
               </div>
             )}
+            </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-shrink-0">
             <Button variant="outline" onClick={() => {
               setIsEditDialogOpen(false);
               resetForm();

@@ -425,8 +425,8 @@ export default function CompaniesPage() {
                 Add Company
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[525px]">
-              <DialogHeader>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+              <DialogHeader className="flex-shrink-0">
                 <DialogTitle>{isEditMode ? "Edit Company" : "Add New Company"}</DialogTitle>
                 <DialogDescription>
                   {isEditMode 
@@ -435,7 +435,8 @@ export default function CompaniesPage() {
                   }
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-6 py-4">
+              <div className="flex-1 overflow-y-auto px-1">
+                <div className="grid gap-6 py-4">
                 <MultilingualInput
                   label="Company Name"
                   value={newCompany.name as LocalizedContent}
@@ -547,9 +548,9 @@ export default function CompaniesPage() {
                     />
                   </div>
                 </div>
-
+                </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className="flex-shrink-0">
                 <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                   Cancel
                 </Button>
