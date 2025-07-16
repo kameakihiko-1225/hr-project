@@ -209,7 +209,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[480px] w-full max-w-[480px] flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[520px] w-full max-w-[480px] flex flex-col"
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -267,15 +267,13 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       </CardHeader>
 
       <CardContent className="space-y-3 pb-2 relative z-10 flex-1 flex flex-col">
-        <CardTitle className="text-lg font-semibold tracking-tight leading-snug text-foreground group-hover:text-primary line-clamp-2">
+        <CardTitle className="text-lg font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title">
           {position.title}
         </CardTitle>
 
         {position.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2rem]">
-            {position.description.length > 80 
-              ? `${position.description.substring(0, 80)}...` 
-              : position.description}
+          <p className="text-sm text-muted-foreground job-card-description">
+            {position.description}
           </p>
         )}
 

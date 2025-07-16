@@ -1,0 +1,47 @@
+Okay, I've noted that! The pagination functionality for the "All Applied Positions Listing" is crucial and will be re-emphasized.
+
+Here's the refined prompt, ensuring pagination is explicitly highlighted in the design section:
+
+---
+
+## **🎨 Frontend UI & Component Design Prompt: "All Applied Positions Listing"**
+
+**🎯 FOCUS:** To precisely define the design and layout for the "All Applied Positions Listing" component, including its interactive pagination.
+
+**📋 CORE DESIGN REQUIREMENTS:**
+
+1.  **Strict Placement:** This component must be placed directly below the "Top Applied Positions" component, **still contained within the overall hero section**.
+
+2.  **Overall Aesthetic:**
+    * Implement a **"simplicity with modern view" design, drawing inspiration from `Screenshot 2025-07-16 at 2.51.44 PM.png`**.
+    * This implies:
+        * Clean, minimalist card/list item design for each position.
+        * Subtle use of lines, borders, and spacing for a sleek, organized look.
+        * Modern typography and a harmonious color palette that complements the hero section's existing design.
+        * Subtle animations on hover or load (if feasible without performance impact).
+    * The design should prioritize readability, a polished, contemporary feel, and adhere to "best cases" for modern web list design.
+
+3.  **Layout within Each Listing Item (per row):**
+    * **Left Side (First Element):** Display **numbering** (e.g., "1.", "2.", "3.", etc.) for each position in the list.
+    * **Next to Numbering:** Display the **Localized Position Name**.
+    * **Far Right Side:** Display the **Total Applied Count** for that position (e.g., "43 Applied"). The label "Applied" must be localized.
+    * Ensure proper spacing and alignment to create a clean, readable, and visually appealing flow across the row.
+
+4.  **Pagination & Interactive Display (CRITICAL):**
+    * **Initial Display:** The listing must initially show only the **first 4 positions** from the fetched data.
+    * **"View More / View Less" Controls:**
+        * If the total number of positions with applicants is greater than 4, a "View More Positions" button/icon must be displayed below the list.
+        * **When "View More Positions" is clicked, the full list of positions should be displayed**, and the button should change to "View Less Positions".
+        * **When "View Less Positions" is clicked, the listing must revert to displaying only the initial 4 positions**, and the button should change back to "View More Positions".
+    * **Localization:** All button texts ("View More Positions", "Показать больше позиций", "Ko'proq lavozimlarni ko'rish" / "View Less Positions", "Показать меньше позиций", "Kamroq lavozimlarni ko'rish") must be correctly localized.
+    * The pagination controls should integrate seamlessly with the "simplicity with modern view" aesthetic.
+
+5.  **Localization Integration (Design Impact):**
+    * Ensure that text length variations across English (🇺🇸), Uzbek (🇺🇿), and Russian (🇷🇺) do **NOT** cause layout issues, overflow, or visual distortion within the hero section's fixed design constraints.
+    * Adjust styling (e.g., font-size, line-height, element width/height) minimally and only if absolutely necessary to prevent breakage, always prioritizing the overall hero section's integrity and the clean, modern aesthetic.
+
+**Deliverables for this Design Section:**
+* A pixel-perfect implementation of the "All Applied Positions Listing" component that aligns with the specified layout (numbering, position name, applied count) and the "simplicity with modern view" aesthetic inspired by `Screenshot 2025-07-16 at 2.51.44 PM.png`.
+* Fully functional and interactive "View More / View Less" pagination controls.
+* Responsive design that maintains visual integrity across various screen sizes and languages.
+* Confirmation that the component is strictly confined to its designated area within the hero section and integrates without negatively impacting other hero elements.
