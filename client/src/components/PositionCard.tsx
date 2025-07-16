@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Position } from '../types/position';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Pencil, Trash2, Building2, Briefcase, DollarSign, Clock, MapPin, Send, ExternalLink } from 'lucide-react';
+import { Badge } from './ui/badge';
+import { Pencil, Trash2, Building2, Briefcase, DollarSign, Clock, MapPin, Send, ExternalLink, Crown, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/lib/authContext';
@@ -23,9 +24,11 @@ interface PositionCardProps {
   onEdit?: (position: Position) => void;
   onDelete?: (position: Position) => void;
   showDepartment?: boolean;
+  applicantCount?: number;
+  topTierBadge?: 1 | 2 | 3; // Badge for top 3 most applied positions
 }
 
-export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false }: PositionCardProps) {
+export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false, applicantCount, topTierBadge }: PositionCardProps) {
   const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -214,9 +217,39 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
+      {/* Top-tier badge and applicant count */}
+      {(topTierBadge || applicantCount !== undefined) && (
+        <div className="absolute top-2 right-2 flex flex-col items-end gap-1 z-20">
+          {topTierBadge && (
+            <Badge 
+              variant="secondary" 
+              className={`text-white border-none shadow-lg font-semibold ${
+                topTierBadge === 1 
+                  ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' // Gold
+                  : topTierBadge === 2 
+                  ? 'bg-gradient-to-r from-gray-400 to-gray-600' // Silver  
+                  : 'bg-gradient-to-r from-amber-600 to-amber-800' // Bronze
+              }`}
+            >
+              <Crown className="h-3 w-3 mr-1" />
+              #{topTierBadge}
+            </Badge>
+          )}
+          {applicantCount !== undefined && (
+            <Badge 
+              variant="outline" 
+              className="bg-white/95 text-gray-800 border-gray-300 shadow-sm text-sm font-medium px-2 py-1"
+            >
+              <Users className="h-4 w-4 mr-1" />
+              {applicantCount} {applicantCount === 1 ? 'applicant' : 'applicants'}
+            </Badge>
+          )}
+        </div>
+      )}
+
       {/* Edit / Delete buttons */}
       {(onEdit || onDelete) && (
-        <div className="absolute top-2 right-2 flex gap-1 z-20">
+        <div className="absolute top-2 left-2 flex gap-1 z-20">
           {onEdit && (
             <Button variant="ghost" size="icon" onClick={handleEdit} className="h-7 w-7">
               <Pencil className="h-4 w-4" />

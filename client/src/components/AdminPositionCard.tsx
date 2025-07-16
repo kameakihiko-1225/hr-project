@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Position } from '../types/position';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Pencil, Trash2, Building2, Briefcase, DollarSign, Clock, MapPin, ExternalLink } from 'lucide-react';
+import { Badge } from './ui/badge';
+import { Pencil, Trash2, Building2, Briefcase, DollarSign, Clock, MapPin, ExternalLink, Crown, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
@@ -20,9 +21,11 @@ interface AdminPositionCardProps {
   onEdit?: (position: Position) => void;
   onDelete?: (position: Position) => void;
   showDepartment?: boolean;
+  applicantCount?: number;
+  topTierBadge?: 1 | 2 | 3; // Badge for top 3 most applied positions
 }
 
-export const AdminPositionCard = React.memo(function AdminPositionCard({ position, onEdit, onDelete, showDepartment = false }: AdminPositionCardProps) {
+export const AdminPositionCard = React.memo(function AdminPositionCard({ position, onEdit, onDelete, showDepartment = false, applicantCount, topTierBadge }: AdminPositionCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -149,7 +152,35 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
       {/* gradient ring on hover */}
       <span className="absolute inset-0 rounded-[inherit] bg-gradient-to-br from-blue-600/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-
+      {/* Top-tier badge and applicant count */}
+      {(topTierBadge || applicantCount !== undefined) && (
+        <div className="absolute top-2 right-2 flex flex-col items-end gap-1 z-20">
+          {topTierBadge && (
+            <Badge 
+              variant="secondary" 
+              className={`text-white border-none shadow-lg font-semibold ${
+                topTierBadge === 1 
+                  ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' // Gold
+                  : topTierBadge === 2 
+                  ? 'bg-gradient-to-r from-gray-400 to-gray-600' // Silver  
+                  : 'bg-gradient-to-r from-amber-600 to-amber-800' // Bronze
+              }`}
+            >
+              <Crown className="h-3 w-3 mr-1" />
+              #{topTierBadge}
+            </Badge>
+          )}
+          {applicantCount !== undefined && (
+            <Badge 
+              variant="outline" 
+              className="bg-white/95 text-gray-800 border-gray-300 shadow-sm text-sm font-medium px-2 py-1"
+            >
+              <Users className="h-4 w-4 mr-1" />
+              {applicantCount} {applicantCount === 1 ? 'applicant' : 'applicants'}
+            </Badge>
+          )}
+        </div>
+      )}
 
       <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
         <CompanyAvatar />

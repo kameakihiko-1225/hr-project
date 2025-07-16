@@ -21,6 +21,7 @@ export default function PositionsPage() {
   
   const [positions, setPositions] = useState<Position[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [applicantCounts, setApplicantCounts] = useState<{ positionId: number; positionTitle: string; appliedCount: number; }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -57,10 +58,11 @@ export default function PositionsPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Fetch departments and positions in parallel for better performance
-        const [departmentsData, positionsData] = await Promise.allSettled([
+        // Fetch departments, positions, and applicant counts in parallel for better performance
+        const [departmentsData, positionsData, applicantCountsData] = await Promise.allSettled([
           getDepartments(),
-          getPositions(selectedDepartmentId !== 'all' ? selectedDepartmentId : undefined)
+          getPositions(selectedDepartmentId !== 'all' ? selectedDepartmentId : undefined),
+          fetch('/api/all-applied-positions').then(res => res.json())
         ]);
 
         // Handle departments
@@ -69,6 +71,14 @@ export default function PositionsPage() {
         } else {
           console.error('Failed to load departments:', departmentsData.status === 'rejected' ? departmentsData.reason : 'Invalid data');
           setDepartments([]);
+        }
+
+        // Handle applicant counts
+        if (applicantCountsData.status === 'fulfilled' && applicantCountsData.value?.data && Array.isArray(applicantCountsData.value.data)) {
+          setApplicantCounts(applicantCountsData.value.data);
+        } else {
+          console.error('Failed to load applicant counts:', applicantCountsData.status === 'rejected' ? applicantCountsData.reason : 'Invalid data');
+          setApplicantCounts([]);
         }
 
         // Handle positions
@@ -132,6 +142,17 @@ export default function PositionsPage() {
     return matchesSearch && matchesDepartment;
   });
   console.log('[Render] filteredPositions:', filteredPositions);
+
+  // Create a map for easy lookup of applicant counts and determine top-tier badges
+  const applicantCountMap = new Map<number, { count: number; topTierBadge?: 1 | 2 | 3 }>();
+  
+  applicantCounts.forEach((item, index) => {
+    const badge = index < 3 ? (index + 1) as (1 | 2 | 3) : undefined;
+    applicantCountMap.set(item.positionId, { 
+      count: item.appliedCount, 
+      topTierBadge: badge 
+    });
+  });
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -325,16 +346,21 @@ export default function PositionsPage() {
           </div>
         ) : filteredPositions.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-            {filteredPositions.map((position) => (
-              <div key={position.id} className="h-full">
-                <AdminPositionCard
-                  position={position}
-                  onEdit={handleEditPosition}
-                  onDelete={handleDeletePosition}
-                  showDepartment={!selectedDepartmentId}
-                />
-              </div>
-            ))}
+            {filteredPositions.map((position) => {
+              const applicantData = applicantCountMap.get(position.id);
+              return (
+                <div key={position.id} className="h-full">
+                  <AdminPositionCard
+                    position={position}
+                    onEdit={handleEditPosition}
+                    onDelete={handleDeletePosition}
+                    showDepartment={!selectedDepartmentId}
+                    applicantCount={applicantData?.count}
+                    topTierBadge={applicantData?.topTierBadge}
+                  />
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-64 text-center">

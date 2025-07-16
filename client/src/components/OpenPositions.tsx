@@ -96,8 +96,27 @@ export const OpenPositions = ({
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
+  // Fetch applicant counts for positions
+  const { data: applicantCountsResponse } = useQuery({
+    queryKey: ['/api/all-applied-positions'],
+    staleTime: 60 * 1000, // 1 minute (shorter cache for dynamic data)
+    gcTime: 5 * 60 * 1000, // 5 minutes
+  });
+
   const departments = departmentsResponse?.data || [];
   const companies = companiesResponse?.data || [];
+  const applicantCounts = applicantCountsResponse?.data || [];
+
+  // Create a map for easy lookup of applicant counts and determine top-tier badges
+  const applicantCountMap = new Map<number, { count: number; topTierBadge?: 1 | 2 | 3 }>();
+  
+  applicantCounts.forEach((item, index) => {
+    const badge = index < 3 ? (index + 1) as (1 | 2 | 3) : undefined;
+    applicantCountMap.set(item.positionId, { 
+      count: item.appliedCount, 
+      topTierBadge: badge 
+    });
+  });
 
   const filteredPositions = allPositions.filter(pos => {
     // Find department and company data for this position
@@ -248,19 +267,34 @@ export const OpenPositions = ({
             <>
               {viewMode === "grid" ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-center">
-                  {currentPositions.map((pos, index) => (
-                    <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[460px]">
-                      <PositionCard position={pos} />
-                    </div>
-                  ))}
+                  {currentPositions.map((pos, index) => {
+                    const applicantData = applicantCountMap.get(pos.id);
+                    return (
+                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[460px]">
+                        <PositionCard 
+                          position={pos} 
+                          applicantCount={applicantData?.count}
+                          topTierBadge={applicantData?.topTierBadge}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="flex flex-col space-y-6">
-                  {currentPositions.map((pos, index) => (
-                    <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in max-w-none">
-                      <PositionCard position={pos} showDepartment={true} />
-                    </div>
-                  ))}
+                  {currentPositions.map((pos, index) => {
+                    const applicantData = applicantCountMap.get(pos.id);
+                    return (
+                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in max-w-none">
+                        <PositionCard 
+                          position={pos} 
+                          showDepartment={true} 
+                          applicantCount={applicantData?.count}
+                          topTierBadge={applicantData?.topTierBadge}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               )}
               
