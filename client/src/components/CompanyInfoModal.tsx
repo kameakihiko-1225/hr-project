@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Mail, Building, Globe } from "lucide-react";
 import { Company } from "@shared/schema";
+import { useTranslation } from 'react-i18next';
+import { LocalizedContent } from "@shared/schema";
 
 interface CompanyInfoModalProps {
   company: Company | null;
@@ -11,6 +13,14 @@ interface CompanyInfoModalProps {
 }
 
 export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalProps) {
+  const { i18n } = useTranslation();
+  
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | LocalizedContent): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as keyof LocalizedContent] || content.en || '';
+  };
+  
   console.log('CompanyInfoModal rendered:', { company, isOpen });
   
   if (!company) {
@@ -26,12 +36,12 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
             {company.logoUrl && (
               <img 
                 src={company.logoUrl} 
-                alt={`${company.name} logo`}
+                alt={`${getLocalizedContent(company.name)} logo`}
                 className="h-12 w-12 rounded-lg object-contain p-1 border"
               />
             )}
             <div>
-              <h2 className="text-xl font-semibold">{company.name}</h2>
+              <h2 className="text-xl font-semibold">{getLocalizedContent(company.name)}</h2>
               <p className="text-sm text-muted-foreground">Company Information</p>
             </div>
           </DialogTitle>
@@ -42,7 +52,7 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
           {company.description && (
             <div>
               <h3 className="font-medium mb-2">About</h3>
-              <p className="text-sm text-muted-foreground">{company.description}</p>
+              <p className="text-sm text-muted-foreground">{getLocalizedContent(company.description)}</p>
             </div>
           )}
 
@@ -67,7 +77,7 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <span>
-                  {company.address || `${company.city}, ${company.country}`}
+                  {getLocalizedContent(company.address) || `${getLocalizedContent(company.city)}, ${getLocalizedContent(company.country)}`}
                 </span>
               </div>
             )}

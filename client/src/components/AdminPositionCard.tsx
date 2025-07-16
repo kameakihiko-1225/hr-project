@@ -13,6 +13,8 @@ import { DepartmentInfoModal } from './DepartmentInfoModal';
 import { getDepartments, getCompanies } from '@/lib/api';
 import { Department } from '../types/department';
 import { Company } from '../types/company';
+import { useTranslation } from 'react-i18next';
+import { LocalizedContent } from '@shared/schema';
 
 const logger = createLogger('adminPositionCard');
 
@@ -26,6 +28,14 @@ interface AdminPositionCardProps {
 }
 
 export const AdminPositionCard = React.memo(function AdminPositionCard({ position, onEdit, onDelete, showDepartment = false, applicantCount, topTierBadge }: AdminPositionCardProps) {
+  const { i18n } = useTranslation();
+  
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | LocalizedContent): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as keyof LocalizedContent] || content.en || '';
+  };
+  
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -88,14 +98,16 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
       country: basePosition.country || department?.country || company?.country || null,
       
       // Company info
-      companyName: company?.name || 'Company',
+      companyName: company ? getLocalizedContent(company.name) : 'Company',
       companyColor: company?.color || '#b69b83',
       
       // Department info
-      departmentName: department?.name || 'Department',
+      departmentName: department ? getLocalizedContent(department.name) : 'Department',
       
       // Other inherited fields
-      description: basePosition.description || department?.description || company?.description || null,
+      description: basePosition.description ? getLocalizedContent(basePosition.description) : 
+                   department?.description ? getLocalizedContent(department.description) : 
+                   company?.description ? getLocalizedContent(company.description) : null,
     };
   };
 
@@ -199,7 +211,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
 
       <CardContent className="space-y-3 pb-2 relative z-10 flex-1 flex flex-col">
         <CardTitle className="text-base font-semibold tracking-tight text-foreground group-hover:text-primary job-card-admin-title">
-          {position.title}
+          {getLocalizedContent(position.title)}
         </CardTitle>
 
         {inheritedData.description && (

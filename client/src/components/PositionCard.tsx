@@ -16,6 +16,7 @@ import { CompanyInfoModal } from './CompanyInfoModal';
 import { DepartmentInfoModal } from './DepartmentInfoModal';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { LocalizedContent } from '@shared/schema';
 
 const logger = createLogger('positionCard');
 
@@ -29,7 +30,7 @@ interface PositionCardProps {
 }
 
 export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false, applicantCount, topTierBadge }: PositionCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -39,6 +40,12 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
   const [hasTrackedView, setHasTrackedView] = useState(false);
+  
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | LocalizedContent): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as keyof LocalizedContent] || content.en || '';
+  };
 
   // Track position view when card is first rendered
   useEffect(() => {
@@ -170,14 +177,16 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       country: basePosition.country || department?.country || company?.country || null,
       
       // Company info
-      companyName: company?.name || 'Company',
+      companyName: company ? getLocalizedContent(company.name) : 'Company',
       companyColor: company?.color || '#b69b83',
       
       // Department info
-      departmentName: department?.name || 'Department',
+      departmentName: department ? getLocalizedContent(department.name) : 'Department',
       
       // Description inheritance
-      description: basePosition.description || department?.description || company?.description || null,
+      description: basePosition.description ? getLocalizedContent(basePosition.description) : 
+                   department?.description ? getLocalizedContent(department.description) : 
+                   company?.description ? getLocalizedContent(company.description) : null,
     };
   };
 
@@ -266,7 +275,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                 <DialogHeader>
                   <DialogTitle>Delete Position</DialogTitle>
                   <DialogDescription>
-                    Are you sure you want to delete the position "{position.title}"? This action cannot be undone.
+                    Are you sure you want to delete the position "{getLocalizedContent(position.title)}"? This action cannot be undone.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -290,7 +299,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
               <Building2 className="h-4 w-4" />
               {position.departments.map((dp, idx) => (
                 <span key={dp.department.id} className="flex items-center">
-                  {dp.department.name}
+                  {getLocalizedContent(dp.department.name)}
                   {idx < position.departments.length - 1 && <span className="mx-1">|</span>}
                 </span>
               ))}
@@ -301,19 +310,19 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
 
       <CardContent className="space-y-2 pb-2 relative z-10 flex-1 flex flex-col">
         <CardTitle className="text-lg font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title">
-          {position.title}
+          {getLocalizedContent(position.title)}
         </CardTitle>
 
         {position.description && (
           <p className="text-sm text-muted-foreground job-card-description line-clamp-2">
-            {position.description}
+            {getLocalizedContent(position.description)}
           </p>
         )}
 
         {/* Salary after description */}
         {position.salaryRange && (
           <p className="text-sm font-medium text-foreground flex items-center gap-1">
-            <DollarSign className="h-4 w-4" /> {position.salaryRange}
+            <DollarSign className="h-4 w-4" /> {getLocalizedContent(position.salaryRange)}
           </p>
         )}
 
@@ -366,7 +375,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
             </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>{position.title}</DialogTitle>
+              <DialogTitle>{getLocalizedContent(position.title)}</DialogTitle>
               <DialogDescription>Position Details</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">

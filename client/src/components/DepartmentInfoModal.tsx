@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Mail, Building, Users, Globe } from "lucide-react";
 import { Department, Company } from "@shared/schema";
+import { useTranslation } from 'react-i18next';
+import { LocalizedContent } from "@shared/schema";
 
 interface DepartmentInfoModalProps {
   department: Department | null;
@@ -12,6 +14,14 @@ interface DepartmentInfoModalProps {
 }
 
 export function DepartmentInfoModal({ department, company, isOpen, onClose }: DepartmentInfoModalProps) {
+  const { i18n } = useTranslation();
+  
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | LocalizedContent): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as keyof LocalizedContent] || content.en || '';
+  };
+  
   console.log('DepartmentInfoModal rendered:', { department, company, isOpen });
   
   if (!department) {
@@ -27,14 +37,14 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
             {company?.logoUrl && (
               <img 
                 src={company.logoUrl} 
-                alt={`${company.name} logo`}
+                alt={`${getLocalizedContent(company.name)} logo`}
                 className="h-12 w-12 rounded-lg object-cover"
               />
             )}
             <div>
-              <h2 className="text-xl font-semibold">{department.name}</h2>
+              <h2 className="text-xl font-semibold">{getLocalizedContent(department.name)}</h2>
               <p className="text-sm text-muted-foreground">
-                Department at {company?.name || 'Unknown Company'}
+                Department at {company ? getLocalizedContent(company.name) : 'Unknown Company'}
               </p>
             </div>
           </DialogTitle>
@@ -45,7 +55,7 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
           {department.description && (
             <div>
               <h3 className="font-medium mb-2">About This Department</h3>
-              <p className="text-sm text-muted-foreground">{department.description}</p>
+              <p className="text-sm text-muted-foreground">{getLocalizedContent(department.description)}</p>
             </div>
           )}
 
@@ -58,7 +68,7 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
               </h3>
               
               {company.description && (
-                <p className="text-sm text-muted-foreground mb-3">{company.description}</p>
+                <p className="text-sm text-muted-foreground mb-3">{getLocalizedContent(company.description)}</p>
               )}
 
               {/* Industry Tags */}

@@ -18,6 +18,13 @@ import { LocalizedContent } from '@shared/schema';
 export default function DepartmentsPage() {
   const [location] = useLocation();
   const { toast } = useToast();
+  const { i18n } = useTranslation();
+  
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | LocalizedContent): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as keyof LocalizedContent] || content.en || '';
+  };
   
   const [departments, setDepartments] = useState<Department[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -349,7 +356,7 @@ export default function DepartmentsPage() {
                 <SelectContent>
                   {Array.isArray(companies) && companies.map((company) => (
                     <SelectItem key={company.id} value={company.id}>
-                      {company.name}
+                      {typeof company.name === 'string' ? company.name : company.name.en || company.name.ru || company.name.uz || 'Unknown Company'}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -418,7 +425,7 @@ export default function DepartmentsPage() {
                 </label>
                 <div className="flex items-center gap-2 p-2 rounded-md bg-muted">
                   <Building2 className="h-4 w-4 text-muted-foreground" />
-                  <span>{currentDepartment.company.name}</span>
+                  <span>{getLocalizedContent(currentDepartment.company.name)}</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   Company cannot be changed. Create a new department if needed.

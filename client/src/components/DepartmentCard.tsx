@@ -9,6 +9,8 @@ import { Separator } from './ui/separator';
 import { useLocation } from 'wouter';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { createLogger } from '@/lib/logger';
+import { useTranslation } from 'react-i18next';
+import { LocalizedContent } from '@shared/schema';
 
 const logger = createLogger('departmentCard');
 
@@ -21,9 +23,16 @@ interface DepartmentCardProps {
 
 export function DepartmentCard({ department, onEdit, onDelete, showCompany = false }: DepartmentCardProps) {
   const [location, navigate] = useLocation();
+  const { i18n } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [companyLogoError, setCompanyLogoError] = useState(false);
+  
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | LocalizedContent): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as keyof LocalizedContent] || content.en || '';
+  };
 
   const handleEdit = () => {
     if (onEdit) {
@@ -75,7 +84,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
     <Card className="overflow-hidden transition-all hover:shadow-md border-l-4 border-l-blue-500">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-xl font-bold truncate">{department.name}</CardTitle>
+          <CardTitle className="text-xl font-bold truncate">{getLocalizedContent(department.name)}</CardTitle>
           <div className="flex gap-2">
             {onEdit && (
               <Button variant="ghost" size="icon" onClick={handleEdit} className="h-8 w-8">
@@ -93,7 +102,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
                   <DialogHeader>
                     <DialogTitle>Delete Department</DialogTitle>
                     <DialogDescription>
-                      Are you sure you want to delete the department "{department.name}"? This action cannot be undone.
+                      Are you sure you want to delete the department "{getLocalizedContent(department.name)}"? This action cannot be undone.
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
@@ -106,7 +115,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
           </div>
         </div>
         <CardDescription className="text-sm text-muted-foreground line-clamp-2">
-          {department.description || 'No description provided'}
+          {department.description ? getLocalizedContent(department.description) : 'No description provided'}
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-2">
@@ -128,7 +137,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
                 <Building2 className="h-4 w-4 text-muted-foreground" />
               )}
               <span className="text-muted-foreground">Company:</span>
-              <span className="font-medium">{department.company.name}</span>
+              <span className="font-medium">{getLocalizedContent(department.company.name)}</span>
             </div>
           )}
           <div className="flex items-center gap-2 text-sm">
@@ -148,14 +157,14 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
           </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>{department.name}</DialogTitle>
+              <DialogTitle>{getLocalizedContent(department.name)}</DialogTitle>
               <DialogDescription>Department Details</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div>
                 <h4 className="text-sm font-medium mb-2">Description</h4>
                 <p className="text-sm text-muted-foreground">
-                  {department.description || 'No description provided'}
+                  {department.description ? getLocalizedContent(department.description) : 'No description provided'}
                 </p>
               </div>
               {showCompany && department.company && (

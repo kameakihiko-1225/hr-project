@@ -44,6 +44,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IndustryTagSelect } from "@/components/IndustryTagSelect";
 import { MultilingualInput } from "@/components/ui/multilingual-input";
+import { useTranslation } from 'react-i18next';
 import { LocalizedContent } from "@shared/schema";
 
 // Create a logger for the companies page
@@ -63,6 +64,13 @@ export default function CompaniesPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode["value"]>("grid");
+  const { i18n } = useTranslation();
+
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | LocalizedContent): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as keyof LocalizedContent] || content.en || '';
+  };
   const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [newCompany, setNewCompany] = useState<Partial<Company>>({
@@ -196,7 +204,7 @@ export default function CompaniesPage() {
           
           toast({
             title: "Company updated",
-            description: `${newCompany.name} has been updated successfully`,
+            description: `${getLocalizedContent(newCompany.name)} has been updated successfully`,
           });
         } else {
           logger.error('Failed to update company', response.error);
@@ -211,7 +219,7 @@ export default function CompaniesPage() {
             
             toast({
               title: "Company updated (mock)",
-              description: `${newCompany.name} has been updated in local state`,
+              description: `${getLocalizedContent(newCompany.name)} has been updated in local state`,
             });
           } else {
             toast({
@@ -242,7 +250,7 @@ export default function CompaniesPage() {
           
           toast({
             title: "Company added",
-            description: `${newCompany.name} has been added successfully`,
+            description: `${getLocalizedContent(newCompany.name)} has been added successfully`,
           });
         } else {
           logger.error('Failed to add company', response.error);
@@ -260,7 +268,7 @@ export default function CompaniesPage() {
             
             toast({
               title: "Company added (mock)",
-              description: `${newCompany.name} has been added as a mock company`,
+              description: `${getLocalizedContent(newCompany.name)} has been added as a mock company`,
             });
           } else {
             toast({
@@ -626,10 +634,10 @@ export default function CompaniesPage() {
                             {company.logoUrl ? (
                               <img
                                 src={company.logoUrl}
-                                alt={company.name}
+                                alt={getLocalizedContent(company.name)}
                                 className="h-full w-full object-cover"
                                 onError={(e) => {
-                                  logger.warn(`Logo failed to load for company: ${company.name}`);
+                                  logger.warn(`Logo failed to load for company: ${getLocalizedContent(company.name)}`);
                                   const target = e.target as HTMLImageElement;
                                   // Replace with Building icon
                                   target.style.display = 'none';
@@ -643,13 +651,13 @@ export default function CompaniesPage() {
                               <Building className="h-6 w-6 text-gray-400" />
                             )}
                           </div>
-                          <span>{company.name}</span>
+                          <span>{getLocalizedContent(company.name)}</span>
                         </div>
                       </TableCell>
                       <TableCell>{company.email}</TableCell>
                       <TableCell>{company.phone}</TableCell>
                       <TableCell>
-                        {company.city}, {company.country}
+                        {getLocalizedContent(company.city)}, {getLocalizedContent(company.country)}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end space-x-2">

@@ -14,6 +14,8 @@ import { Separator } from "./ui/separator";
 import { Company } from "@/types/company";
 import { createLogger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
+import { useTranslation } from 'react-i18next';
+import { LocalizedContent } from '@shared/schema';
 
 const logger = createLogger('companyCard');
 
@@ -29,6 +31,13 @@ interface CompanyCardProps {
 export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
   const [showDetails, setShowDetails] = useState(false);
   const [logoError, setLogoError] = useState(false);
+  const { i18n } = useTranslation();
+  
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | LocalizedContent): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as keyof LocalizedContent] || content.en || '';
+  };
   
   const handleEdit = () => {
     onEdit(company.id);
@@ -39,7 +48,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
   };
 
   const handleImageError = () => {
-    logger.warn(`Failed to load logo for company: ${company.name}`);
+    logger.warn(`Failed to load logo for company: ${getLocalizedContent(company.name)}`);
     setLogoError(true);
   };
 
@@ -53,7 +62,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
       .substring(0, 2);
   };
 
-  const companyInitials = getInitials(company.name);
+  const companyInitials = getInitials(getLocalizedContent(company.name));
 
   // Get industries from either the industries array or the legacy industry field
   const displayIndustries = company.industries?.length 
@@ -70,7 +79,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
           {!logoError && company.logoUrl ? (
             <img
               src={company.logoUrl}
-              alt={`${company.name} logo`}
+              alt={`${getLocalizedContent(company.name)} logo`}
               className="w-full h-full object-cover"
               onError={handleImageError}
             />
@@ -156,7 +165,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">{company.name}</DialogTitle>
+            <DialogTitle className="text-xl font-bold">{getLocalizedContent(company.name)}</DialogTitle>
             <DialogDescription>
               Company details
             </DialogDescription>
@@ -170,7 +179,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
                 {!logoError && company.logoUrl ? (
                   <img 
                     src={company.logoUrl} 
-                    alt={`${company.name} logo`} 
+                    alt={`${getLocalizedContent(company.name)} logo`} 
                     className="h-full w-full object-cover"
                     onError={handleImageError}
                   />
@@ -195,7 +204,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
                 )}
               </div>
               <div>
-                <h3 className="font-semibold text-lg">{company.name}</h3>
+                <h3 className="font-semibold text-lg">{getLocalizedContent(company.name)}</h3>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {displayIndustries.length > 0 ? (
                     displayIndustries.map((industry, idx) => (
