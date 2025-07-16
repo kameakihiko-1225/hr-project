@@ -184,7 +184,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
 
   const CompanyAvatar = () => (
-    <Avatar className="h-20 w-20 border-2 border-white/30 shadow-2xl group-hover:shadow-3xl group-hover:scale-105 transition-all duration-300">
+    <Avatar className="h-16 w-16 border-2 border-white/30 shadow-2xl group-hover:shadow-3xl group-hover:scale-105 transition-all duration-300">
       {companyLogoUrl && !logoError ? (
         <AvatarImage 
           src={companyLogoUrl} 
@@ -195,7 +195,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           onError={handleLogoError} 
         />
       ) : (
-        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-xl shadow-inner">
+        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-lg shadow-inner">
           {companyName.charAt(0)}
         </AvatarFallback>
       )}
@@ -209,7 +209,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[520px] w-full max-w-[480px] flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[400px] w-full max-w-[380px] flex flex-col"
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -246,7 +246,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       )}
 
-      <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
+      <CardHeader className="flex items-start gap-3 pb-2 pt-4 relative z-10">
         <CompanyAvatar />
         <div className="flex-1">
           <h3 className="font-semibold text-base leading-tight text-foreground">
@@ -266,25 +266,25 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3 pb-2 relative z-10 flex-1 flex flex-col">
+      <CardContent className="space-y-2 pb-2 relative z-10 flex-1 flex flex-col">
         <CardTitle className="text-lg font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title">
           {position.title}
         </CardTitle>
 
         {position.description && (
-          <p className="text-sm text-muted-foreground job-card-description">
+          <p className="text-sm text-muted-foreground job-card-description line-clamp-2">
             {position.description}
           </p>
         )}
 
         {/* Salary after description */}
         {position.salaryRange && (
-          <p className="text-sm font-medium text-foreground flex items-center gap-1 mt-1">
+          <p className="text-sm font-medium text-foreground flex items-center gap-1">
             <DollarSign className="h-4 w-4" /> {position.salaryRange}
           </p>
         )}
 
-        <div className="flex flex-wrap gap-3 mt-auto text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-2 mt-auto text-sm text-muted-foreground">
           {position.city && (
             <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {position.city}{position.country ? `, ${position.country}` : ''}</span>
           )}
@@ -294,40 +294,40 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-center gap-4 border-t border-border pt-4 pb-4 relative z-10 mt-auto shrink-0">
+      <CardFooter className="flex flex-col items-center gap-3 border-t border-border pt-3 pb-3 relative z-10 mt-auto shrink-0">
         {postedAgo && (
-          <span className="text-sm text-muted-foreground flex items-center gap-1"><Clock className="h-4 w-4" /> {postedAgo}</span>
+          <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
         )}
 
         <div className="flex items-center gap-2 w-full">
           <Button 
             variant="outline" 
-            size="default" 
-            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300"
+            size="sm" 
+            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
             }}
           >
-            <Building2 className="h-4 w-4 sm:h-3 sm:w-3" />
+            <Building2 className="h-3 w-3" />
             <span className="hidden sm:inline">{t('position_card.company_info')}</span>
           </Button>
           <Button 
             variant="outline" 
-            size="default" 
-            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300"
+            size="sm" 
+            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
             }}
           >
-            <Briefcase className="h-4 w-4 sm:h-3 sm:w-3" />
+            <Briefcase className="h-3 w-3" />
             <span className="hidden sm:inline">{t('position_card.department_info')}</span>
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="default" className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300">
-                <ExternalLink className="h-4 w-4 sm:h-3 sm:w-3" />
+              <Button variant="outline" size="sm" className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300">
+                <ExternalLink className="h-3 w-3" />
                 <span className="hidden sm:inline">{t('position_card.view_details')}</span>
               </Button>
             </DialogTrigger>
@@ -411,7 +411,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         {position.applyLink ? (
           <button
             onClick={handleApply}
-            className="px-8 py-4 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 w-full justify-center"
+            className="px-4 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 w-full justify-center"
           >
             <span className="hidden sm:inline">{t('position_card.apply')}</span>
             <span className="sm:hidden">{t('position_card.apply')}</span>
@@ -421,7 +421,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button
             onClick={handleApply}
             disabled={isApplying}
-            className="px-8 py-4 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 w-full justify-center"
+            className="px-4 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 w-full justify-center"
           >
             {isApplying ? 'Generating…' : (
               <>
