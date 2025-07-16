@@ -11,8 +11,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { insertGalleryItemSchema, type GalleryItem, type InsertGalleryItem } from '@shared/schema';
+import { insertGalleryItemSchema, type GalleryItem, type InsertGalleryItem, type LocalizedContent } from '@shared/schema';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { MultilingualInput } from '@/components/ui/multilingual-input';
+import { useTranslation } from 'react-i18next';
 
 const categories = [
   { value: 'teamwork', label: 'Team Collaboration' },
@@ -27,6 +29,13 @@ export default function AdminBlog() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { i18n } = useTranslation();
+
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | LocalizedContent): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as keyof LocalizedContent] || content.en || '';
+  };
 
   // Fetch blog items
   useEffect(() => {
@@ -225,8 +234,8 @@ export default function AdminBlog() {
   const form = useForm<InsertGalleryItem>({
     resolver: zodResolver(insertGalleryItemSchema),
     defaultValues: {
-      title: '',
-      description: '',
+      title: { en: '' } as LocalizedContent,
+      description: { en: '' } as LocalizedContent,
       category: 'teamwork',
       imageUrl: '',
       tags: [],
@@ -249,8 +258,8 @@ export default function AdminBlog() {
   const handleEdit = (item: GalleryItem) => {
     setEditingItem(item);
     form.reset({
-      title: item.title,
-      description: item.description,
+      title: typeof item.title === 'string' ? { en: item.title } : item.title as LocalizedContent,
+      description: typeof item.description === 'string' ? { en: item.description } : item.description as LocalizedContent,
       category: item.category,
       imageUrl: item.imageUrl,
       tags: item.tags || [],
@@ -298,8 +307,8 @@ export default function AdminBlog() {
                 onClick={() => {
                   setEditingItem(null);
                   form.reset({
-                    title: '',
-                    description: '',
+                    title: { en: '' } as LocalizedContent,
+                    description: { en: '' } as LocalizedContent,
                     category: 'teamwork',
                     imageUrl: '',
                     tags: [],
@@ -323,32 +332,24 @@ export default function AdminBlog() {
               </DialogHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Title</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter blog item title" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea {...field} placeholder="Enter blog item description" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="space-y-4">
+                    <MultilingualInput
+                      label="Blog Title"
+                      value={form.watch('title') as LocalizedContent}
+                      onChange={(value) => form.setValue('title', value)}
+                      placeholder="Enter blog item title"
+                      required
+                    />
+                    
+                    <MultilingualInput
+                      label="Description"
+                      value={form.watch('description') as LocalizedContent}
+                      onChange={(value) => form.setValue('description', value)}
+                      placeholder="Enter blog item description"
+                      type="textarea"
+                      required
+                    />
+                  </div>
                   <FormField
                     control={form.control}
                     name="category"
@@ -461,21 +462,21 @@ export default function AdminBlog() {
                 <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden mb-3">
                   <img
                     src={item.imageUrl}
-                    alt={item.title}
+                    alt={getLocalizedContent(item.title)}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNmM2Y0ZjYiLz48dGV4dCB4PSI1MCIgeT0iMTA1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM2YjczODAiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
                     }}
                   />
                 </div>
-                <CardTitle className="text-lg">{item.title}</CardTitle>
+                <CardTitle className="text-lg">{getLocalizedContent(item.title)}</CardTitle>
                 <CardDescription className="text-sm">
                   {categories.find(c => c.value === item.category)?.label}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                  {item.description}
+                  {getLocalizedContent(item.description)}
                 </p>
                 <div className="flex justify-between items-center">
                   <div className="flex space-x-2">

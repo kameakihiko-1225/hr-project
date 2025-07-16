@@ -141,7 +141,7 @@ export default function PositionsPage() {
     // If 'all', show all; otherwise, check if departmentId matches
     const matchesDepartment =
       selectedDepartmentId === 'all' ||
-      position.departmentId.toString() === selectedDepartmentId;
+      position.departmentId.toString() === selectedDepartmentId.toString();
 
     return matchesSearch && matchesDepartment;
   });
