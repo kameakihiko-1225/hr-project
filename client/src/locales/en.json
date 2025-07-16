@@ -269,5 +269,23 @@
     "loading": "Loading position data...",
     "error": "Failed to load position data",
     "no_data": "No application data available"
+  },
+
+  "top_applied_positions": {
+    "title": "Top Applied Positions",
+    "applied": "Applied",
+    "loading": "Loading top positions...",
+    "error": "Failed to load top positions",
+    "no_data": "No positions with applications yet"
+  },
+
+  "all_applied_positions": {
+    "title": "All Available Positions with Applicants",
+    "applied": "Applied",
+    "view_more": "View More Positions",
+    "loading": "Loading positions...",
+    "error": "Failed to load positions",
+    "no_data": "No positions with applications",
+    "loading_more": "Loading more..."
   }
 }

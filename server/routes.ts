@@ -1024,6 +1024,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Top Applied Positions endpoint (up to 3 positions with most apply clicks)
+  app.get("/api/top-applied-positions", async (req, res) => {
+    try {
+      const topPositions = await storage.getTopAppliedPositions();
+      res.json({ success: true, data: topPositions });
+    } catch (error) {
+      console.error('Error getting top applied positions:', error);
+      res.status(500).json({ success: false, error: "Failed to get top applied positions" });
+    }
+  });
+
+  // All Applied Positions endpoint (paginated list of all positions with apply clicks)
+  app.get("/api/all-applied-positions", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 4;
+      
+      const result = await storage.getAllAppliedPositions(page, limit);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      console.error('Error getting all applied positions:', error);
+      res.status(500).json({ success: false, error: "Failed to get all applied positions" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // Initialize gallery data on startup

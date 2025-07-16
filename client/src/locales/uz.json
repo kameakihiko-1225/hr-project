@@ -248,5 +248,23 @@
     "loading": "Lavozim ma'lumotlari yuklanmoqda...",
     "error": "Lavozim ma'lumotlarini yuklab bo'lmadi",
     "no_data": "Ariza ma'lumotlari mavjud emas"
+  },
+
+  "top_applied_positions": {
+    "title": "Eng mashhur lavozimlar",
+    "applied": "Ariza topshirildi",
+    "loading": "Top lavozimlar yuklanmoqda...",
+    "error": "Top lavozimlarni yuklab bo'lmadi",
+    "no_data": "Hali arizalar bilan lavozimlar yo'q"
+  },
+
+  "all_applied_positions": {
+    "title": "Nomzodlari bor barcha mavjud lavozimlar",
+    "applied": "Ariza topshirildi",
+    "view_more": "Ko'proq lavozimlarni ko'rish",
+    "loading": "Lavozimlar yuklanmoqda...",
+    "error": "Lavozimlarni yuklab bo'lmadi",
+    "no_data": "Arizalar bilan lavozimlar yo'q",
+    "loading_more": "Ko'proq yuklanmoqda..."
   }
 }

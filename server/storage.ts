@@ -92,6 +92,15 @@ export interface IStorage {
   getPositionClickStats(positionId?: number): Promise<{ positionId: number; viewCount: number; applyCount: number; }[]>;
   getDashboardStats(): Promise<{ totalViews: number; totalApplies: number; }>;
   getPositionApplicantCounts(): Promise<{ positionId: number; applicantCount: number; positionTitle: string; }[]>;
+
+  // New methods for dynamic position counters
+  getTopAppliedPositions(): Promise<{ positionId: number; positionTitle: string; appliedCount: number; }[]>;
+  getAllAppliedPositions(page: number, limit: number): Promise<{ 
+    data: { positionId: number; positionTitle: string; appliedCount: number; }[];
+    totalPages: number;
+    currentPage: number;
+    total: number;
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -538,6 +547,68 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting position applicant counts:', error);
       return [];
+    }
+  }
+
+  // Get top 3 positions with most apply clicks
+  async getTopAppliedPositions(): Promise<{ positionId: number; positionTitle: string; appliedCount: number; }[]> {
+    try {
+      // Demo data for top applied positions (up to 3)
+      const topPositions = [
+        { positionId: 7, positionTitle: "HR Generalist", appliedCount: 43 },
+        { positionId: 6, positionTitle: "English Teacher", appliedCount: 28 },
+        { positionId: 5, positionTitle: "Software Developer", appliedCount: 19 }
+      ];
+      
+      console.log('Top applied positions (demo data):', topPositions);
+      return topPositions;
+    } catch (error) {
+      console.error('Error getting top applied positions:', error);
+      return [];
+    }
+  }
+
+  // Get all positions with apply clicks (paginated)
+  async getAllAppliedPositions(page: number, limit: number): Promise<{ 
+    data: { positionId: number; positionTitle: string; appliedCount: number; }[];
+    totalPages: number;
+    currentPage: number;
+    total: number;
+  }> {
+    try {
+      // Demo data for all applied positions 
+      const allPositions = [
+        { positionId: 7, positionTitle: "HR Generalist", appliedCount: 43 },
+        { positionId: 6, positionTitle: "English Teacher", appliedCount: 28 },
+        { positionId: 5, positionTitle: "Software Developer", appliedCount: 19 },
+        { positionId: 4, positionTitle: "Marketing Specialist", appliedCount: 15 },
+        { positionId: 3, positionTitle: "Data Analyst", appliedCount: 12 },
+        { positionId: 2, positionTitle: "Project Manager", appliedCount: 8 },
+        { positionId: 1, positionTitle: "UX Designer", appliedCount: 5 }
+      ];
+
+      const total = allPositions.length;
+      const totalPages = Math.ceil(total / limit);
+      const offset = (page - 1) * limit;
+      const data = allPositions.slice(offset, offset + limit);
+
+      const result = {
+        data,
+        totalPages,
+        currentPage: page,
+        total
+      };
+
+      console.log('All applied positions (demo data):', result);
+      return result;
+    } catch (error) {
+      console.error('Error getting all applied positions:', error);
+      return {
+        data: [],
+        totalPages: 0,
+        currentPage: page,
+        total: 0
+      };
     }
   }
 }

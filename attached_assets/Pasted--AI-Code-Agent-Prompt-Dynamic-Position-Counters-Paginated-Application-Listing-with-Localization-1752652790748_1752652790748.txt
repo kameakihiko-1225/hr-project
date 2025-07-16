@@ -1,0 +1,163 @@
+## AI Code Agent Prompt: Dynamic Position Counters & Paginated Application Listing with Localization (Refined Placement)
+
+**Goal:** Implement two distinct sections for displaying job position application data **entirely within the hero section**:
+1.  **"Top Applied Positions"**: A set of up to 3 dynamically generated counter cards, showing positions with the most 'apply' clicks.
+2.  **"All Applied Positions Listing"**: Immediately below the "Top Applied Positions" cards, a paginated listing view displaying all positions that have received at least one 'apply' click, showing "Position Name - Applied Count".
+
+**Data Source:** All application counts **must be derived from the `position_clicks` database table where `click_type` is 'apply'**. Position names should be retrieved from the `Positions` database table.
+
+**CRITICAL CONSTRAINTS (Reiterated & Emphasized):**
+* **ALL New Components WITHIN HERO Section:** Both the "Top Applied Positions" cards and the "All Applied Positions Listing" (including its pagination) must be contained **entirely within the existing hero section**.
+* **Order within Hero:** The "All Applied Positions Listing" must be placed directly below the "Top Applied Positions" cards.
+* **PRESERVE EXISTING UI/UX DESIGN (Overall Hero Layout):** The addition of these two new components within the hero section should not disrupt the overall hero section's visual integrity, the placement of the main heading, image, or primary call-to-action button ("Explore Career Opportunities"). Careful design and layout are required to integrate these new elements gracefully into the hero.
+* **Design for Top Positions:** The "Top Applied Positions" cards must use the design from "Screenshot 2025-07-16 at 12.26.57 PM.png".
+* **Data Source `position_clicks`:** All application counts for both sections must be calculated by counting `click_type: "apply"` entries in the `position_clicks` table.
+* **Dynamic Card Generation & Centering (Top Positions):**
+    * Limit to **top 3** positions with the most 'apply' clicks.
+    * If fewer than 3 positions have `apply` clicks, only display the available cards (1 or 2).
+    * These cards **must be horizontally centered** if there are 1 or 2 cards.
+* **"All Applied Positions Listing" Design:** Should have a "futuristic design and beautiful visual effects." This design needs to seamlessly blend *within the hero section's aesthetic*.
+* **Pagination:** The listing view must be paginated with a limit of **4 positions per page**.
+* **"View More Positions" Button:** This button/icon, when clicked, should load the next page of results for the "All Applied Positions Listing".
+* **No Mock Data:** All counts and position names must be live data.
+* **Full Localization:** All user-facing text (static UI and dynamic content: position titles, labels like "Applied", pagination controls, button texts) must be localized for English, Russian, and Uzbek.
+* **Preserve Proper Nouns:** "Millat Umidi" and "Millat Umidi Group" must remain untranslated.
+
+---
+
+### **Section 1: Database Schema & Backend API Development**
+
+"**Objective:** Ensure database schemas support application tracking via `position_clicks` and develop optimized API endpoints for both the 'Top Applied' and 'All Applied' position data, with localization.
+
+**Instructions for the AI Code Agent:**
+
+1.  **Database Schema (Confirmation/Refinement):**
+    * **`position_clicks` table:** Confirm this table exists and contains `position_id` and `click_type` (specifically 'apply') columns.
+    * **`Positions` table:** Ensure this table has `id` and localized title fields (e.g., `title_en`, `title_ru`, `title_uz` or a translation table structure).
+    * Ensure proper foreign key relationships between `position_clicks.position_id` and `Positions.id`.
+
+2.  **API Endpoints:**
+    * **`/api/top-applied-positions`:**
+        * **Purpose:** Retrieve up to 3 positions with the highest count of `click_type: "apply"` entries from `position_clicks`.
+        * **Logic:**
+            * Group `position_clicks` by `position_id` and filter where `click_type = 'apply'`.
+            * Count the occurrences for each `position_id`.
+            * Order the results by count in descending order.
+            * Limit the results to the top 3.
+            * Join with the `Positions` table to get the localized `position_name` for each `position_id`.
+        * **Response Format:** An array of objects, e.g., `[{ position_id: 7, position_name: {en: "...", ru: "...", uz: "..."}, applied_count: 43 }, ...]`.
+    * **`/api/all-applied-positions`:**
+        * **Purpose:** Retrieve a paginated list of *all* positions that have at least one `click_type: "apply"` entry, along with their total 'apply' counts.
+        * **Parameters:** Accept `page` (default 1) and `limit` (fixed at 4 as per UI requirement).
+        * **Logic:**
+            * Similar to the top positions query, but without the `LIMIT 3` and with pagination applied.
+            * Include only positions that have an `applied_count` greater than 0.
+            * Join with the `Positions` table to get the localized `position_name`.
+        * **Response Format:** An object containing `total_pages`, `current_page`, `data` (an array of position objects similar to the top positions endpoint).
+    * **Localization Handling in APIs:** Both endpoints must return localized position names based on the `Accept-Language` header or a `lang` query parameter. Implement graceful fallback (e.g., to English) if a translation is missing for a specific locale.
+
+**Deliverables for this Section:**
+* Confirmed/refined database schema for `position_clicks` and `Positions`.
+* New or refined API endpoints: `/api/top-applied-positions` and `/api/all-applied-positions`.
+* Backend logic to accurately count 'apply' clicks from `position_clicks` and retrieve localized position names.
+* Robust error handling and validation for API endpoints."
+
+---
+
+### **Section 2: Frontend UI & Component Development**
+
+"**Objective:** Implement the frontend components for both position display sections, ensuring they are placed **within the hero section**, adhere to specified designs, dynamic behaviors, and full localization.
+
+**Instructions for the AI Code Agent:**
+
+1.  **"Top Applied Positions" Component (within Hero Section):**
+    * **Placement:** Insert this component directly within the hero section, below existing elements (like the 'Explore Career Opportunities' button and any existing stat cards if they remain).
+    * **Data Fetching:** Fetch data from `/api/top-applied-positions`.
+    * **Dynamic Rendering:**
+        * Render 1, 2, or 3 cards based on the number of positions returned.
+        * If no positions have 'apply' clicks, this entire component should not be rendered.
+    * **Layout & Centering:**
+        * Use a flexbox or grid layout to display the cards horizontally.
+        * If 1 or 2 cards, use `justify-content: center` (or equivalent) to ensure they are horizontally centered within their container.
+    * **Card Design:** Precisely mimic the design style from "Screenshot 2025-07-16 at 12.26.57 PM.png" (rounded corners, subtle background, distinct number styling, font styles).
+    * **Content per Card:**
+        * Rank (e.g., "#1", "#2", "#3") – determined by order in the API response.
+        * **Localized Position Name** (e.g., "HR Generalist", "Кадровый аналитик", "Kadrlar bo'yicha mutaxassis").
+        * **Application Count** (e.g., "43").
+        * **Localized Label for Applicants/Applied** (e.g., "Applicants", "Соискателей", "So'rovchilar").
+
+2.  **"All Applied Positions Listing" Component (Immediately Below Top Positions, WITHIN Hero Section):**
+    * **Placement:** This component must be placed directly below the "Top Applied Positions" component, still **contained within the overall hero section**.
+    * **Design:** Implement a "futuristic design and beautiful visual effects" for this listing view. This implies:
+        * Modern, clean card/list item design for each position.
+        * Subtle animations, hover effects, and transitions.
+        * Consistent use of typography and color palette for a sleek look that **harmonizes with the hero section's existing design**.
+    * **Data Fetching & Pagination:**
+        * Fetch data from `/api/all-applied-positions` with `page=1&limit=4` initially.
+        * Implement state management to handle current page and total pages.
+        * Render a list of position items based on the current page's data.
+    * **Content per Listing Item:** Each item should be a card-like element displaying:
+        * **Localized Position Name** (as the main heading/title).
+        * **Total Applied Count** for that position (e.g., "43 Applied"). The label "Applied" must be localized.
+    * **"View More Positions" Button/Icon:**
+        * Below the list of 4 positions, add a button or icon (e.g., a "Load More" button or an arrow icon with localized text).
+        * This button should trigger fetching the *next page* of results from `/api/all-applied-positions`.
+        * It should only be visible if `current_page < total_pages`.
+        * The button text ("View More Positions", "Показать больше позиций", "Ko'proq lavozimlarni ko'rish") must be localized.
+
+3.  **Localization Integration (General):**
+    * Ensure all new static labels (e.g., section titles like "Top Applied Positions", "All Available Positions with Applicants") are added to the i18n system and correctly displayed in the active language.
+    * Ensure dynamic data (position names) is rendered in the active language based on API responses.
+    * Validate that text length variations due to localization do not break layouts, especially in the responsive design. Special attention needed to keep the hero section from becoming excessively long or cluttered due to these additions.
+
+**Deliverables for this Section:**
+* Functional `Top Applied Positions` component integrated into the hero section, adhering to design and centering rules.
+* Functional `All Applied Positions Listing` component, placed immediately below the top positions, **still within the hero section**, with futuristic design, pagination (4 items per page), and "View More Positions" button.
+* Full localization for all UI text and dynamic content in both components.
+* Robust frontend data fetching, state management, and error handling for both sections.
+* Confirmation that the overall hero section's existing UI/UX is not negatively impacted despite containing these new components.
+
+---
+
+### **Section 3: Technical SEO & Testing**
+
+"**Objective:** Ensure SEO friendliness for new dynamic content and comprehensive testing.
+
+**Instructions for the AI Code Agent:**
+
+1.  **SEO Considerations:**
+    * Ensure the hero section (now containing these lists) remains SEO-friendly.
+    * Ensure the structure allows search engines to crawl all paginated job listings.
+
+2.  **Automated Testing (Enhanced):**
+    * **Backend:** Test `top-applied-positions` and `all-applied-positions` endpoints for:
+        * Accurate counting of `click_type: "apply"` from `position_clicks`.
+        * Correct sorting for top positions.
+        * Correct pagination logic (limit 4, page numbers).
+        * Accurate localization of position names in responses.
+    * **Frontend:** Test UI components for:
+        * Correct placement **within the hero section**.
+        * Dynamic rendering of 1, 2, or 3 top cards and their correct centering.
+        * Accurate display of position names and applied counts.
+        * Functionality of "View More Positions" pagination.
+        * Visual adherence to "futuristic design" for the listing.
+        * Responsiveness and layout stability across all supported languages **within the hero section constraints**.
+
+3.  **Manual QA Guidance:**
+    * Verify the visual appearance and functionality of both the "Top Applied Positions" section and the "All Applied Positions Listing" **entirely within the hero section** in all three languages.
+    * Specifically check centering of top cards for 1 or 2 items.
+    * Test pagination thoroughly, ensuring "View More Positions" works as expected and shows the correct number of items.
+    * Confirm all numbers and localized labels are correct.
+    * Ensure that the `position_clicks` data directly translates to the displayed 'applied' counts.
+    * **Critically, verify that the hero section's existing design (main heading, image, primary button) remains intact and not visually compromised or elongated by the addition of these new components.**
+
+**Deliverables for this Section:**
+* Updated automated test suite for new API logic and frontend components.
+* Detailed manual QA checklist focusing on new functionality, design, localization, and crucial hero section placement validation."The user has clarified that both the "Top Applied Positions" and the "All Applied Positions Listing" should be located *within* the hero section, with the listing appearing directly below the top positions. I have updated the prompt to reflect this crucial layout change, emphasizing the need for seamless integration within the existing hero section design.
+
+The prompt now explicitly details:
+* **Placement:** Both new components will reside inside the hero section, with the "All Applied Positions Listing" immediately following the "Top Applied Positions" cards.
+* **Design Harmonization:** The "futuristic design" for the listing must blend with the hero section's current aesthetic.
+* **Existing UI Preservation:** A strong emphasis on ensuring the addition of these elements does not negatively impact the existing hero section's layout (main heading, image, main CTA).
+
+This revised prompt should provide the AI code agent with clear instructions for implementing these features exactly as requested.
