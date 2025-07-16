@@ -1,39 +1,10 @@
 /**
  * Environment setup utility
  * This file ensures environment variables are properly defined for the application
+ * 
+ * Note: We don't modify import.meta.env directly as it's read-only in production builds.
+ * Instead, we use the env.ts file for environment variable management with fallbacks.
  */
-
-// Define default environment variables if not already set
-if (!import.meta.env.VITE_DATABASE_URL) {
-  import.meta.env.VITE_DATABASE_URL = "postgresql://user:password@localhost:5432/aurora_hrms?schema=public";
-}
-
-if (!import.meta.env.VITE_JWT_SECRET) {
-  import.meta.env.VITE_JWT_SECRET = "your-super-secret-key-change-this-in-production";
-}
-
-if (!import.meta.env.VITE_JWT_EXPIRES_IN) {
-  import.meta.env.VITE_JWT_EXPIRES_IN = "7d";
-}
-
-if (!import.meta.env.VITE_API_URL) {
-  import.meta.env.VITE_API_URL = "http://localhost:8080/api";
-}
-
-// Don't set default empty values for Supabase configuration
-// This will allow the actual environment variables to take effect
-// if (!import.meta.env.VITE_SUPABASE_URL) {
-//   import.meta.env.VITE_SUPABASE_URL = "";
-// }
-
-// if (!import.meta.env.VITE_SUPABASE_ANON_KEY) {
-//   import.meta.env.VITE_SUPABASE_ANON_KEY = "";
-// }
-
-// Only enable mock authentication if explicitly set to true
-if (import.meta.env.VITE_USE_MOCK_AUTH === undefined) {
-  import.meta.env.VITE_USE_MOCK_AUTH = "false";
-}
 
 /**
  * Initialize environment

@@ -198,6 +198,16 @@ Preferred communication style: Simple, everyday language.
 - **Telegram Service Testing**: Successfully tested simplified Telegram webhook service with fake data - service responding correctly on port 3001
 - **Cross-Device Compatibility**: Ensured robust compatibility across laptop, tablet, and phone resolutions with responsive design patterns
 
+### July 16, 2025 - Production Deployment Fix & Read-Only Property Error Resolution
+- **Critical Production Error Fix**: Resolved "Cannot assign to read only property 'undefined' of object '#<Window>'" error
+  - Removed problematic assignments to `import.meta.env` properties in setupEnv.ts which are read-only in production builds
+  - Eliminated all direct modifications to import.meta.env that were causing deployment failures
+  - Environment variable management now properly handled through env.ts with fallbacks instead of direct assignments
+- **Build Process Optimization**: Fixed production build hanging issues
+  - Identified large Lucide React icon imports causing build timeouts
+  - Streamlined environment setup to prevent read-only property conflicts
+  - Ensured production builds can complete successfully without timeout errors
+
 ### July 16, 2025 - Deployment Build Fix & Asset Path Resolution
 - **Critical Import Fix**: Resolved deployment failure by fixing missing authService import in client/src/lib/dbInit.ts
   - Changed from non-existent `@/api/auth/authService` to correct `./auth` path
