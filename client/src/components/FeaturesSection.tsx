@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Target, TrendingUp, Ban, Cpu, Layers, ThumbsUp, Bot, ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTranslation } from "react-i18next";
 
 export const FeaturesSection = () => {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [isCompact, setIsCompact] = useState(false);
   
@@ -120,16 +122,16 @@ export const FeaturesSection = () => {
         <div className="text-center mb-10">
           <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
             <Target className="h-4 w-4 mr-2" />
-            Careers at Millat Umidi
+            {t('features.badge')}
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Why Join
+            {t('features.title_start')}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 block">
-              Millat&nbsp;Umidi?
+              {t('features.title_highlight')}
             </span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover the key benefits of building your career with us.
+            {t('features.subtitle')}
           </p>
           
           {isMobile && (
@@ -137,7 +139,7 @@ export const FeaturesSection = () => {
               onClick={toggleView}
               className="mt-4 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              {isCompact ? "Show Detailed View" : "Show Compact View"}
+              {isCompact ? t('features.toggle_detailed') : t('features.toggle_compact')}
             </button>
           )}
         </div>
@@ -160,8 +162,8 @@ export const FeaturesSection = () => {
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 cursor-pointer shadow-lg"
           >
             <Bot className="h-5 w-5" />
-            <span className="hidden sm:inline">Join us and grow!</span>
-            <span className="sm:hidden">Join Us</span>
+            <span className="hidden sm:inline">{t('features.cta_full')}</span>
+            <span className="sm:hidden">{t('features.cta_short')}</span>
           </div>
         </div>
       </div>

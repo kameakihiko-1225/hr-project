@@ -1,8 +1,10 @@
 import { Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from 'react-i18next';
 
 export const ContactSection = () => {
+  const { t } = useTranslation();
   const handleEmailClick = () => {
     window.open('mailto:career@millatumidi.uz', '_blank');
   };
@@ -21,10 +23,10 @@ export const ContactSection = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Get in Touch
+              {t('contact.title')}
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Ready to start your journey with Millat Umidi Group? We're here to help you find your perfect opportunity.
+              {t('contact.subtitle')}
             </p>
           </div>
 
@@ -41,10 +43,10 @@ export const ContactSection = () => {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Millat Umidi Group
+                    {t('footer.company_name')}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    Building the future of education in Uzbekistan
+                    {t('contact.company_description')}
                   </p>
                 </div>
               </div>
@@ -57,7 +59,7 @@ export const ContactSection = () => {
                         <Mail className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white">Email</h4>
+                        <h4 className="font-semibold text-gray-900 dark:text-white">{t('contact.email')}</h4>
                         <p className="text-blue-600 dark:text-blue-400 hover:underline">
                           career@millatumidi.uz
                         </p>
@@ -74,7 +76,7 @@ export const ContactSection = () => {
                         <Phone className="h-6 w-6 text-green-600 dark:text-green-400" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white">Phone</h4>
+                        <h4 className="font-semibold text-gray-900 dark:text-white">{t('contact.phone')}</h4>
                         <p className="text-green-600 dark:text-green-400 hover:underline">
                           +998 71 200 03 06
                         </p>
@@ -91,7 +93,7 @@ export const ContactSection = () => {
                         <MapPin className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white">Address</h4>
+                        <h4 className="font-semibold text-gray-900 dark:text-white">{t('contact.address')}</h4>
                         <p className="text-purple-600 dark:text-purple-400 hover:underline">
                           Chilonzor 2-Charkh Kamolon 100043, Tashkent
                         </p>
@@ -109,10 +111,10 @@ export const ContactSection = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <MapPin className="h-5 w-5 text-purple-600" />
-                    <span>Our Location</span>
+                    <span>{t('contact.our_location')}</span>
                   </CardTitle>
                   <CardDescription>
-                    Visit us at our headquarters in Tashkent
+                    {t('contact.visit_us')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

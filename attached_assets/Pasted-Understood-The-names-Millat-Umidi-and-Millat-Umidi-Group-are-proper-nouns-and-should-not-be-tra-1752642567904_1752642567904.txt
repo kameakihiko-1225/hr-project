@@ -1,0 +1,211 @@
+Understood. The names "Millat Umidi" and "Millat Umidi Group" are proper nouns and should not be translated across any of the languages (English, Russian, or Uzbek). They should remain exactly as "Millat Umidi" or "Millat Umidi Group" in all localized versions of the website.
+
+I will incorporate this constraint into the prompt.
+
+AI Code Agent Prompt: Full Website Localization (English, Russian, Uzbek) - Preserving Existing UI/UX & Proper Nouns
+Goal: Implement full website localization for all pages and components, supporting English (en), Russian (ru), and Uzbek (uz) languages. This includes all text content, UI elements, date/time formats, and any other culturally sensitive aspects.
+
+CRITICAL CONSTRAINT 1: PRESERVE EXISTING UI/UX DESIGN.
+
+No changes to the fundamental UI/UX design, layout, or visual styling are permitted.
+
+The overall structure, positioning of existing elements (buttons, images, headings), and visual design should remain untouched.
+
+The only exceptions for layout adjustments are those strictly necessary to accommodate varying text lengths in different languages (e.g., increasing container width or height, allowing text to wrap naturally if space is constrained) to ensure content remains readable and accessible without overflow.
+
+The addition of a language switcher is the only new UI element allowed.
+
+CRITICAL CONSTRAINT 2: PRESERVE PROPER NOUNS.
+
+The terms "Millat Umidi" and "Millat Umidi Group" are proper nouns and MUST NOT be translated. They should appear exactly as "Millat Umidi" or "Millat Umidi Group" in English, Russian, and Uzbek versions of the website.
+
+Key Principles for Implementation:
+
+Internationalization (i18n) First: The codebase should be prepared to handle multiple languages efficiently, separating content from code.
+
+Maintainability & Scalability: The solution should be easy to update with new translations and potentially new languages in the future.
+
+User Experience (UX): Users should have a clear and intuitive way to switch languages, and the localized content should be natural and culturally appropriate, within the existing UI framework.
+
+SEO Considerations: Implement hreflang tags and other multilingual SEO best practices.
+
+Detailed Task Breakdown & Prompt Sections:
+
+Section 1: Setup & Core Internationalization (i18n) Architecture
+"Objective: Establish the fundamental internationalization (i18n) architecture across the entire website to support English, Russian, and Uzbek, without altering the core UI/UX structure and ensuring proper noun preservation.
+
+Instructions for the AI Code Agent:
+
+Extract All Hardcoded Strings:
+
+Thoroughly scan all HTML templates, JavaScript files, and any server-side rendered content for hardcoded text strings (e.g., headings, paragraphs, button labels, error messages, placeholders, image alt text, titles, descriptions).
+
+Replace these hardcoded strings with dynamic keys or placeholders that can be referenced by a translation system.
+
+Crucial: Ensure that "Millat Umidi" and "Millat Umidi Group" are identified and explicitly marked as non-translatable (e.g., by not creating translation keys for them, or by marking them in the translation files as fixed strings).
+
+Example: <h1>Join Our Mission to Transform Education</h1> becomes <h1>{t('homepage.mission_heading')}</h1>
+
+Implement a Robust Translation Management System (TMS) Integration (or File-Based System):
+
+Option A (Preferred: TMS Integration): If an existing TMS API is available (e.g., Lokalise, Phrase, Crowdin), integrate the website to fetch translations dynamically via this API based on the selected language. Provide the necessary API keys and endpoints.
+
+Option B (Alternative: File-Based JSON/YAML): If no TMS is used, create a structured file-based system (e.g., locales/en.json, locales/ru.json, locales/uz.json) to store all translation strings as key-value pairs. Implement a mechanism to load the appropriate language file at runtime.
+
+Ensure the structure allows for easy organization (e.g., homepage.title, navigation.about_us, button.submit).
+
+Language Detection and Persistence:
+
+Implement logic to detect the user's preferred language (e.g., from browser Accept-Language header, user settings, or a default).
+
+Persist the user's language preference (e.g., using local storage, cookies, or session on the server-side) so it's remembered across sessions.
+
+Global Language State Management:
+
+Ensure a global state or context exists that holds the current active language, making it accessible to all components and pages for dynamic rendering.
+
+Deliverables for this Section:
+
+Modified codebase with hardcoded strings replaced by i18n keys, with proper nouns handled correctly.
+
+Implementation of chosen translation loading mechanism (TMS integration or file-based system).
+
+Language detection and persistence logic.
+
+Global language state management."
+
+Section 2: UI & Content Localization (L10n) - With UI/UX & Proper Noun Preservation
+"Objective: Localize all visible UI elements and content across all pages and components for English, Russian, and Uzbek, while strictly adhering to the existing UI/UX design and layout, and ensuring proper nouns are untranslated.
+
+Instructions for the AI Code Agent:
+
+Translate All Extracted Strings (Excluding Proper Nouns):
+
+Populate the en.json, ru.json, and uz.json (or TMS entries) with accurate and contextually appropriate translations for all previously extracted keys.
+
+Crucial: Confirm that "Millat Umidi" and "Millat Umidi Group" are not translated and appear as-is in all language files/outputs.
+
+For AI-generated translations: Prioritize accuracy and natural flow. For complex or nuanced phrases, flag them for human review if the AI's confidence is low.
+
+Specific Translation Notes:
+
+English (en): Standard American English.
+
+Russian (ru): Standard Literary Russian.
+
+Uzbek (uz): Standard Literary Uzbek (Cyrillic script for now, if Latin is also desired, specify).
+
+Implement Language Switcher:
+
+Add a prominent and user-friendly language switcher component (e.g., a dropdown in the header/footer) allowing users to easily switch between English, Russian, and Uzbek. This is the only new UI element permitted.
+
+Display the language names in their native script (e.g., "English", "Русский", "O'zbek").
+
+Minimal Layout and Design Adaptations for Text Expansion/Contraction:
+
+Review all components and pages to ensure the layout remains visually appealing and functional when text length changes due to translation (e.g., Russian and Uzbek text can often be longer than English).
+
+Crucially, avoid any fundamental UI/UX changes. Adjust CSS properties (e.g., min-width, height, flex-wrap, line-height, font-size if absolutely necessary for legibility) only to prevent text overflow or unreadable text, while striving to maintain the original component dimensions and positioning as much as possible. Text should wrap naturally rather than breaking the layout.
+
+Date, Time, Number, and Currency Formatting:
+
+Implement locale-specific formatting for dates, times, numbers, and currencies across the website (e.g., MM/DD/YYYY for English, DD.MM.YYYY for Russian, different currency symbols and decimal separators), without altering the visual style or placement of these elements.
+
+Image and Media Localization (if applicable):
+
+If images or media contain embedded text, identify them.
+
+Option A (Preferred): If source files are available, create localized versions of these images with translated text.
+
+Option B (Alternative): Implement a mechanism to dynamically overlay translated text on images if design allows, or use different image paths based on the selected language. The image's position and size must remain consistent with the original UI.
+
+"Join Our Mission" Section (Specific to previous request):
+
+Ensure the image is precisely positioned so its top aligns with the top of the "Join Our Mission to Transform Education" heading across all three languages. Maintain this specific alignment precisely.
+
+Ensure "Umidjon Ishmukhamedov, Founder of Millat Umidi Group" text is horizontally aligned with the bottom of the "Explore Career Opportunities" button across all three languages. Maintain this specific alignment precisely.
+
+Re-evaluate and adjust spacing in this section to ensure visual balance and readability for all three languages, but only with minimal adjustments that do not change the fundamental layout or the specified alignments.
+
+(Confirm whether the "15+ Years of Experience" and "1000+ Students Impacted" sections should be present or removed as per the previous discussion, applying the decision consistently across all languages while respecting UI/UX preservation.)
+
+Deliverables for this Section:
+
+Complete translation files for English, Russian, and Uzbek, with "Millat Umidi" and "Millat Umidi Group" untranslated.
+
+Functional language switcher component, integrated seamlessly without disrupting existing UI.
+
+Responsive and adaptable UI/layout for all languages, with minimal adjustments only for text flow.
+
+Correct locale-specific formatting for dates, times, numbers, and currencies.
+
+Localized images/media (or a plan for their implementation) that retain original positioning and size.
+
+Corrected "Join Our Mission" section layout for all languages, adhering to specified alignments and minimal UI changes. "
+
+Section 3: Technical SEO & Testing
+"Objective: Optimize the localized website for search engines and ensure a high-quality user experience, confirming UI/UX preservation and proper noun handling.
+
+Instructions for the AI Code Agent:
+
+Implement hreflang Tags:
+
+For every localized page, dynamically add hreflang attributes in the HTML <head> section, linking to the equivalent pages in English, Russian, and Uzbek.
+
+Example: <link rel="alternate" href="https://yourwebsite.com/en/page" hreflang="en" />
+
+Example: <link rel="alternate" href="https://yourwebsite.com/ru/page" hreflang="ru" />
+
+Example: <link rel="alternate" href="https://yourwebsite.com/uz/page" hreflang="uz" />
+
+Also include an x-default tag if there's a default language or page.
+
+URL Structure (if not already handled):
+
+Ensure a consistent and clear URL structure for localized content (e.g., yourwebsite.com/en/, yourwebsite.com/ru/, yourwebsite.com/uz/ or subdomains like en.yourwebsite.com). If not already implemented, propose and implement this.
+
+Multilingual SEO Best Practices:
+
+Advise on keyword research for each language, though actual content optimization is outside this coding task.
+
+Automated Testing:
+
+Implement automated tests (e.g., Jest, Cypress, Selenium) to verify:
+
+Language switching functionality.
+
+Correct display of translated strings.
+
+Verification that "Millat Umidi" and "Millat Umidi Group" remain untranslated.
+
+Proper formatting of dates, numbers, and currencies for each locale.
+
+Layout stability across different languages, specifically asserting that original UI element positions and sizes are maintained unless text length absolutely necessitates a minor adjustment.
+
+No unintended UI/UX changes have been introduced.
+
+Manual QA Guidance:
+
+Provide a checklist for human QA testers to verify:
+
+Linguistic accuracy and cultural appropriateness.
+
+Tone of voice consistency.
+
+Strict adherence to the original UI/UX design and layout for all languages.
+
+Confirmation that "Millat Umidi" and "Millat Umidi Group" are untranslated.
+
+Visual alignment and responsiveness on various devices for all languages.
+
+Functionality of all interactive elements.
+
+Deliverables for this Section:
+
+Implemented hreflang tags.
+
+Confirmation/implementation of a robust URL structure for localization.
+
+Automated tests for localization features, including UI/UX preservation and proper noun checks.
+
+A comprehensive manual QA checklist focusing on linguistic, UI/UX, and proper noun integrity."

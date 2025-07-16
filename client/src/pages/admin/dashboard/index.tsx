@@ -23,6 +23,7 @@ import { MockAuthNotice } from "@/components/admin/MockAuthNotice";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useTranslation } from "react-i18next";
 import api from "@/lib/api";
 
 interface DashboardStats {
@@ -80,6 +81,7 @@ interface ApiResponse {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const [systemStatus, setSystemStatus] = useState<SystemStatus>({
     api: { status: 'online', lastChecked: new Date().toISOString() },
     database: { status: 'disconnected', lastChecked: new Date().toISOString() },
@@ -272,8 +274,8 @@ export default function Dashboard() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <p className="text-gray-500">Welcome to the Millat Umidi HR admin portal</p>
+          <h1 className="text-2xl font-bold">{t('admin.dashboard')}</h1>
+          <p className="text-gray-500">{t('admin.welcome')}</p>
         </div>
 
         <MockAuthNotice />

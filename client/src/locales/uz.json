@@ -14,5 +14,78 @@
   "contact": "Aloqa",
   "apply_now": "Ariza yuborish",
   "stories": "Hikoyalar",
+  
+  "hero": {
+    "badge": "Millat Umidi da martaba",
+    "title_start": "Qo'shiling",
+    "title_highlight": "Millat Umidi Group ga",
+    "subtitle": "Millat Umidi O'zbekistondagi eng yirik ta'lim xoldinglaridan biridir. Bizning loyihalarimiz: Millat Umidi University, Millat Umidi School, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC",
+    "cta_full": "Ochiq ishlarni ko'rish",
+    "cta_short": "Ishlar",
+    "trust1": "Maqsadli missiya",
+    "trust2": "Dinamik, o'sishga yo'naltirilgan jamoa",
+    "trust3": "Ta'lim, texnologiya va operatsiyalarda imkoniyatlar"
+  },
+  
+  "founder": {
+    "name": "Umidjon Ishmukhamedov",
+    "title": "Founder of Millat Umidi Group",
+    "mission_title": "Bizning missiyamizga qo'shiling",
+    "mission_highlight": "Ta'limni o'zgartirish",
+    "quote1": "Millat Umidi da biz ta'lim farovon jamiyatning poydevori ekanligiga ishonamiz. Bizning yo'limiz oddiy tasavvur bilan boshlangan: erta aqllarni tarbiyalovchi va ularni ertangi kunning qiyinchiliklariga tayyorlovchi jahon darajasidagi ta'lim muassasalarini yaratish.",
+    "quote2": "Biz shunchaki maktab va universitetlar qurmayapmiz; biz orzularni quryapmiz, kelajakni shakllantiryapmiz va keyingi avlod uchun imkoniyatlar yaratyapmiz. Jamoamizning har bir a'zosi ushbu o'zgaruvchan missiyada hal qiluvchi rol o'ynaydi.",
+    "quote3": "O'zbekiston va undan tashqarida ta'limga uzoq muddatli ta'sir ko'rsatishda bizga qo'shiling. Birgalikda biz xalqimizning yoshlari uchun yorqin kelajak qura olamiz.",
+    "cta_full": "Martaba imkoniyatlarini o'rganish",
+    "cta_short": "Martaba",
+    "experience_number": "15+",
+    "experience_label": "Yillik tajriba",
+    "impact_number": "1000+",
+    "impact_label": "Talabalar ta'sirlandi"
+  },
+  
+  "features": {
+    "badge": "Millat Umidi da martaba",
+    "title_start": "Nega qo'shilish kerak",
+    "title_highlight": "Millat Umidi ga?",
+    "subtitle": "Biz bilan martaba qurishning asosiy afzalliklarini kashf eting.",
+    "cta_full": "Bizga qo'shiling va o'sing!",
+    "cta_short": "Qo'shilish",
+    "toggle_detailed": "Batafsil ko'rinishni ko'rsatish",
+    "toggle_compact": "Ixcham ko'rinishni ko'rsatish"
+  },
+  
+  "stats": {
+    "title": "Nega Millat Umidi ni tanlash kerak?",
+    "subtitle": "Millat Umidi bilan ishlang va mehnat bozorida eng yaxshi tajribaga ega bo'ling."
+  },
+  
+  "company_logos_title": "Bizning ekotizimim",
+  
+  "footer": {
+    "company_name": "Millat Umidi Group",
+    "company_tagline": "Ertangi ta'limni quramiz",
+    "company_description": "Innovatsion texnologiya va ishtiyoqli rahbarlik bilan O'zbekistonda ta'limni o'zgartiramiz.",
+    "contact_us": "Biz bilan bog'laning",
+    "quick_links": "Tezkor havolalar",
+    "follow_us": "Bizni kuzatib boring",
+    "copyright": "Barcha huquqlar himoyalangan."
+  },
+  
+  "contact": {
+    "title": "Biz bilan bog'laning",
+    "subtitle": "Millat Umidi Group bilan sayohatingizni boshlashga tayyormisiz? Biz sizga mukammal imkoniyat topishda yordam berishga tayyormiz.",
+    "company_description": "O'zbekistonda ta'limning kelajagini quramiz",
+    "email": "Elektron pochta",
+    "phone": "Telefon",
+    "address": "Manzil",
+    "our_location": "Bizning joylashuvimiz",
+    "visit_us": "Toshkentdagi bosh ofisimizga tashrif buyuring"
+  },
+  
+  "admin": {
+    "dashboard": "Administrator paneli",
+    "welcome": "Millat Umidi HR administrator portaliga xush kelibsiz"
+  },
+  
   "footer_copyright": "Barcha huquqlar himoyalangan."
-} 
+}

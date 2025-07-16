@@ -8,8 +8,10 @@ import {
   Instagram,
   ExternalLink,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const Footer = () => {
+  const { t } = useTranslation();
   const handleEmailClick = () => {
     window.open("mailto:career@millatumidi.uz", "_blank");
   };
@@ -39,23 +41,22 @@ export const Footer = () => {
               />
               <div>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                  Millat Umidi Group
+                  {t('footer.company_name')}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Building Tomorrow's Education
+                  {t('footer.company_tagline')}
                 </p>
               </div>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Transforming education across Uzbekistan with innovative
-              technology and passionate leadership.
+              {t('footer.company_description')}
             </p>
           </div>
 
           {/* Contact Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Contact Us
+              {t('footer.contact_us')}
             </h3>
             <div className="space-y-3">
               <div
@@ -98,26 +99,26 @@ export const Footer = () => {
           {/* Quick Links */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Quick Links
+              {t('footer.quick_links')}
             </h3>
             <div className="space-y-2">
               <a
                 href="/"
                 className="block text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors"
               >
-                Home
+                {t('home')}
               </a>
               <a
                 href="/blog"
                 className="block text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors"
               >
-                Blog
+                {t('blog')}
               </a>
               <a
                 href="#contact"
                 className="block text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors"
               >
-                Contact
+                {t('contact')}
               </a>
             </div>
           </div>
@@ -125,7 +126,7 @@ export const Footer = () => {
           {/* Social Media */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Follow Us
+              {t('footer.follow_us')}
             </h3>
             <div className="flex space-x-4">
               <a
@@ -158,8 +159,7 @@ export const Footer = () => {
 
         <div className="border-t border-gray-200 dark:border-gray-700 mt-12 pt-8 text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            &copy; {new Date().getFullYear()} Millat Umidi Group. All rights
-            reserved.
+            &copy; {new Date().getFullYear()} {t('footer.company_name')}. {t('footer.copyright')}
           </p>
         </div>
       </div>

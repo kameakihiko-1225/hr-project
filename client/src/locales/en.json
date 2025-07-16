@@ -14,19 +14,78 @@
   "contact": "Contact",
   "apply_now": "Apply Now",
   "stories": "Stories",
-  "hero_badge": "Careers at Millat Umidi",
-  "hero_title_start": "Join",
-  "hero_title_highlight": "Uzbekistan’s Fastest-Growing Education Company",
-  "hero_subtitle": "Millat Umidi is one of the biggest educational holdings in Uzbekistan. Our projects: Millat Umidi University, Millat Umidi School, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC",
-  "hero_cta": "See Open Roles",
-  "hero_trust1": "Purpose-Driven Mission",
-  "hero_trust2": "Dynamic, Growth-Oriented Team",
-  "hero_trust3": "Opportunities in Education, Tech & Operations",
-  "stats_title": "Why Choose Millat Umidi?",
+  
+  "hero": {
+    "badge": "Careers at Millat Umidi",
+    "title_start": "Join",
+    "title_highlight": "Millat Umidi Group",
+    "subtitle": "Millat Umidi is one of the biggest educational holdings in Uzbekistan. Our projects: Millat Umidi University, Millat Umidi School, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC",
+    "cta_full": "See Open Roles",
+    "cta_short": "Roles",
+    "trust1": "Purpose-Driven Mission",
+    "trust2": "Dynamic, Growth-Oriented Team",
+    "trust3": "Opportunities in Education, Tech & Operations"
+  },
+  
+  "founder": {
+    "name": "Umidjon Ishmukhamedov",
+    "title": "Founder of Millat Umidi Group",
+    "mission_title": "Join Our Mission to",
+    "mission_highlight": "Transform Education",
+    "quote1": "At Millat Umidi, we believe that education is the foundation of a prosperous society. Our journey began with a simple vision: to create world-class educational institutions that nurture young minds and prepare them for tomorrow's challenges.",
+    "quote2": "We are not just building schools and universities; we are building dreams, shaping futures, and creating opportunities for the next generation. Every member of our team plays a crucial role in this transformative mission.",
+    "quote3": "Join us in making a lasting impact on education in Uzbekistan and beyond. Together, we can build a brighter future for our nation's youth.",
+    "cta_full": "Explore Career Opportunities",
+    "cta_short": "Careers",
+    "experience_number": "15+",
+    "experience_label": "Years of Experience",
+    "impact_number": "1000+",
+    "impact_label": "Students Impacted"
+  },
+  
+  "features": {
+    "badge": "Careers at Millat Umidi",
+    "title_start": "Why Join",
+    "title_highlight": "Millat Umidi?",
+    "subtitle": "Discover the key benefits of building your career with us.",
+    "cta_full": "Join us and grow!",
+    "cta_short": "Join Us",
+    "toggle_detailed": "Show Detailed View",
+    "toggle_compact": "Show Compact View"
+  },
+  
+  "stats": {
+    "title": "Why Choose Millat Umidi?",
+    "subtitle": "Work with Millat Umidi and get the best experience in the job market."
+  },
+  
   "company_logos_title": "Our Ecosystem",
-  "stats_subtitle": "Work with Millat Umidi and get the best experience in the job market.",
-  "toggle_card": "Show Card View",
-  "toggle_detailed": "Show Detailed View",
-  "toggle_compact": "Show Compact View",
+  
+  "footer": {
+    "company_name": "Millat Umidi Group",
+    "company_tagline": "Building Tomorrow's Education",
+    "company_description": "Transforming education across Uzbekistan with innovative technology and passionate leadership.",
+    "contact_us": "Contact Us",
+    "quick_links": "Quick Links",
+    "follow_us": "Follow Us",
+    "copyright": "All rights reserved."
+  },
+  
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "Ready to start your journey with Millat Umidi Group? We're here to help you find your perfect opportunity.",
+    "company_description": "Building the future of education in Uzbekistan",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "our_location": "Our Location",
+    "visit_us": "Visit us at our headquarters in Tashkent"
+  },
+  
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "welcome": "Welcome to the Millat Umidi HR admin portal"
+  },
+  
   "footer_copyright": "All rights reserved."
-} 
+}
