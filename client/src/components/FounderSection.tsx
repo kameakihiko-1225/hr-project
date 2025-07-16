@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import founderImage from "@assets/Umidjon_aka-removebg-preview_1752578772239.png";
+// Use the logo from public directory instead
+// import founderImage from "@assets/Umidjon_aka-removebg-preview_1752578772239.png";
 
 export const FounderSection = () => {
   const scrollToPositions = () => {
@@ -23,7 +24,7 @@ export const FounderSection = () => {
           <div className="flex flex-col items-center lg:items-center space-y-6 order-2 lg:order-1">
             <div className="relative">
               <img
-                src={founderImage}
+                src="/logo png.png"
                 alt="Umidjon Ishmukhamedov"
                 className="w-72 h-auto lg:w-80 lg:h-auto object-cover object-top drop-shadow-2xl"
                 style={{ clipPath: 'inset(0 0 15% 0)' }}

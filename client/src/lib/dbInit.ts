@@ -1,7 +1,7 @@
 import { createLogger } from './logger';
 import prisma from './prisma';
 import { env } from './env';
-import { authService } from '@/api/auth/authService';
+import { authService } from './auth';
 
 // Create a logger for database initialization
 const logger = createLogger('dbInit');

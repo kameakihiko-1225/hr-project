@@ -34,7 +34,7 @@ export const ContactSection = () => {
               <div className="flex items-center space-x-4">
                 <div className="h-16 w-16 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md">
                   <img 
-                    src="/2025-07-14 1.05.36 PM.jpg" 
+                    src="/logo png.png" 
                     alt="Millat Umidi Group" 
                     className="h-12 w-12 object-contain rounded-full"
                   />
