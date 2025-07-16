@@ -18,12 +18,20 @@ export const StatsSection = () => {
   const [isCompact, setIsCompact] = useState(false);
   const { jobSeekers, applicants } = useClickCounter();
   
-  const [stats, setStats] = useState([
-    { icon: Users, number: "-", label: t('stats_cards.applicants'), description: t('stats_descriptions.applied_via_platform'), color: "from-blue-500 to-blue-600" },
-    { icon: Building2, number: "-", label: t('stats_cards.companies'), description: t('stats_descriptions.using_our_platform'), color: "from-indigo-500 to-indigo-600" },
-    { icon: Briefcase, number: "-", label: t('stats_cards.positions'), description: t('stats_descriptions.available_roles'), color: "from-green-500 to-green-600" },
-    { icon: Award, number: "24/7", label: t('stats_descriptions.apply_anytime'), description: t('stats_descriptions.always_available'), color: "from-purple-500 to-purple-600" },
-  ]);
+  const [statsNumbers, setStatsNumbers] = useState({
+    applicants: "-",
+    companies: "-", 
+    positions: "-",
+    alwaysOpen: "24/7"
+  });
+
+  // Create stats array that updates with language changes
+  const stats = [
+    { icon: Users, number: statsNumbers.applicants, label: t('stats_cards.applicants'), description: t('stats_descriptions.applied_via_platform'), color: "from-blue-500 to-blue-600" },
+    { icon: Building2, number: statsNumbers.companies, label: t('stats_cards.companies'), description: t('stats_descriptions.using_our_platform'), color: "from-indigo-500 to-indigo-600" },
+    { icon: Briefcase, number: statsNumbers.positions, label: t('stats_cards.positions'), description: t('stats_descriptions.available_roles'), color: "from-green-500 to-green-600" },
+    { icon: Award, number: statsNumbers.alwaysOpen, label: t('stats_descriptions.apply_anytime'), description: t('stats_descriptions.always_available'), color: "from-purple-500 to-purple-600" },
+  ];
 
   // Load live stats from database
   useEffect(() => {
@@ -42,19 +50,12 @@ export const StatsSection = () => {
           const apiStats: StatsApi = data.data;
           const clickStats = clickData?.success ? clickData.data : { totalViews: 0, totalApplies: 0 };
           
-          setStats(prev => prev.map(item => {
-            switch (item.label) {
-              case t('stats_cards.companies'):
-                return { ...item, number: apiStats.companies.toString() };
-              case t('stats_cards.applicants'):
-                // Use database-tracked applies + legacy counter for transition period
-                return { ...item, number: (clickStats.totalApplies + applicants).toString() };
-              case t('stats_cards.positions'):
-                return { ...item, number: apiStats.positions.toString() };
-              default:
-                return item;
-            }
-          }));
+          setStatsNumbers({
+            applicants: (clickStats.totalApplies + applicants).toString(),
+            companies: apiStats.companies.toString(),
+            positions: apiStats.positions.toString(),
+            alwaysOpen: "24/7"
+          });
         }
       } catch (error) {
         console.error('Failed to load stats', error);
