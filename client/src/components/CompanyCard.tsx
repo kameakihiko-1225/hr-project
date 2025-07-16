@@ -127,7 +127,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
         </div>
         <CardContent className="p-4">
           <div className="space-y-2">
-            <h3 className="font-semibold text-lg truncate">{company.name}</h3>
+            <h3 className="font-semibold text-lg truncate">{getLocalizedContent(company.name)}</h3>
             <div className="flex flex-wrap gap-1">
               {displayIndustries.length > 0 ? (
                 displayIndustries.map((industry, idx) => (
@@ -137,7 +137,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
                     className="flex items-center gap-1 text-xs"
                   >
                     <Tag className="h-3 w-3" />
-                    {industry.name}
+                    {getLocalizedContent(industry.name)}
                   </Badge>
                 ))
               ) : (
@@ -214,7 +214,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
                         className="flex items-center gap-1 text-xs"
                       >
                         <Tag className="h-3 w-3" />
-                        {industry.name}
+                        {getLocalizedContent(industry.name)}
                       </Badge>
                     ))
                   ) : (
@@ -228,7 +228,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
               <div className="space-y-2">
                 <h4 className="text-sm font-medium">Description</h4>
                 <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-md border">
-                  {company.description}
+                  {getLocalizedContent(company.description)}
                 </p>
               </div>
             )}
