@@ -289,10 +289,25 @@ app.post('/webhook', async (req, res) => {
           try {
             const verifyResp = await axios.get(`${BITRIX_BASE}/crm.contact.get.json?ID=${contactId}`);
             const contact = verifyResp.data.result;
-            if (contact && contact.PHONE) {
+            if (contact && contact.PHONE && contact.PHONE.length > 0) {
               console.log('[TELEGRAM-BOT] Phone field verified in contact:', contact.PHONE);
             } else {
-              console.log('[TELEGRAM-BOT] WARNING: Phone field not found in created contact, backup field should contain:', phone);
+              console.log('[TELEGRAM-BOT] WARNING: Phone field not found in created contact, adding phone number manually');
+              
+              // Add phone number using update API
+              const phoneUpdateForm = new FormData();
+              phoneUpdateForm.append('ID', contactId);
+              phoneUpdateForm.append('fields[PHONE][0][VALUE]', phone);
+              phoneUpdateForm.append('fields[PHONE][0][VALUE_TYPE]', 'MOBILE');
+              
+              try {
+                const phoneUpdateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, phoneUpdateForm, {
+                  headers: phoneUpdateForm.getHeaders(),
+                });
+                console.log('[TELEGRAM-BOT] Phone field manually added via update:', phoneUpdateResp.data);
+              } catch (phoneUpdateError) {
+                console.log('[TELEGRAM-BOT] Failed to manually add phone field:', phoneUpdateError.message);
+              }
             }
           } catch (verifyError) {
             console.log('[TELEGRAM-BOT] Could not verify contact phone field:', verifyError.message);

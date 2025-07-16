@@ -209,9 +209,15 @@ Preferred communication style: Simple, everyday language.
 - **Smart Answer Processing**: Implemented intelligent detection for phase2 questions - voice file IDs use voice fields, text answers and failed file retrievals use text fields
 - **File ID Detection**: Enhanced Telegram file ID validation to exclude text with spaces and improve accuracy
 - **Phone Number Integration Fix**: Resolved critical phone field issue by implementing proper Bitrix24 crm_multifield format during initial contact creation
-  - Phone field format: `[{"VALUE": "+998111222333", "VALUE_TYPE": "WORK"}]`
+  - Phone field format: `[{"VALUE": "+998111222333", "VALUE_TYPE": "MOBILE"}]` with E.164 international format
   - Direct integration in contact creation payload (not separate update)
   - Proper FormData handling for array-based phone field structure
+  - Added phone verification and manual addition if missing after contact creation
+- **Applicant Tracking System**: Implemented comprehensive applicant tracking that connects Apply Now button clicks to Hero section statistics
+  - Created position click tracking with 'view' and 'apply' types
+  - Added API endpoints for dashboard click stats and position applicant counts
+  - Updated Hero section to display real applicant data from database instead of mock data
+  - Hero section now shows actual Apply Now button click counts matching Job Seekers data
 - **Favicon Update**: Updated website favicon to use Millat Umidi logo ("logo png.png") with proper Apple touch icon support
 - **Webhook URL**: Finalized webhook endpoint at domain.com/webhook with proxy forwarding to port 3001 (no port numbers needed in webhook configuration)
 - **Complete Integration**: Successfully tested end-to-end candidate data flow from Telegram bot to Bitrix24 CRM with proper field mapping, file handling, and phone number display
