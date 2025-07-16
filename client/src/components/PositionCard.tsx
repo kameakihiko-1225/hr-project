@@ -184,18 +184,18 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
 
   const CompanyAvatar = () => (
-    <Avatar className="h-20 w-20 border-2 border-white/30 shadow-2xl group-hover:shadow-3xl group-hover:scale-105 transition-all duration-300">
+    <Avatar className="h-12 w-12 border border-gray-200 dark:border-gray-600 shadow-sm">
       {companyLogoUrl && !logoError ? (
         <AvatarImage 
           src={companyLogoUrl} 
           alt={companyName} 
-          className="object-contain object-center w-full h-full p-2"
+          className="object-contain object-center w-full h-full p-1"
           loading="lazy"
           decoding="async"
           onError={handleLogoError} 
         />
       ) : (
-        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-xl shadow-inner">
+        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-500 text-white font-medium text-sm">
           {companyName.charAt(0)}
         </AvatarFallback>
       )}
@@ -204,19 +204,20 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
 
   return (
     <Card
-      tabIndex={0}
-      role="button"
-      onKeyDown={(e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') handleApply();
-      }}
-      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[520px] w-full max-w-[480px] flex flex-col"
+      className="animate-fade-in group relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 hover:-translate-y-1 transition-all duration-300 h-[420px] w-full max-w-[480px] flex flex-col p-4"
     >
-      {/* Hover effect overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+      {/* Posted time badge - top right */}
+      {postedAgo && (
+        <div className="absolute top-3 right-3 z-10">
+          <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full px-2 py-1">
+            {postedAgo}
+          </span>
+        </div>
+      )}
 
       {/* Edit / Delete buttons */}
       {(onEdit || onDelete) && (
-        <div className="absolute top-2 right-2 flex gap-1 z-20">
+        <div className="absolute top-2 left-2 flex gap-1 z-20">
           {onEdit && (
             <Button variant="ghost" size="icon" onClick={handleEdit} className="h-7 w-7">
               <Pencil className="h-4 w-4" />
@@ -246,15 +247,16 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       )}
 
-      <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
+      {/* Header with company info */}
+      <div className="flex items-start gap-3 mb-3">
         <CompanyAvatar />
-        <div className="flex-1">
-          <h3 className="font-semibold text-base leading-tight text-foreground">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm text-gray-600 dark:text-gray-400 font-medium leading-tight">
             {companyName}
           </h3>
           {showDepartment && Array.isArray(position.departments) && position.departments.length > 0 && (
-            <p className="text-sm text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
-              <Building2 className="h-4 w-4" />
+            <p className="text-xs text-gray-500 dark:text-gray-500 truncate flex items-center gap-1 mt-1">
+              <Building2 className="h-3 w-3" />
               {position.departments.map((dp, idx) => (
                 <span key={dp.department.id} className="flex items-center">
                   {dp.department.name}
@@ -264,175 +266,89 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
             </p>
           )}
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="space-y-3 pb-2 relative z-10 flex-1 flex flex-col">
-        <CardTitle className="text-lg font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title">
-          {position.title}
-        </CardTitle>
+      {/* Content area */}
+      <div className="flex-1 flex flex-col justify-between">
+        {/* Job title */}
+        <div className="mb-3">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 min-h-[3.5rem]">
+            {position.title}
+          </h2>
+        </div>
 
+        {/* Description */}
         {position.description && (
-          <p className="text-sm text-muted-foreground job-card-description">
-            {position.description}
-          </p>
+          <div className="mb-3">
+            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
+              {position.description}
+            </p>
+          </div>
         )}
 
-        {/* Salary after description */}
-        {position.salaryRange && (
-          <p className="text-sm font-medium text-foreground flex items-center gap-1 mt-1">
-            <DollarSign className="h-4 w-4" /> {position.salaryRange}
-          </p>
-        )}
-
-        <div className="flex flex-wrap gap-3 mt-auto text-sm text-muted-foreground">
+        {/* Tags and meta info */}
+        <div className="flex flex-wrap gap-2 mb-4">
           {position.city && (
-            <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {position.city}{position.country ? `, ${position.country}` : ''}</span>
+            <span className="inline-flex items-center gap-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs rounded-full px-2 py-1">
+              <MapPin className="h-3 w-3" /> 
+              {position.city}{position.country ? `, ${position.country}` : ''}
+            </span>
           )}
           {position.employmentType && (
-            <span className="flex items-center gap-1"><Briefcase className="h-4 w-4" /> {position.employmentType}</span>
+            <span className="inline-flex items-center gap-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs rounded-full px-2 py-1">
+              <Briefcase className="h-3 w-3" /> 
+              {position.employmentType}
+            </span>
+          )}
+          {position.salaryRange && (
+            <span className="inline-flex items-center gap-1 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full px-2 py-1 font-medium">
+              <DollarSign className="h-3 w-3" /> 
+              {position.salaryRange}
+            </span>
           )}
         </div>
-      </CardContent>
 
-      <CardFooter className="flex flex-col items-center gap-4 border-t border-border pt-4 pb-4 relative z-10 mt-auto shrink-0">
-        {postedAgo && (
-          <span className="text-sm text-muted-foreground flex items-center gap-1"><Clock className="h-4 w-4" /> {postedAgo}</span>
-        )}
-
-        <div className="flex items-center gap-2 w-full">
+        {/* Action buttons - inside card at bottom */}
+        <div className="grid grid-cols-2 gap-2 mt-auto">
+          {/* Apply Now button - full width on top */}
+          <div className="col-span-2">
+            <Button 
+              onClick={handleApply}
+              className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-all duration-200 hover:shadow-md"
+            >
+              {t('position_card.apply_now')}
+            </Button>
+          </div>
+          
+          {/* Info buttons - side by side */}
           <Button 
             variant="outline" 
-            size="default" 
-            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300"
+            size="sm"
+            className="text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
             }}
           >
-            <Building2 className="h-4 w-4 sm:h-3 sm:w-3" />
-            <span className="hidden sm:inline">{t('position_card.company_info')}</span>
+            <Building2 className="h-3 w-3 mr-1" />
+            {t('position_card.company_info')}
           </Button>
+          
           <Button 
             variant="outline" 
-            size="default" 
-            className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300"
+            size="sm"
+            className="text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
             }}
           >
-            <Briefcase className="h-4 w-4 sm:h-3 sm:w-3" />
-            <span className="hidden sm:inline">{t('position_card.department_info')}</span>
+            <Briefcase className="h-3 w-3 mr-1" />
+            {t('position_card.department_info')}
           </Button>
-          <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="default" className="flex items-center justify-center gap-1 flex-1 h-10 text-sm font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300">
-                <ExternalLink className="h-4 w-4 sm:h-3 sm:w-3" />
-                <span className="hidden sm:inline">{t('position_card.view_details')}</span>
-              </Button>
-            </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>{position.title}</DialogTitle>
-              <DialogDescription>Position Details</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div>
-                <h4 className="text-sm font-medium mb-2">Description</h4>
-                <p className="text-sm text-muted-foreground">
-                  {inheritedData.description || 'No description provided'}
-                </p>
-              </div>
-              
-              {position.salaryRange && (
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Salary Range</h4>
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    <span>{position.salaryRange}</span>
-                  </div>
-                </div>
-              )}
-              
-              {position.employmentType && (
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Employment Type</h4>
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="h-4 w-4" />
-                    <span>{position.employmentType}</span>
-                  </div>
-                </div>
-              )}
-              
-              <div>
-                <h4 className="text-sm font-medium mb-2">Department</h4>
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
-                  <span>{inheritedData.departmentName}</span>
-                </div>
-                <div className="flex items-center gap-2 mt-1 ml-6">
-                  <span className="text-sm text-muted-foreground">
-                    {inheritedData.companyName}
-                  </span>
-                </div>
-              </div>
-              
-              {position.applyLink && (
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Apply Link</h4>
-                  <div className="flex items-center gap-2">
-                    <ExternalLink className="h-4 w-4" />
-                    <a 
-                      href={position.applyLink} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline truncate max-w-[250px]"
-                    >
-                      {position.applyLink}
-                    </a>
-                  </div>
-                </div>
-              )}
-              
-              <div>
-                <h4 className="text-sm font-medium mb-2">Created</h4>
-                <p className="text-sm text-muted-foreground">
-                  {new Date(position.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>Close</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
         </div>
+      </div>
 
-        {position.applyLink ? (
-          <button
-            onClick={handleApply}
-            className="px-8 py-4 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 w-full justify-center"
-          >
-            <span className="hidden sm:inline">{t('position_card.apply')}</span>
-            <span className="sm:hidden">{t('position_card.apply')}</span>
-            <ExternalLink className="h-4 w-4" />
-          </button>
-        ) : (
-          <Button
-            onClick={handleApply}
-            disabled={isApplying}
-            className="px-8 py-4 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 w-full justify-center"
-          >
-            {isApplying ? 'Generating…' : (
-              <>
-                <span className="hidden sm:inline">{t('position_card.apply')}</span>
-                <span className="sm:hidden">{t('position_card.apply')}</span>
-              </>
-            )} <Send className="h-4 w-4" />
-          </Button>
-        )}
-      </CardFooter>
-      
       {/* Company Info Modal */}
       <CompanyInfoModal 
         company={companyFromAPI}
@@ -453,6 +369,93 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           setIsDepartmentModalOpen(false);
         }}
       />
+
+      {/* Details Dialog */}
+      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="absolute bottom-2 right-2 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            <ExternalLink className="h-3 w-3" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{position.title}</DialogTitle>
+            <DialogDescription>Position Details</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <h4 className="text-sm font-medium mb-2">Description</h4>
+              <p className="text-sm text-muted-foreground">
+                {inheritedData.description || 'No description provided'}
+              </p>
+            </div>
+            
+            {position.salaryRange && (
+              <div>
+                <h4 className="text-sm font-medium mb-2">Salary Range</h4>
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  <span>{position.salaryRange}</span>
+                </div>
+              </div>
+            )}
+            
+            {position.employmentType && (
+              <div>
+                <h4 className="text-sm font-medium mb-2">Employment Type</h4>
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  <span>{position.employmentType}</span>
+                </div>
+              </div>
+            )}
+            
+            <div>
+              <h4 className="text-sm font-medium mb-2">Department</h4>
+              <div className="flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                <span>{inheritedData.departmentName}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1 ml-6">
+                <span className="text-sm text-muted-foreground">
+                  {inheritedData.companyName}
+                </span>
+              </div>
+            </div>
+            
+            {position.applyLink && (
+              <div>
+                <h4 className="text-sm font-medium mb-2">Apply Link</h4>
+                <div className="flex items-center gap-2">
+                  <ExternalLink className="h-4 w-4" />
+                  <a 
+                    href={position.applyLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline truncate max-w-[250px]"
+                  >
+                    {position.applyLink}
+                  </a>
+                </div>
+              </div>
+            )}
+            
+            <div>
+              <h4 className="text-sm font-medium mb-2">Created</h4>
+              <p className="text-sm text-muted-foreground">
+                {new Date(position.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 });

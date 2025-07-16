@@ -47,43 +47,20 @@
 }
 
 /* Position Card Utilities */
-.job-card-title {
+.line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.4;
-  min-height: 3.5rem;
 }
 
-.job-card-description {
+.line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.5;
-}
-
-.job-card-admin-title {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.4;
-  min-height: 2.5rem;
-}
-
-.job-card-admin-description {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.4;
-  min-height: 3rem;
 }
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
