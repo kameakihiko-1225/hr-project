@@ -1,0 +1,172 @@
+# Multi-Language CRUD Backend Audit Prompt
+
+## Objective
+Conduct a comprehensive audit of the backend codebase to evaluate multi-language localization support for CRUD operations on Position, Department, Company, and Blog entities. Verify that the system can handle JSON-based localized data and respond appropriately to web application locale changes.
+
+## Audit Scope
+Walk through **ALL** backend logic related to the following entities:
+- **Position** (job positions, roles, etc.)
+- **Department** (organizational departments)
+- **Company** (company/organization data)
+- **Blog** (blog posts, articles, content)
+
+## Key Areas to Examine
+
+### 1. Data Model & Schema Analysis
+- **Database Schema**: Examine table structures for each entity
+  - Are there dedicated columns for multi-language support?
+  - Is there a separate translations table or embedded JSON localization?
+  - Check for locale-specific fields (e.g., `name_en`, `name_fr`, `description_multilang`)
+- **Entity Models**: Review ORM models/data classes
+  - How are multilingual fields defined?
+  - Are there validation rules for localized content?
+  - Check for JSON field types and their structure
+
+### 2. CREATE Operations Audit
+For each entity (Position, Department, Company, Blog):
+- **Input Validation**: 
+  - How does the system validate JSON localization data on creation?
+  - Are required languages enforced?
+  - Is the JSON structure validated for localized fields?
+- **Data Storage**:
+  - How are multilingual fields stored in the database?
+  - Are default language fallbacks implemented?
+  - Check for proper JSON serialization/deserialization
+- **API Endpoints**:
+  - Do CREATE endpoints accept localized JSON objects?
+  - Are there separate endpoints for different languages?
+  - How are language-specific validations handled?
+
+### 3. READ Operations Audit
+For each entity:
+- **Locale-Aware Queries**:
+  - How does the system determine which language to return?
+  - Are there query parameters for language selection (`?lang=en`, `?locale=fr-FR`)?
+  - Check for Accept-Language header handling
+- **Data Retrieval Logic**:
+  - How are JSON localized fields extracted for specific languages?
+  - Are there fallback mechanisms (e.g., fallback to default language)?
+  - Check for proper deserialization of multilingual JSON data
+- **Response Formatting**:
+  - Are responses structured to include only the requested language?
+  - Or do they include all languages with client-side selection?
+  - Check for consistent response formats across all entities
+
+### 4. UPDATE Operations Audit
+For each entity:
+- **Partial Updates**:
+  - Can individual language entries be updated without affecting others?
+  - How does the system handle updates to JSON localization objects?
+  - Are there safeguards against accidentally removing language data?
+- **Language Addition/Removal**:
+  - Can new languages be added to existing records?
+  - What happens when a language is removed from the system?
+  - Check for orphaned language data handling
+- **Merge Logic**:
+  - How are multilingual JSON objects merged during updates?
+  - Are there conflict resolution strategies for concurrent language updates?
+
+### 5. DELETE Operations Audit
+For each entity:
+- **Cascade Behavior**:
+  - What happens to localized data when a record is deleted?
+  - Are there soft-delete mechanisms that preserve multilingual content?
+- **Language-Specific Deletion**:
+  - Can specific language versions be deleted while preserving others?
+  - How does the system handle deletion of the default language?
+
+### 6. Locale Change Handling
+- **Dynamic Language Switching**:
+  - How does the backend respond when the web app locale changes?
+  - Are there mechanisms to bulk-fetch data in the new language?
+  - Check for caching strategies for different languages
+- **Session/User Language Preferences**:
+  - How are user language preferences stored and retrieved?
+  - Are there per-user language settings that override global locale?
+- **Real-time Updates**:
+  - If using WebSockets or similar, how are locale changes propagated?
+
+## Specific Technical Checks
+
+### JSON Structure Validation
+Verify that localized JSON fields follow a consistent structure:
+```json
+{
+  "en": "English content",
+  "fr": "Contenu français",
+  "es": "Contenido español",
+  "de": "Deutscher Inhalt"
+}
+```
+
+### Database Query Patterns
+Check for patterns like:
+- `SELECT JSON_EXTRACT(multilang_field, '$.en') as content WHERE ...`
+- `UPDATE table SET multilang_field = JSON_SET(multilang_field, '$.fr', 'new content')`
+- Proper indexing on JSON fields for performance
+
+### API Response Consistency
+Ensure all entities return localized data in the same format:
+- Consistent error messages in multiple languages
+- Uniform fallback behavior across all CRUD operations
+- Proper HTTP status codes for language-related errors
+
+## Testing Scenarios to Verify
+
+### 1. Language Switching Test
+- Create records in multiple languages
+- Change web app locale from English to French
+- Verify all entity data returns in French
+- Check fallback behavior for missing translations
+
+### 2. CRUD Operation Tests
+For each entity, test:
+- Creating records with multilingual JSON data
+- Reading records with different locale headers
+- Updating specific language content
+- Deleting records and verifying multilingual data cleanup
+
+### 3. Edge Cases
+- Empty or null localized fields
+- Malformed JSON in multilingual fields
+- Unsupported language codes
+- Mixed language content in single requests
+
+## Expected Deliverables
+
+### 1. Audit Report
+For each entity (Position, Department, Company, Blog), provide:
+- Current multilingual support status (✅ Fully Supported, ⚠️ Partially Supported, ❌ Not Supported)
+- Specific gaps or issues identified
+- Code examples of problematic areas
+
+### 2. Recommendations
+- Required changes to support full multilingual CRUD operations
+- Suggested JSON schema for localized fields
+- Database migration requirements
+- API endpoint modifications needed
+
+### 3. Implementation Roadmap
+- Priority order for fixing identified issues
+- Estimated effort for each fix
+- Dependencies between different entity improvements
+
+## Success Criteria
+The backend will be considered ready for multi-language support when:
+- All CRUD operations work seamlessly with JSON localized data
+- Changing web app locale immediately reflects in all entity data
+- Proper fallback mechanisms exist for missing translations
+- Performance is maintained across different language operations
+- Error handling includes appropriate multilingual messages
+
+## Code Review Checklist
+- [ ] Database schema supports multilingual JSON fields
+- [ ] All CRUD operations handle localized data properly
+- [ ] API endpoints accept and return locale-aware responses
+- [ ] Proper validation for multilingual JSON structures
+- [ ] Fallback mechanisms for missing translations
+- [ ] Performance optimizations for multilingual queries
+- [ ] Error handling includes multilingual support
+- [ ] Documentation updated for multilingual features
+- [ ] Unit tests cover multilingual scenarios
+- [ ] Integration tests verify end-to-end locale switching
