@@ -8,6 +8,7 @@ import { ClickCounterProvider } from "@/contexts/ClickCounterContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Blog from "./pages/Blog";
+import Companies from "./pages/Companies";
 import NotFound from "./pages/NotFound";
 
 
@@ -59,6 +60,7 @@ const App = () => (
           <Switch>
             <Route path="/" component={Index} />
             <Route path="/blog" component={Blog} />
+            <Route path="/companies" component={Companies} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" component={AdminLogin} />

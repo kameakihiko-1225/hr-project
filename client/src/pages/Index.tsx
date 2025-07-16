@@ -6,10 +6,11 @@ import { FounderSection } from "@/components/FounderSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { StatsSection } from "@/components/StatsSection";
 import { CompanyCarousel } from "@/components/CompanyCarousel";
-
 import { CTASection } from "@/components/CTASection";
 import { FilterSection } from "@/components/FilterSection";
 import { OpenPositions } from "@/components/OpenPositions";
+import { TopPositionsSection } from "@/components/TopPositionsSection";
+import { AllPositionsSection } from "@/components/AllPositionsSection";
 
 const Index = () => {
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
@@ -52,6 +53,8 @@ const Index = () => {
     <div className="min-h-screen bg-white">
       <Header />
       <HeroSection />
+      <TopPositionsSection />
+      <AllPositionsSection />
       <FounderSection />
       <CompanyCarousel />
       <FeaturesSection />

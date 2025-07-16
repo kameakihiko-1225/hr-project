@@ -1,0 +1,228 @@
+Implement a comprehensive job positions display section below the hero area. This section will feature a dynamic "Top Positions" counter card, followed by a full listing of all available job positions, complete with futuristic design and pagination.
+
+Data Sources:
+
+position_clicks database table for application counts.
+
+Other relevant database tables for position, company, department data (as outlined in the previous prompt's Section 1).
+
+CRITICAL CONSTRAINTS (Reiterated & Expanded):
+
+PRESERVE EXISTING UI/UX DESIGN (Overall Layout): For elements outside this new section. This new section's design (listing, pagination) should be modern and "futuristic" but integrate cleanly with the overall site aesthetic.
+
+PRESERVE PROPER NOUNS: "Millat Umidi" and "Millat Umidi Group" must remain untranslated.
+
+No Mock Data: All data must be persisted in and retrieved directly from the database.
+
+Full Localization (Content & UI): All user-facing text (both static UI and dynamic content: position titles, descriptions, company/department names, labels, button texts, etc.) must be localized for English, Russian, and Uzbek.
+
+Section 1: Database Interaction & Data Retrieval Enhancements
+"Objective: Optimize database queries for retrieving top positions based on clicks and all active positions for the listing view, ensuring efficient data fetching for localization.
+
+Instructions for the AI Code Agent:
+
+Refine Top Positions Query (from position_clicks):
+
+Develop an optimized query that directly leverages the position_clicks database table to count applications. This table should likely store position_id and potentially a timestamp.
+
+The query should JOIN with the Positions table (and its translation table) to retrieve localized position titles.
+
+Select the top 3 positions with the highest application counts.
+
+Ensure the query is highly performant.
+
+Full Positions Listing Query:
+
+Develop a separate, efficient query to retrieve all active job positions from the database.
+
+This query must include localized titles, descriptions, and associated localized Company and Department names.
+
+It should support pagination parameters (offset, limit).
+
+API Endpoint Refinement:
+
+/api/top-positions-with-counts: Create/refine this endpoint to return the top 3 positions (or fewer if less than 3 exist with applicants). Each entry should include localized position title, and application count.
+
+/api/all-positions: Create/refine this endpoint to return paginated lists of all active job positions. Each entry must include localized position title, description, company name, and department name. This endpoint should accept page and limit parameters.
+
+Ensure both endpoints respect the requested language (Accept-Language header or lang parameter) for all translatable fields. Implement fallback to a default language if a translation is missing.
+
+Confirm that "Millat Umidi Group" (for company name) is never translated in the data returned by these APIs.
+
+Deliverables for this Section:
+
+Optimized database queries for top 3 positions and all paginated positions.
+
+Refined or new API endpoints (/api/top-positions-with-counts, /api/all-positions) supporting localization."
+
+Section 2: Frontend UI & Component Development (with Localization & Dynamic Behaviors)
+"Objective: Develop the frontend components for the 'Top Positions' section and the 'All Positions' listing, ensuring dynamic rendering, responsive design, futuristic visuals, pagination, and full localization.
+
+Instructions for the AI Code Agent:
+
+Top Positions Counter Card Component (Refined from image):
+
+Data Fetching: This component will fetch data from /api/top-positions-with-counts.
+
+Dynamic Card Generation: Dynamically render 1, 2, or 3 individual counter cards based on the number of positions returned by the API that have applicants.
+
+Layout & Centering:
+
+If 3 cards, display them side-by-side as shown in the provided screenshot.
+
+If 1 or 2 cards, they must be horizontally centered within the available space.
+
+Maintain adequate spacing between cards.
+
+Content Display per Card: Each card must display:
+
+Rank (e.g., "#1", "#2", "#3")
+
+Localized Position Title (e.g., "HR Generalist", "Кадровый аналитик", "Kadrlar bo'yicha mutaxassis")
+
+Application Count (e.g., "43")
+
+Localized Label for Applicants (e.g., "Applicants", "Соискателей", "So'rovchilar")
+
+Styling: Apply the visual style from the provided screenshot (rounded corners, subtle background, distinct number styling). Integrate smoothly below the hero section.
+
+No cards if no applicants: If the API returns no positions with applicants, this entire "Top Positions" section should not appear.
+
+All Positions Listing View Component:
+
+Placement: This component should be positioned directly below the "Top Positions Counter Card" section.
+
+Design: Implement a "futuristic design and beautiful visual effects" for this listing view. This could include:
+
+Clean, minimalist cards for each position.
+
+Subtle hover effects or transitions.
+
+Modern typography.
+
+Effective use of negative space.
+
+(Optional but encouraged for "futuristic"): Subtle animations on load, perhaps a sleek pagination design.
+
+Content per Listing Item (Card): Each item should display:
+
+Localized Position Title
+
+Localized Company Name (e.g., "Millat Umidi Group" - must not be translated)
+
+Localized Department Name
+
+A concise snippet of the Localized Position Description (e.g., first 100-150 characters with an ellipsis).
+
+A clear "Apply Now" button or link that directs to the job application page for that specific position.
+
+Pagination:
+
+Implement client-side or server-side pagination with a limit of 4 positions per page.
+
+Display clear pagination controls (e.g., "Previous," "Next," page numbers).
+
+Data for each page should be fetched from the /api/all-positions endpoint using page and limit parameters.
+
+"More" Button Icon for Companies:
+
+Below the job listings (or perhaps incorporated into a filter section), add a prominent "More Companies" button/icon.
+
+When clicked, this button should lead to a separate page or modal that displays a full list of all companies (/api/companies) with their localized details (name, description, etc.). This implies developing that separate "All Companies" view as well.
+
+Localization of UI Elements: Ensure all static text within this listing (e.g., "All Available Positions", "Apply Now", "Next Page", "Previous Page", "More Companies") is integrated with the existing i18n system and correctly displayed in English, Russian, or Uzbek based on the active language.
+
+Blog Item Creation & Display (Frontend):
+
+Admin Panel/Content Creation UI (Refined):
+
+Ensure the administrative interface for creating Blog Items (from previous prompt) supports:
+
+Input fields for title_en, title_ru, title_uz.
+
+Rich text editor fields for content_en, content_ru, content_uz.
+
+Input for image_url.
+
+Fields for slug_en, slug_ru, slug_uz (auto-generated but editable).
+
+Securely send this multilingual data to the respective POST /api/blog endpoint.
+
+Blog Display UI (Refined):
+
+Ensure the existing "Blog" section/page correctly fetches and displays blog item title, content, and any other relevant fields in the currently active language.
+
+Navigation to individual blog posts should use the correct localized slug.
+
+Deliverables for this Section:
+
+Revised Top Positions Counter Card component with dynamic rendering, centering, and localization.
+
+New All Positions Listing View component with futuristic design, localization, and pagination (4 items/page).
+
+New "All Companies" display page/modal.
+
+Confirmation of localization for all new static and dynamic text in these components.
+
+Enhanced administrative UI for blog content creation with multilingual fields.
+
+Integration of position_clicks data for the counter.
+
+Seamless visual integration into the website.
+
+Section 3: Technical SEO & Testing (Comprehensive)
+"Objective: Ensure all new features are search engine optimized for multilingual content and undergo rigorous testing.
+
+Instructions for the AI Code Agent:
+
+Multilingual SEO for New Content:
+
+hreflang Tags: Crucially, ensure that dynamically generated pages for individual job positions and individual blog posts correctly implement hreflang tags, linking to their respective localized URLs (using localized slugs).
+
+Localized Slugs: Verify that the routing system correctly handles and generates localized URLs for job positions and blog posts (e.g., /en/jobs/software-engineer, /ru/jobs/inzhener-programmist).
+
+XML Sitemaps (Advisory): Reiterate the need to ensure multilingual XML sitemaps will be updated (typically by the platform's SEO module) to include all localized job and blog URLs.
+
+Automated Testing (Extensive):
+
+Data Integrity: Test that position_clicks accurately reflects application counts and that application_count is incremented correctly.
+
+Top Positions Logic: Test that the top 3 positions are correctly identified and displayed, and that centering works for 1 or 2 cards.
+
+Pagination: Thoroughly test pagination for the "All Positions" listing (first page, last page, intermediate pages, edge cases).
+
+Localization End-to-End: Comprehensive tests for all new components to ensure:
+
+Correct translation of all dynamic (position titles, descriptions) and static (labels, buttons) text across EN, RU, UZ.
+
+UI layout stability and responsiveness for all languages (no overflow, clipping, or visual breakage).
+
+Correct handling of untranslatable proper nouns ("Millat Umidi Group").
+
+Content Creation: Test the administrative UI for creating multilingual Company, Department, Position, and Blog entries, ensuring data is saved and retrieved correctly in all languages.
+
+Navigation: Test the "More Companies" button/link and the navigation to individual job/blog pages.
+
+Manual QA Guidance (Detailed):
+
+Update the manual QA checklist to cover:
+
+Visual verification of the "Top Positions" section: correct number of cards, centering, and adherence to design.
+
+Thorough review of the "All Positions" listing: visual effects, responsiveness, data accuracy, and pagination functionality.
+
+Confirmation of all localized text elements for new components being accurate and culturally appropriate in all three languages.
+
+Testing the entire workflow for creating, editing, and deleting Company, Department, Position, and Blog entries via the admin panel in all supported languages.
+
+End-to-end user journeys for applying to jobs and Browse blog posts in each language.
+
+Verification that no UI/UX changes have occurred outside of this new section, and that this new section integrates seamlessly without breaking other elements.
+
+Deliverables for this Section:
+
+Implemented multilingual SEO best practices (especially hreflang) for all new dynamic content.
+
+An extensively updated automated test suite covering all new features.
+
+A comprehensive manual QA checklist for all new functionalities, including specific checks for design, localization, and data integrity."

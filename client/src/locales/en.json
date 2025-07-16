@@ -269,5 +269,22 @@
     "loading": "Loading position data...",
     "error": "Failed to load position data",
     "no_data": "No application data available"
+  },
+
+  "positions_section": {
+    "all_positions_title": "All Available Positions",
+    "apply_now": "Apply Now",
+    "loading": "Loading positions...",
+    "error": "Failed to load positions",
+    "no_positions": "No positions available",
+    "more_companies": "More Companies",
+    "page_info": "Page {page} of {total}",
+    "previous": "Previous",
+    "next": "Next",
+    "company": "Company",
+    "department": "Department",
+    "location": "Location",
+    "employment_type": "Employment Type",
+    "salary_range": "Salary Range"
   }
 }
