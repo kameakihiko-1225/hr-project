@@ -19,9 +19,10 @@ export const FounderSection = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       
       <div className="max-w-6xl mx-auto relative">
-        <div className="grid lg:grid-cols-2 gap-8 items-start">
+        <div className="founder-section-layout">
           {/* Left side - Founder Photo */}
-          <div className="flex flex-col items-center lg:items-center space-y-6 order-2 lg:order-1">
+          <div className="founder-image-container items-center lg:items-center order-2 lg:order-1">
+            {/* Image positioned to align top with heading */}
             <div className="relative overflow-hidden">
               <img
                 src="/Umidjon_aka-removebg-preview_1752578772239.png"
@@ -31,7 +32,8 @@ export const FounderSection = () => {
               />
             </div>
             
-            <div className="text-center lg:text-left">
+            {/* Text positioned at bottom to align with button */}
+            <div className="founder-name-text">
               <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 Umidjon Ishmukhamedov
               </h3>
@@ -42,7 +44,7 @@ export const FounderSection = () => {
           </div>
 
           {/* Right side - Inspirational Message */}
-          <div className="space-y-6 order-1 lg:order-2">
+          <div className="founder-content-container order-1 lg:order-2">
             <div className="space-y-4">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
                 Join Our Mission to 
@@ -69,7 +71,8 @@ export const FounderSection = () => {
               </div>
             </div>
 
-            <div className="pt-4">
+            {/* Button section */}
+            <div className="button-section pt-4">
               <Button 
                 onClick={scrollToPositions}
                 size="lg"
