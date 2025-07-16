@@ -517,18 +517,13 @@ export default function PositionsPage() {
           </DialogHeader>
           <div className="flex-1 overflow-y-auto px-1">
             <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <label htmlFor="title" className="text-sm font-medium">
-                Position Title
-              </label>
-              <Input
-                id="title"
-                name="title"
-                placeholder="e.g., Software Engineer"
-                value={formData.title}
-                onChange={handleInputChange}
-              />
-            </div>
+            <MultilingualInput
+              label="Position Title"
+              value={formData.title as LocalizedContent}
+              onChange={(value) => setFormData(prev => ({ ...prev, title: value }))}
+              placeholder="e.g., Software Engineer"
+              required
+            />
             <div className="grid gap-2">
               <label htmlFor="description" className="text-sm font-medium">
                 Description

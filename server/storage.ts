@@ -215,34 +215,26 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log('Executing getAllDepartmentsWithPositionCounts with companyId:', companyId);
       
-      let query = db
-        .select({
-          id: departments.id,
-          name: departments.name,
-          description: departments.description,
-          companyId: departments.companyId,
-          createdAt: departments.createdAt,
-          positionCount: count(positions.id)
+      // Get all departments first
+      const departmentsResult = await this.getAllDepartments(companyId, language);
+      
+      // Count positions for each department
+      const departmentsWithCounts = await Promise.all(
+        departmentsResult.map(async (department) => {
+          const positionCount = await db
+            .select({ count: count(positions.id) })
+            .from(positions)
+            .where(eq(positions.departmentId, department.id));
+          
+          return {
+            ...department,
+            positionCount: positionCount[0]?.count || 0
+          };
         })
-        .from(departments)
-        .leftJoin(positions, eq(departments.id, positions.departmentId))
-        .groupBy(departments.id, departments.name, departments.description, departments.companyId, departments.createdAt);
+      );
       
-      if (companyId) {
-        query = query.where(eq(departments.companyId, companyId));
-      }
-      
-      const result = await query;
-      console.log('getAllDepartmentsWithPositionCounts result:', result);
-      
-      // Localize department fields
-      const localizedResult = result.map(department => ({
-        ...department,
-        name: getLocalizedContent(department.name, language),
-        description: getLocalizedContent(department.description, language),
-      }));
-      
-      return localizedResult;
+      console.log('getAllDepartmentsWithPositionCounts result:', departmentsWithCounts);
+      return departmentsWithCounts;
     } catch (error) {
       console.error('Database error in getAllDepartmentsWithPositionCounts:', error);
       // Return regular departments if position count query fails

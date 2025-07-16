@@ -355,31 +355,22 @@ export default function DepartmentsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid gap-2">
-              <label htmlFor="name" className="text-sm font-medium">
-                Department Name
-              </label>
-              <Input
-                id="name"
-                name="name"
-                placeholder="e.g., Engineering"
-                value={formData.name}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="description" className="text-sm font-medium">
-                Description
-              </label>
-              <Textarea
-                id="description"
-                name="description"
-                placeholder="Department description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={3}
-              />
-            </div>
+            
+            <MultilingualInput
+              label="Department Name"
+              value={formData.name as LocalizedContent}
+              onChange={(value) => setFormData(prev => ({ ...prev, name: value }))}
+              placeholder="e.g., Engineering"
+              required
+            />
+            
+            <MultilingualInput
+              label="Description"
+              value={formData.description as LocalizedContent}
+              onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+              placeholder="Department description"
+              type="textarea"
+            />
             </div>
           </div>
           <DialogFooter className="flex-shrink-0">
@@ -405,31 +396,21 @@ export default function DepartmentsPage() {
           </DialogHeader>
           <div className="flex-1 overflow-y-auto px-1">
             <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <label htmlFor="name" className="text-sm font-medium">
-                Department Name
-              </label>
-              <Input
-                id="name"
-                name="name"
-                placeholder="e.g., Engineering"
-                value={formData.name}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="description" className="text-sm font-medium">
-                Description
-              </label>
-              <Textarea
-                id="description"
-                name="description"
-                placeholder="Department description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={3}
-              />
-            </div>
+            <MultilingualInput
+              label="Department Name"
+              value={formData.name as LocalizedContent}
+              onChange={(value) => setFormData(prev => ({ ...prev, name: value }))}
+              placeholder="e.g., Engineering"
+              required
+            />
+            
+            <MultilingualInput
+              label="Description"
+              value={formData.description as LocalizedContent}
+              onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+              placeholder="Department description"
+              type="textarea"
+            />
             {currentDepartment?.company && (
               <div className="grid gap-2">
                 <label className="text-sm font-medium">
