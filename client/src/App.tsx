@@ -26,8 +26,26 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: async ({ queryKey }) => {
-        const [url] = queryKey;
-        const response = await fetch(url as string, {
+        const [url, params] = queryKey;
+        let apiUrl = url as string;
+        
+        // Add language parameter if not already present
+        const urlObj = new URL(apiUrl, window.location.origin);
+        if (!urlObj.searchParams.has('language')) {
+          const currentLanguage = localStorage.getItem('i18nextLng') || 'en';
+          urlObj.searchParams.set('language', currentLanguage);
+        }
+        
+        // Add additional params if provided
+        if (params && typeof params === 'object') {
+          Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              urlObj.searchParams.set(key, String(value));
+            }
+          });
+        }
+        
+        const response = await fetch(urlObj.toString(), {
           headers: {
             'Content-Type': 'application/json',
             ...getAuthHeaders(),

@@ -12,6 +12,8 @@ import { createDepartment, deleteDepartment, getDepartments, getCompanies, updat
 import { Department } from '../../../types/department';
 import { Company } from '../../../types/company';
 import { Loader2, Plus, Building2, Search } from 'lucide-react';
+import { MultilingualInput } from '../../../components/ui/multilingual-input';
+import { LocalizedContent } from '@shared/schema';
 
 export default function DepartmentsPage() {
   const [location] = useLocation();
@@ -28,8 +30,8 @@ export default function DepartmentsPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentDepartment, setCurrentDepartment] = useState<Department | null>(null);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
+    name: { en: '' } as LocalizedContent,
+    description: { en: '' } as LocalizedContent,
     companyId: ''
   });
 
@@ -107,10 +109,15 @@ export default function DepartmentsPage() {
     return matchesSearch && matchesCompany;
   });
 
-  // Handle form input changes
+  // Handle form input changes for non-multilingual fields (legacy compatibility)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    // For backward compatibility, handle string values by converting to LocalizedContent
+    if (['name', 'description'].includes(name)) {
+      setFormData(prev => ({ ...prev, [name]: { en: value } as LocalizedContent }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   // Handle company selection
@@ -121,7 +128,7 @@ export default function DepartmentsPage() {
   // Handle create department
   const handleCreateDepartment = async () => {
     try {
-      if (!formData.name || !formData.companyId) {
+      if (!formData.name || (typeof formData.name === 'object' && !formData.name.en) || !formData.companyId) {
         toast({
           title: 'Validation Error',
           description: 'Department name and company are required.',
@@ -158,8 +165,8 @@ export default function DepartmentsPage() {
   const handleEditDepartment = (department: Department) => {
     setCurrentDepartment(department);
     setFormData({
-      name: department.name,
-      description: department.description || '',
+      name: typeof department.name === 'string' ? { en: department.name } : department.name,
+      description: typeof department.description === 'string' ? { en: department.description } : department.description || { en: '' },
       companyId: department.company?.id || ''
     });
     setIsEditDialogOpen(true);
@@ -170,7 +177,7 @@ export default function DepartmentsPage() {
     if (!currentDepartment) return;
 
     try {
-      if (!formData.name) {
+      if (!formData.name || (typeof formData.name === 'object' && !formData.name.en)) {
         toast({
           title: 'Validation Error',
           description: 'Department name is required.',
@@ -228,8 +235,8 @@ export default function DepartmentsPage() {
   // Reset form
   const resetForm = () => {
     setFormData({
-      name: '',
-      description: '',
+      name: { en: '' } as LocalizedContent,
+      description: { en: '' } as LocalizedContent,
       companyId: ''
     });
     setCurrentDepartment(null);

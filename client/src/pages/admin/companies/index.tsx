@@ -43,6 +43,8 @@ import { Company, IndustryTag } from "@/types/company";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IndustryTagSelect } from "@/components/IndustryTagSelect";
+import { MultilingualInput } from "@/components/ui/multilingual-input";
+import { LocalizedContent } from "@shared/schema";
 
 // Create a logger for the companies page
 const logger = createLogger('companiesPage');
@@ -65,12 +67,13 @@ export default function CompaniesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [newCompany, setNewCompany] = useState<Partial<Company>>({
     id: "",
-    name: "",
+    name: { en: "" } as LocalizedContent,
     email: "",
     phone: "",
-    city: "",
-    country: "",
-    description: "",
+    city: { en: "" } as LocalizedContent,
+    country: { en: "" } as LocalizedContent,
+    description: { en: "" } as LocalizedContent,
+    address: { en: "" } as LocalizedContent,
     logoUrl: "",
     color: "#b69b83",
     industries: []
@@ -138,12 +141,13 @@ export default function CompaniesPage() {
   const resetForm = () => {
     setNewCompany({
       id: "",
-      name: "",
+      name: { en: "" } as LocalizedContent,
       email: "",
       phone: "",
-      city: "",
-      country: "",
-      description: "",
+      city: { en: "" } as LocalizedContent,
+      country: { en: "" } as LocalizedContent,
+      description: { en: "" } as LocalizedContent,
+      address: { en: "" } as LocalizedContent,
       logoUrl: "",
       color: "#b69b83",
       industries: []
@@ -155,10 +159,10 @@ export default function CompaniesPage() {
     try {
       logger.info(`${isEditMode ? 'Updating' : 'Adding'} company: ${newCompany.name}`);
       
-      if (!newCompany.name) {
+      if (!newCompany.name || (typeof newCompany.name === 'object' && !newCompany.name.en)) {
         toast({
           title: "Company name required",
-          description: "Please enter a name for the company",
+          description: "Please enter a name for the company in English",
           variant: "destructive",
         });
         return;
@@ -171,6 +175,7 @@ export default function CompaniesPage() {
         const response = await api.put(`/companies/${newCompany.id}`, {
           name: newCompany.name,
           description: newCompany.description,
+          address: newCompany.address,
           email: newCompany.email,
           phone: newCompany.phone,
           city: newCompany.city,
@@ -338,14 +343,15 @@ export default function CompaniesPage() {
         logger.info(`Found similar company with ID ${similarCompany.id}`);
         setNewCompany({
           id: similarCompany.id,
-          name: similarCompany.name,
+          name: typeof similarCompany.name === 'string' ? { en: similarCompany.name } : similarCompany.name,
           email: similarCompany.email || "",
           phone: similarCompany.phone || "",
-          city: similarCompany.city || "",
-          country: similarCompany.country || "",
-          description: similarCompany.description || "",
+          city: typeof similarCompany.city === 'string' ? { en: similarCompany.city } : similarCompany.city,
+          country: typeof similarCompany.country === 'string' ? { en: similarCompany.country } : similarCompany.country,
+          description: typeof similarCompany.description === 'string' ? { en: similarCompany.description } : similarCompany.description,
+          address: typeof similarCompany.address === 'string' ? { en: similarCompany.address } : similarCompany.address,
           logoUrl: similarCompany.logoUrl || "",
-          color: similarCompany.color || "#b69b83", // Ensure color is always defined
+          color: similarCompany.color || "#b69b83",
           industries: similarCompany.industries || []
         });
         
@@ -366,12 +372,13 @@ export default function CompaniesPage() {
     // Set the form values to the company being edited
     setNewCompany({
       id: companyToEdit.id,
-      name: companyToEdit.name,
+      name: typeof companyToEdit.name === 'string' ? { en: companyToEdit.name } : companyToEdit.name,
       email: companyToEdit.email || "",
       phone: companyToEdit.phone || "",
-      city: companyToEdit.city || "",
-      country: companyToEdit.country || "",
-      description: companyToEdit.description || "",
+      city: typeof companyToEdit.city === 'string' ? { en: companyToEdit.city } : companyToEdit.city,
+      country: typeof companyToEdit.country === 'string' ? { en: companyToEdit.country } : companyToEdit.country,
+      description: typeof companyToEdit.description === 'string' ? { en: companyToEdit.description } : companyToEdit.description,
+      address: typeof companyToEdit.address === 'string' ? { en: companyToEdit.address } : companyToEdit.address,
       logoUrl: companyToEdit.logoUrl || "",
       color: companyToEdit.color || "#b69b83", // Ensure color is always defined
       industries: companyToEdit.industries || []
@@ -428,21 +435,43 @@ export default function CompaniesPage() {
                   }
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="name"
-                    value={newCompany.name}
-                    onChange={(e) =>
-                      setNewCompany({ ...newCompany, name: e.target.value })
-                    }
-                    className="col-span-3"
-                    required
-                  />
-                </div>
+              <div className="grid gap-6 py-4">
+                <MultilingualInput
+                  label="Company Name"
+                  value={newCompany.name as LocalizedContent}
+                  onChange={(value) => setNewCompany({ ...newCompany, name: value })}
+                  placeholder="Enter company name"
+                  required
+                />
+                
+                <MultilingualInput
+                  label="Description"
+                  value={newCompany.description as LocalizedContent}
+                  onChange={(value) => setNewCompany({ ...newCompany, description: value })}
+                  placeholder="Enter company description"
+                  type="textarea"
+                />
+                
+                <MultilingualInput
+                  label="Address"
+                  value={newCompany.address as LocalizedContent}
+                  onChange={(value) => setNewCompany({ ...newCompany, address: value })}
+                  placeholder="Enter company address"
+                />
+                
+                <MultilingualInput
+                  label="City"
+                  value={newCompany.city as LocalizedContent}
+                  onChange={(value) => setNewCompany({ ...newCompany, city: value })}
+                  placeholder="Enter city"
+                />
+                
+                <MultilingualInput
+                  label="Country"
+                  value={newCompany.country as LocalizedContent}
+                  onChange={(value) => setNewCompany({ ...newCompany, country: value })}
+                  placeholder="Enter country"
+                />
                 
                 <div className="grid grid-cols-4 items-start gap-4">
                   <Label htmlFor="industries" className="text-right pt-2">
@@ -483,32 +512,6 @@ export default function CompaniesPage() {
                     className="col-span-3"
                   />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="city" className="text-right">
-                    City
-                  </Label>
-                  <Input
-                    id="city"
-                    value={newCompany.city}
-                    onChange={(e) =>
-                      setNewCompany({ ...newCompany, city: e.target.value })
-                    }
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="country" className="text-right">
-                    Country
-                  </Label>
-                  <Input
-                    id="country"
-                    value={newCompany.country}
-                    onChange={(e) =>
-                      setNewCompany({ ...newCompany, country: e.target.value })
-                    }
-                    className="col-span-3"
-                  />
-                </div>
                 <div className="grid grid-cols-4 items-start gap-4">
                   <Label htmlFor="logo" className="text-right pt-2">
                     Logo
@@ -544,26 +547,13 @@ export default function CompaniesPage() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="description" className="text-right">
-                    Description
-                  </Label>
-                  <Textarea
-                    id="description"
-                    value={newCompany.description}
-                    onChange={(e) =>
-                      setNewCompany({ ...newCompany, description: e.target.value })
-                    }
-                    className="col-span-3"
-                    rows={3}
-                  />
-                </div>
+
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleAddCompany} disabled={!newCompany.name}>
+                <Button onClick={handleAddCompany} disabled={!newCompany.name || (typeof newCompany.name === 'object' && !newCompany.name.en)}>
                   {isEditMode ? "Update Company" : "Save Company"}
                 </Button>
               </DialogFooter>

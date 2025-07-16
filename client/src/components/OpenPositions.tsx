@@ -25,18 +25,18 @@ export const OpenPositions = ({
   selectedPositions,
   hasSearched
 }: OpenPositionsProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // Use React Query with cache-busting but stable key
+  // Use React Query with language parameter for localization
   const [refreshKey, setRefreshKey] = useState(0);
   const { data: positionsResponse, isLoading } = useQuery({
-    queryKey: ['/api/positions', refreshKey], // Stable key that we can control
+    queryKey: ['/api/positions', refreshKey, i18n.language], // Include current language
     queryFn: async () => {
-      const response = await fetch(`/api/positions?_t=${Date.now()}`, {
+      const response = await fetch(`/api/positions?language=${i18n.language}&_t=${Date.now()}`, {
         method: 'GET',
         headers: {
           'Cache-Control': 'no-cache',

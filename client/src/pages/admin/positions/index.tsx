@@ -13,6 +13,8 @@ import { Position } from '../../../types/position';
 import { Department } from '../../../types/department';
 import { Loader2, Plus, Briefcase, Search } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { MultilingualInput } from '../../../components/ui/multilingual-input';
+import { LocalizedContent } from '@shared/schema';
 
 export default function PositionsPage() {
   const [location] = useLocation();
@@ -36,12 +38,12 @@ export default function PositionsPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentPosition, setCurrentPosition] = useState<Position | null>(null);
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    salaryRange: '',
-    employmentType: '',
+    title: { en: '' } as LocalizedContent,
+    description: { en: '' } as LocalizedContent,
+    salaryRange: { en: '' } as LocalizedContent,
+    employmentType: { en: '' } as LocalizedContent,
     departmentId: '',
-    applyLink: ''
+    applyLink: { en: '' } as LocalizedContent
   });
 
   // Employment type options
@@ -153,10 +155,15 @@ export default function PositionsPage() {
     });
   });
 
-  // Handle form input changes
+  // Handle form input changes for non-multilingual fields (legacy compatibility)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    // For backward compatibility, handle string values by converting to LocalizedContent
+    if (['title', 'description', 'salaryRange', 'employmentType', 'applyLink'].includes(name)) {
+      setFormData(prev => ({ ...prev, [name]: { en: value } as LocalizedContent }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   // Handle select changes
@@ -167,7 +174,7 @@ export default function PositionsPage() {
   // Handle create position
   const handleCreatePosition = async () => {
     try {
-      if (!formData.title || !formData.departmentId) {
+      if (!formData.title || (typeof formData.title === 'object' && !formData.title.en) || !formData.departmentId) {
         toast({
           title: 'Validation Error',
           description: 'Position title and department are required.',
@@ -207,12 +214,12 @@ export default function PositionsPage() {
   const handleEditPosition = (position: Position) => {
     setCurrentPosition(position);
     setFormData({
-      title: position.title,
-      description: position.description || '',
-      salaryRange: position.salaryRange || '',
-      employmentType: position.employmentType || '',
+      title: typeof position.title === 'string' ? { en: position.title } : position.title,
+      description: typeof position.description === 'string' ? { en: position.description } : position.description || { en: '' },
+      salaryRange: typeof position.salaryRange === 'string' ? { en: position.salaryRange } : position.salaryRange || { en: '' },
+      employmentType: typeof position.employmentType === 'string' ? { en: position.employmentType } : position.employmentType || { en: '' },
       departmentId: position.departmentId || '',
-      applyLink: position.applyLink || ''
+      applyLink: typeof position.applyLink === 'string' ? { en: position.applyLink } : position.applyLink || { en: '' }
     });
     setIsEditDialogOpen(true);
   };
@@ -222,7 +229,7 @@ export default function PositionsPage() {
     if (!currentPosition) return;
 
     try {
-      if (!formData.title) {
+      if (!formData.title || (typeof formData.title === 'object' && !formData.title.en)) {
         toast({
           title: 'Validation Error',
           description: 'Position title is required.',
@@ -286,12 +293,12 @@ export default function PositionsPage() {
   // Reset form
   const resetForm = () => {
     setFormData({
-      title: '',
-      description: '',
-      salaryRange: '',
-      employmentType: '',
+      title: { en: '' } as LocalizedContent,
+      description: { en: '' } as LocalizedContent,
+      salaryRange: { en: '' } as LocalizedContent,
+      employmentType: { en: '' } as LocalizedContent,
       departmentId: '',
-      applyLink: ''
+      applyLink: { en: '' } as LocalizedContent
     });
     setCurrentPosition(null);
   };

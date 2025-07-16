@@ -72,7 +72,7 @@ export const positions = pgTable("positions", {
   qualifications: json("qualifications").$type<LocalizedContent>(), // Localized qualifications
   responsibilities: json("responsibilities").$type<LocalizedContent>(), // Localized responsibilities
   departmentId: integer("departmentid").notNull(),
-  applyLink: text("applyLink"),
+  applyLink: json("apply_link").$type<LocalizedContent>(), // Localized apply links for different languages
   createdAt: timestamp("created_at").defaultNow(),
 });
 
