@@ -41,7 +41,7 @@ export default function PositionsPage() {
     title: { en: '' } as LocalizedContent,
     description: { en: '' } as LocalizedContent,
     salaryRange: { en: '' } as LocalizedContent,
-    employmentType: { en: '' } as LocalizedContent,
+    employmentType: 'Full-time',
     departmentId: '',
     applyLink: { en: '' } as LocalizedContent
   });
