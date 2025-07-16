@@ -248,22 +248,5 @@
     "loading": "Lavozim ma'lumotlari yuklanmoqda...",
     "error": "Lavozim ma'lumotlarini yuklab bo'lmadi",
     "no_data": "Ariza ma'lumotlari mavjud emas"
-  },
-
-  "positions_section": {
-    "all_positions_title": "Barcha mavjud lavozimlar",
-    "apply_now": "Ariza topshirish",
-    "loading": "Lavozimlar yuklanmoqda...",
-    "error": "Lavozimlarni yuklab bo'lmadi",
-    "no_positions": "Mavjud lavozimlar yo'q",
-    "more_companies": "Ko'proq kompaniyalar",
-    "page_info": "{total}dan {page}-sahifa",
-    "previous": "Oldingi",
-    "next": "Keyingi",
-    "company": "Kompaniya",
-    "department": "Bo'lim",
-    "location": "Joylashuv",
-    "employment_type": "Ish turi",
-    "salary_range": "Maosh"
   }
 }

@@ -92,9 +92,6 @@ export interface IStorage {
   getPositionClickStats(positionId?: number): Promise<{ positionId: number; viewCount: number; applyCount: number; }[]>;
   getDashboardStats(): Promise<{ totalViews: number; totalApplies: number; }>;
   getPositionApplicantCounts(): Promise<{ positionId: number; applicantCount: number; positionTitle: string; }[]>;
-  getTopPositionsWithCounts(): Promise<{ positionId: number; applicantCount: number; positionTitle: string; companyName: string; departmentName: string; }[]>;
-  getAllPositionsPaginated(offset: number, limit: number): Promise<{ id: number; title: string; description: string; companyName: string; departmentName: string; city: string; country: string; salaryRange: string; employmentType: string; applyLink: string; }[]>;
-  getPositionsCount(): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -541,84 +538,6 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting position applicant counts:', error);
       return [];
-    }
-  }
-
-  // Get top 3 positions with highest application counts including company/department info
-  async getTopPositionsWithCounts(): Promise<{ positionId: number; applicantCount: number; positionTitle: string; companyName: string; departmentName: string; }[]> {
-    try {
-      // For demonstration, provide enhanced sample data with company and department info
-      const topPositions = [
-        { 
-          positionId: 7, 
-          applicantCount: 43, 
-          positionTitle: "HR Generalist",
-          companyName: "Millat Umidi University",
-          departmentName: "HR Department"
-        },
-        { 
-          positionId: 6, 
-          applicantCount: 28, 
-          positionTitle: "English Teacher",
-          companyName: "Millat Umidi Private School",
-          departmentName: "Language Department"
-        },
-        { 
-          positionId: 5, 
-          applicantCount: 19, 
-          positionTitle: "Software Developer",
-          companyName: "Millat Umidi Group",
-          departmentName: "IT Department"
-        }
-      ];
-      
-      console.log('Top positions with counts (demo data):', topPositions);
-      return topPositions;
-    } catch (error) {
-      console.error('Error getting top positions with counts:', error);
-      return [];
-    }
-  }
-
-  // Get all positions with pagination and enhanced data
-  async getAllPositionsPaginated(offset: number, limit: number): Promise<{ id: number; title: string; description: string; companyName: string; departmentName: string; city: string; country: string; salaryRange: string; employmentType: string; applyLink: string; }[]> {
-    try {
-      // Get all positions from database
-      const allPositions = await this.getAllPositions();
-      
-      // For demonstration, enhance with company and department data
-      const enhancedPositions = allPositions.map(position => ({
-        id: position.id,
-        title: position.title,
-        description: position.description || 'Join our dynamic team and make a meaningful impact.',
-        companyName: "Millat Umidi University", // In production, join with companies table
-        departmentName: "HR Department", // In production, join with departments table
-        city: position.city || "Tashkent",
-        country: position.country || "Uzbekistan",
-        salaryRange: position.salaryRange || "Competitive salary",
-        employmentType: position.employmentType || "Full-time",
-        applyLink: position.applyLink || "#"
-      }));
-      
-      // Apply pagination
-      const paginatedResults = enhancedPositions.slice(offset, offset + limit);
-      
-      console.log(`All positions paginated (offset: ${offset}, limit: ${limit}):`, paginatedResults.length);
-      return paginatedResults;
-    } catch (error) {
-      console.error('Error getting paginated positions:', error);
-      return [];
-    }
-  }
-
-  // Get total count of positions for pagination
-  async getPositionsCount(): Promise<number> {
-    try {
-      const allPositions = await this.getAllPositions();
-      return allPositions.length;
-    } catch (error) {
-      console.error('Error getting positions count:', error);
-      return 0;
     }
   }
 }

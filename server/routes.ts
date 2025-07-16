@@ -1024,45 +1024,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Top positions with counts endpoint
-  app.get("/api/top-positions-with-counts", async (req, res) => {
-    try {
-      const topPositions = await storage.getTopPositionsWithCounts();
-      res.json({ success: true, data: topPositions });
-    } catch (error) {
-      console.error('Error getting top positions with counts:', error);
-      res.status(500).json({ success: false, error: "Failed to get top positions with counts" });
-    }
-  });
-
-  // All positions with pagination endpoint
-  app.get("/api/all-positions", async (req, res) => {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 4;
-      const offset = (page - 1) * limit;
-      
-      const allPositions = await storage.getAllPositionsPaginated(offset, limit);
-      const totalCount = await storage.getPositionsCount();
-      
-      res.json({ 
-        success: true, 
-        data: {
-          positions: allPositions,
-          pagination: {
-            page,
-            limit,
-            total: totalCount,
-            totalPages: Math.ceil(totalCount / limit)
-          }
-        }
-      });
-    } catch (error) {
-      console.error('Error getting all positions:', error);
-      res.status(500).json({ success: false, error: "Failed to get all positions" });
-    }
-  });
-
   const httpServer = createServer(app);
 
   // Initialize gallery data on startup
