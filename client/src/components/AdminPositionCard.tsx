@@ -142,7 +142,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
 
   return (
     <Card
-      className="animate-fade-in group relative overflow-hidden border border-border bg-white dark:bg-gray-900 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out h-[480px] w-full flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-border bg-white dark:bg-gray-900 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out h-[440px] w-full flex flex-col"
     >
       {/* glass reflection */}
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -167,13 +167,15 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
       </CardHeader>
 
       <CardContent className="space-y-3 pb-2 relative z-10 flex-1 flex flex-col">
-        <CardTitle className="text-base font-semibold tracking-tight text-foreground group-hover:text-primary job-card-admin-title">
+        <CardTitle className="text-base font-semibold tracking-tight leading-snug text-foreground group-hover:text-primary line-clamp-2">
           {position.title}
         </CardTitle>
 
         {inheritedData.description && (
-          <p className="text-xs text-muted-foreground job-card-admin-description">
-            {inheritedData.description}
+          <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2rem]">
+            {inheritedData.description.length > 80 
+              ? `${inheritedData.description.substring(0, 80)}...` 
+              : inheritedData.description}
           </p>
         )}
 

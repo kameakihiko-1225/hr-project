@@ -247,17 +247,17 @@ export const OpenPositions = ({
           {filteredPositions.length > 0 ? (
             <>
               {viewMode === "grid" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
                   {currentPositions.map((pos, index) => (
-                    <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[480px]">
+                    <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in">
                       <PositionCard position={pos} />
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col space-y-6">
+                <div className="flex flex-col space-y-4">
                   {currentPositions.map((pos, index) => (
-                    <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in max-w-none">
+                    <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in">
                       <PositionCard position={pos} showDepartment={true} />
                     </div>
                   ))}
