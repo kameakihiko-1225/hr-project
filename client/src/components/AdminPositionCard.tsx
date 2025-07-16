@@ -119,19 +119,19 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
 
   const CompanyAvatar = () => (
-    <Avatar className="h-12 w-12 border border-gray-200 dark:border-gray-600 shadow-sm">
+    <Avatar className="h-20 w-20 border-2 border-white/20 shadow-lg">
       {inheritedData.logoUrl && !logoError ? (
         <AvatarImage 
           src={inheritedData.logoUrl} 
           alt={inheritedData.companyName} 
-          className="object-contain object-center w-full h-full p-1"
+          className="object-contain object-center w-full h-full p-2"
           loading="lazy"
           decoding="async"
           onError={handleLogoError} 
         />
       ) : (
         <AvatarFallback 
-          className="text-white font-medium text-sm"
+          className="text-white font-semibold text-xl"
           style={{ backgroundColor: inheritedData.companyColor }}
         >
           {inheritedData.companyName.charAt(0)}
@@ -142,115 +142,179 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
 
   return (
     <Card
-      className="animate-fade-in group relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600 hover:-translate-y-1 transition-all duration-300 h-[400px] w-full flex flex-col p-4"
+      className="animate-fade-in group relative overflow-hidden border border-border bg-white dark:bg-gray-900 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out h-[480px] w-full flex flex-col"
     >
-      {/* Posted time badge - top right */}
-      {postedAgo && (
-        <div className="absolute top-3 right-3 z-10">
-          <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full px-2 py-1">
-            {postedAgo}
-          </span>
-        </div>
-      )}
+      {/* glass reflection */}
+      <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      {/* gradient ring on hover */}
+      <span className="absolute inset-0 rounded-[inherit] bg-gradient-to-br from-blue-600/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      {/* Header with company info */}
-      <div className="flex items-start gap-3 mb-3">
+
+
+      <CardHeader className="flex items-start gap-3 pb-2 relative z-10">
         <CompanyAvatar />
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm text-gray-600 dark:text-gray-400 font-medium leading-tight">
+        <div className="flex-1">
+          <h3 className="font-semibold text-sm leading-tight text-foreground">
             {inheritedData.companyName}
           </h3>
           {showDepartment && (
-            <p className="text-xs text-gray-500 dark:text-gray-500 truncate flex items-center gap-1 mt-1">
+            <p className="text-xs text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
               <Building2 className="h-3 w-3" />
               {inheritedData.departmentName}
             </p>
           )}
         </div>
-      </div>
+      </CardHeader>
 
-      {/* Content area */}
-      <div className="flex-1 flex flex-col justify-between">
-        {/* Job title */}
-        <div className="mb-3">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 min-h-[3rem]">
-            {position.title}
-          </h2>
-        </div>
+      <CardContent className="space-y-3 pb-2 relative z-10 flex-1 flex flex-col">
+        <CardTitle className="text-base font-semibold tracking-tight text-foreground group-hover:text-primary job-card-admin-title">
+          {position.title}
+        </CardTitle>
 
-        {/* Description */}
         {inheritedData.description && (
-          <div className="mb-3">
-            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
-              {inheritedData.description}
-            </p>
-          </div>
+          <p className="text-xs text-muted-foreground job-card-admin-description">
+            {inheritedData.description}
+          </p>
         )}
 
-        {/* Tags and meta info */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        {/* Salary after description */}
+        {position.salaryRange && (
+          <p className="text-xs font-medium text-foreground flex items-center gap-1 mt-1">
+            <DollarSign className="h-3 w-3" /> {position.salaryRange}
+          </p>
+        )}
+
+        <div className="flex flex-wrap gap-3 mt-auto text-xs text-muted-foreground">
           {(inheritedData.city || inheritedData.country) && (
-            <span className="inline-flex items-center gap-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs rounded-full px-2 py-1">
+            <span className="flex items-center gap-1">
               <MapPin className="h-3 w-3" /> 
               {inheritedData.city}{inheritedData.country ? `, ${inheritedData.country}` : ''}
             </span>
           )}
           {position.employmentType && (
-            <span className="inline-flex items-center gap-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs rounded-full px-2 py-1">
-              <Briefcase className="h-3 w-3" /> 
-              {position.employmentType}
-            </span>
-          )}
-          {position.salaryRange && (
-            <span className="inline-flex items-center gap-1 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full px-2 py-1 font-medium">
-              <DollarSign className="h-3 w-3" /> 
-              {position.salaryRange}
-            </span>
+            <span className="flex items-center gap-1"><Briefcase className="h-3 w-3" /> {position.employmentType}</span>
           )}
         </div>
+      </CardContent>
 
-        {/* Action buttons - inside card at bottom */}
-        <div className="grid grid-cols-3 gap-2 mt-auto">
+      <CardFooter className="flex flex-col gap-2 border-t border-border pt-2 pb-3 relative z-10 mt-auto shrink-0">
+        {postedAgo && (
+          <span className="text-xs text-muted-foreground flex items-center gap-1 justify-center"><Clock className="h-3 w-3" /> {postedAgo}</span>
+        )}
+
+        {/* Action buttons row */}
+        <div className="flex justify-center gap-2 w-full">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setIsCompanyModalOpen(true)}
-            className="text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            className="flex items-center gap-1 flex-1 max-w-[80px]"
           >
-            <Building2 className="h-3 w-3 mr-1" />
+            <Building2 className="h-3 w-3" />
             Company
           </Button>
-          
           <Button
             variant="outline"
             size="sm"
             onClick={() => setIsDepartmentModalOpen(true)}
-            className="text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            className="flex items-center gap-1 flex-1 max-w-[80px]"
           >
-            <Briefcase className="h-3 w-3 mr-1" />
+            <Briefcase className="h-3 w-3" />
             Dept
           </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsDetailsDialogOpen(true)}
-            className="text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            <ExternalLink className="h-3 w-3 mr-1" />
-            Details
-          </Button>
+          <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="flex items-center gap-1 flex-1 max-w-[90px]">
+                <ExternalLink className="h-3 w-3" />
+                Details
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{position.title}</DialogTitle>
+              <DialogDescription>Position Details</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div>
+                <h4 className="text-sm font-medium mb-2">Description</h4>
+                <p className="text-sm text-muted-foreground">
+                  {inheritedData.description || 'No description provided'}
+                </p>
+              </div>
+              
+              {position.salaryRange && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Salary Range</h4>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    <span>{position.salaryRange}</span>
+                  </div>
+                </div>
+              )}
+              
+              {position.employmentType && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Employment Type</h4>
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4" />
+                    <span>{position.employmentType}</span>
+                  </div>
+                </div>
+              )}
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2">Department</h4>
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  <span>{inheritedData.departmentName}</span>
+                </div>
+                <div className="flex items-center gap-2 mt-1 ml-6">
+                  <span className="text-sm text-muted-foreground">
+                    {inheritedData.companyName}
+                  </span>
+                </div>
+              </div>
+              
+              {position.applyLink && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Apply Link</h4>
+                  <div className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    <a 
+                      href={position.applyLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline truncate max-w-[250px]"
+                    >
+                      {position.applyLink}
+                    </a>
+                  </div>
+                </div>
+              )}
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2">Created</h4>
+                <p className="text-sm text-muted-foreground">
+                  {new Date(position.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         </div>
 
         {/* Edit and Delete buttons for admin */}
         {(onEdit || onDelete) && (
-          <div className="grid grid-cols-2 gap-2 mt-3">
+          <div className="flex justify-center gap-2 w-full">
             {onEdit && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleEdit}
-                className="text-xs font-medium flex items-center gap-1"
+                className="flex items-center gap-1"
               >
                 <Pencil className="h-3 w-3" />
                 Edit
@@ -261,7 +325,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
                 variant="outline"
                 size="sm"
                 onClick={() => setIsDeleteDialogOpen(true)}
-                className="text-xs font-medium text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 flex items-center gap-1"
+                className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 flex items-center gap-1"
               >
                 <Trash2 className="h-3 w-3" />
                 Delete
@@ -269,7 +333,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
             )}
           </div>
         )}
-      </div>
+      </CardFooter>
       
       {/* Company Info Modal */}
       <CompanyInfoModal 
@@ -285,100 +349,6 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
         isOpen={isDepartmentModalOpen}
         onClose={() => setIsDepartmentModalOpen(false)}
       />
-
-      {/* Delete Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Position</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete the position "{position.title}"? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Details Dialog */}
-      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>{position.title}</DialogTitle>
-            <DialogDescription>Position Details</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <h4 className="text-sm font-medium mb-2">Description</h4>
-              <p className="text-sm text-muted-foreground">
-                {inheritedData.description || 'No description provided'}
-              </p>
-            </div>
-            
-            {position.salaryRange && (
-              <div>
-                <h4 className="text-sm font-medium mb-2">Salary Range</h4>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  <span>{position.salaryRange}</span>
-                </div>
-              </div>
-            )}
-            
-            {position.employmentType && (
-              <div>
-                <h4 className="text-sm font-medium mb-2">Employment Type</h4>
-                <div className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  <span>{position.employmentType}</span>
-                </div>
-              </div>
-            )}
-            
-            <div>
-              <h4 className="text-sm font-medium mb-2">Department</h4>
-              <div className="flex items-center gap-2">
-                <Building2 className="h-4 w-4" />
-                <span>{inheritedData.departmentName}</span>
-              </div>
-              <div className="flex items-center gap-2 mt-1 ml-6">
-                <span className="text-sm text-muted-foreground">
-                  {inheritedData.companyName}
-                </span>
-              </div>
-            </div>
-            
-            {position.applyLink && (
-              <div>
-                <h4 className="text-sm font-medium mb-2">Apply Link</h4>
-                <div className="flex items-center gap-2">
-                  <ExternalLink className="h-4 w-4" />
-                  <a 
-                    href={position.applyLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline truncate max-w-[250px]"
-                  >
-                    {position.applyLink}
-                  </a>
-                </div>
-              </div>
-            )}
-            
-            <div>
-              <h4 className="text-sm font-medium mb-2">Created</h4>
-              <p className="text-sm text-muted-foreground">
-                {new Date(position.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </Card>
   );
 });
