@@ -203,30 +203,30 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
         )}
 
         {/* Action buttons row */}
-        <div className="flex justify-center gap-2 w-full">
+        <div className="flex justify-center gap-1 w-full">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setIsCompanyModalOpen(true)}
-            className="flex items-center gap-1 flex-1 max-w-[80px]"
+            className="flex items-center gap-1 flex-1 min-w-0 h-8 text-xs"
           >
-            <Building2 className="h-3 w-3" />
-            Company
+            <Building2 className="h-3 w-3 flex-shrink-0" />
+            <span className="truncate">Company</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setIsDepartmentModalOpen(true)}
-            className="flex items-center gap-1 flex-1 max-w-[80px]"
+            className="flex items-center gap-1 flex-1 min-w-0 h-8 text-xs"
           >
-            <Briefcase className="h-3 w-3" />
-            Dept
+            <Briefcase className="h-3 w-3 flex-shrink-0" />
+            <span className="truncate">Dept</span>
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center gap-1 flex-1 max-w-[90px]">
-                <ExternalLink className="h-3 w-3" />
-                Details
+              <Button variant="outline" size="sm" className="flex items-center gap-1 flex-1 min-w-0 h-8 text-xs">
+                <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">Details</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">

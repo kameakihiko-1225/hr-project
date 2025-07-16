@@ -299,36 +299,36 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
         )}
 
-        <div className="flex items-center gap-2 w-full">
+        <div className="flex items-center gap-1 w-full">
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300"
+            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
             }}
           >
-            <Building2 className="h-3 w-3" />
-            <span className="hidden sm:inline">{t('position_card.company_info')}</span>
+            <Building2 className="h-3 w-3 flex-shrink-0" />
+            <span className="hidden lg:inline truncate">{t('position_card.company_info')}</span>
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300"
+            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
             }}
           >
-            <Briefcase className="h-3 w-3" />
-            <span className="hidden sm:inline">{t('position_card.department_info')}</span>
+            <Briefcase className="h-3 w-3 flex-shrink-0" />
+            <span className="hidden lg:inline truncate">{t('position_card.department_info')}</span>
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300">
-                <ExternalLink className="h-3 w-3" />
-                <span className="hidden sm:inline">{t('position_card.view_details')}</span>
+              <Button variant="outline" size="sm" className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0">
+                <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                <span className="hidden lg:inline truncate">{t('position_card.view_details')}</span>
               </Button>
             </DialogTrigger>
           <DialogContent className="max-w-md">
