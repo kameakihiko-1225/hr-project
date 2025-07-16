@@ -58,27 +58,18 @@ export const TopAppliedPositions = () => {
         <div className="text-center mb-6">
           <Skeleton className="h-8 w-64 mx-auto" />
         </div>
-        <div className="relative">
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="flex gap-6 pb-4" style={{ minWidth: 'max-content' }}>
-              {[1, 2, 3].map((i) => (
-                <div 
-                  key={i} 
-                  className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-800 flex-shrink-0"
-                  style={{ 
-                    width: '320px',
-                    minWidth: '320px'
-                  }}
-                >
-                  <div className="text-center">
-                    <Skeleton className="h-6 w-8 mx-auto mb-2" />
-                    <Skeleton className="h-6 w-32 mx-auto mb-3" />
-                    <Skeleton className="h-12 w-16 mx-auto mb-2" />
-                    <Skeleton className="h-4 w-20 mx-auto" />
-                  </div>
+        <div className="flex justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-800 min-w-[280px]">
+                <div className="text-center">
+                  <Skeleton className="h-6 w-8 mx-auto mb-2" />
+                  <Skeleton className="h-6 w-32 mx-auto mb-3" />
+                  <Skeleton className="h-12 w-16 mx-auto mb-2" />
+                  <Skeleton className="h-4 w-20 mx-auto" />
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -107,61 +98,44 @@ export const TopAppliedPositions = () => {
         </h3>
       </div>
       
-      {/* Top Position Cards - Horizontally Scrollable Triple View */}
-      <div className="relative">
-        {/* Scroll container */}
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-6 pb-4" style={{ minWidth: 'max-content' }}>
-            {topPositions.map((position, index) => (
-              <div
-                key={position.positionId}
-                className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 flex-shrink-0"
-                style={{ 
-                  width: '320px',
-                  minWidth: '320px'
-                }}
-              >
-                <div className="text-center">
-                  {/* Rank Badge */}
-                  <div className="flex items-center justify-center mb-3">
-                    <span className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-bold rounded-full">
-                      #{index + 1}
-                    </span>
+      {/* Top Position Cards - Centered for 1 or 2 cards */}
+      <div className="flex justify-center">
+        <div className={`grid gap-6 max-w-4xl ${
+          topPositions.length === 1 ? 'grid-cols-1' :
+          topPositions.length === 2 ? 'grid-cols-1 sm:grid-cols-2' :
+          'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+        }`}>
+          {topPositions.map((position, index) => (
+            <div
+              key={position.positionId}
+              className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 min-w-[280px]"
+            >
+              <div className="text-center">
+                {/* Rank Badge */}
+                <div className="flex items-center justify-center mb-3">
+                  <span className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-bold rounded-full">
+                    #{index + 1}
+                  </span>
+                </div>
+                
+                {/* Position Title */}
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2">
+                  {position.positionTitle}
+                </h4>
+                
+                {/* Applied Count */}
+                <div className="mb-2">
+                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                    {position.appliedCount.toLocaleString()}
                   </div>
-                  
-                  {/* Position Title */}
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2">
-                    {position.positionTitle}
-                  </h4>
-                  
-                  {/* Applied Count */}
-                  <div className="mb-2">
-                    <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                      {position.appliedCount.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                      {t('top_applied_positions.applied')}
-                    </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                    {t('top_applied_positions.applied')}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Scroll indicators */}
-        {topPositions.length > 2 && (
-          <div className="flex justify-center mt-4">
-            <div className="flex space-x-2">
-              {Array.from({ length: Math.ceil(topPositions.length / 3) }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full opacity-50"
-                />
-              ))}
             </div>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
     </div>
   );
