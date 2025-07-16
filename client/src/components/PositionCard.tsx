@@ -209,7 +209,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[400px] w-full max-w-[380px] flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[440px] w-full max-w-[380px] flex flex-col"
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -294,7 +294,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-center gap-3 border-t border-border pt-3 pb-3 relative z-10 mt-auto shrink-0">
+      <CardFooter className="flex flex-col items-center gap-3 border-t border-border pt-3 pb-4 relative z-10 mt-auto shrink-0">
         {postedAgo && (
           <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
         )}

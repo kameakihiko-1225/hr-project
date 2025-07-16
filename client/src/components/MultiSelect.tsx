@@ -142,12 +142,12 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
       {isOpen && !disabled && (
         <div 
           ref={dropdownRef}
-          className="absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto 
+          className="absolute top-full left-0 right-0 mt-2 max-h-48 overflow-y-auto 
                      bg-white border border-gray-200 rounded-lg shadow-xl z-[60] animate-fade-in min-w-full"
           onMouseEnter={handleMouseEnter}
         >
-          <div className="sticky top-0 bg-white border-b border-gray-200 p-3 flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-700 truncate flex-1 mr-2">
+          <div className="sticky top-0 bg-white border-b border-gray-200 p-2 flex justify-between items-center">
+            <span className="text-xs font-medium text-gray-600 truncate flex-1 mr-2">
               {selected.length > 0 ? `${selected.length} selected` : 'Available options'}
             </span>
             <button
@@ -158,7 +158,7 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
               className="p-1 hover:bg-gray-100 rounded-full flex-shrink-0"
               aria-label="Close dropdown"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-3 h-3 text-gray-500" />
             </button>
           </div>
           
@@ -167,7 +167,7 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
               <div
                 key={option}
                 className={`
-                  px-4 py-3 cursor-pointer transition-all duration-200 hover:bg-blue-50
+                  px-3 py-2 cursor-pointer transition-all duration-200 hover:bg-blue-50
                   ${selected.includes(option) ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}
                 `}
                 onClick={() => toggleOption(option)}
