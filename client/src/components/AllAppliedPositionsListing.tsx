@@ -114,36 +114,37 @@ export const AllAppliedPositionsListing = () => {
         </h3>
       </div>
       
-      {/* Position Listing with Futuristic Design */}
-      <div className="space-y-4">
-        {displayedPositions.map((position) => (
+      {/* Position Listing with Simplicity & Modern View Design */}
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+        {displayedPositions.map((position, index) => (
           <div
             key={position.positionId}
-            className="group bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
+            className={`group flex items-center justify-between px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 ${
+              index !== displayedPositions.length - 1 ? 'border-b border-gray-100 dark:border-gray-700' : ''
+            }`}
           >
-            {/* Gradient Background Effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-            
-            <div className="relative flex items-center justify-between">
-              {/* Position Info */}
-              <div className="flex-1">
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
-                  {position.positionTitle}
-                </h4>
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <Users className="h-4 w-4 mr-1" />
-                  <span className="font-medium">
-                    {position.appliedCount.toLocaleString()} {t('all_applied_positions.applied')}
-                  </span>
-                </div>
+            {/* Left Side: Numbering */}
+            <div className="flex items-center space-x-4 flex-1">
+              <div className="flex-shrink-0 w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-sm font-semibold text-gray-600 dark:text-gray-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all duration-200">
+                {index + 1}
               </div>
               
-              {/* Applied Count Badge */}
-              <div className="ml-4">
-                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-200">
-                  {position.appliedCount.toLocaleString()}
-                </div>
+              {/* Position Name */}
+              <div className="flex-1 min-w-0">
+                <h4 className="text-lg font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 truncate">
+                  {position.positionTitle}
+                </h4>
               </div>
+            </div>
+            
+            {/* Right Side: Applied Count */}
+            <div className="flex-shrink-0 flex items-center space-x-2">
+              <span className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+                {position.appliedCount}
+              </span>
+              <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                {t('all_applied_positions.applied')}
+              </span>
             </div>
           </div>
         ))}
@@ -151,15 +152,16 @@ export const AllAppliedPositionsListing = () => {
       
       {/* View More/Less Button */}
       {allPositions.length > 4 && (
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-6">
           <Button
             onClick={showAll ? handleViewLess : handleViewMore}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+            variant="outline"
+            className="group border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-6 py-2 rounded-lg font-medium transition-all duration-200"
           >
             {showAll ? (
               <>
                 {t('all_applied_positions.view_less')}
-                <ChevronRight className="h-4 w-4 ml-2 rotate-90 group-hover:-translate-y-1 transition-transform duration-200" />
+                <ChevronRight className="h-4 w-4 ml-2 rotate-180 group-hover:-translate-x-1 transition-transform duration-200" />
               </>
             ) : (
               <>
