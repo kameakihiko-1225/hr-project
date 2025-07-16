@@ -29,15 +29,42 @@ export const FounderSection = () => {
                 className="w-96 h-auto lg:w-[28rem] lg:h-auto object-contain drop-shadow-2xl"
                 style={{ clipPath: 'inset(0 0 20% 0)' }}
               />
-              
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm px-6 py-3 rounded-lg shadow-lg">
-                <h3 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                  Umidjon Ishmukhamedov
-                </h3>
-                <p className="text-base lg:text-lg text-blue-600 dark:text-blue-400 font-semibold">
-                  Founder of Millat Umidi Group
-                </p>
-              </div>
+            </div>
+            
+            {/* Curved arrow pointing to image */}
+            <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 lg:bottom-16">
+              <svg 
+                width="120" 
+                height="60" 
+                viewBox="0 0 120 60" 
+                className="text-gray-600 dark:text-gray-400"
+              >
+                <path
+                  d="M20 50 Q60 20 100 50"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M15 45 L20 50 L25 45"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            
+            {/* Founder name and title positioned below arrow */}
+            <div className="text-center mt-4 lg:mt-6">
+              <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                Umidjon Ishmukhamedov
+              </h3>
+              <p className="text-lg text-blue-600 dark:text-blue-400 font-semibold">
+                Founder of Millat Umidi Group
+              </p>
             </div>
           </div>
 
@@ -91,18 +118,6 @@ export const FounderSection = () => {
                   />
                 </svg>
               </Button>
-            </div>
-
-            {/* Optional: Add some stats or achievements */}
-            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">15+</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Years of Experience</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">1000+</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Students Impacted</div>
-              </div>
             </div>
           </div>
         </div>
