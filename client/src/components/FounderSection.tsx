@@ -24,9 +24,9 @@ export const FounderSection = () => {
           <div className="flex flex-col items-center lg:items-center space-y-6 order-2 lg:order-1">
             <div className="relative">
               <img
-                src="/logo png.png"
+                src="/umidjon-founder.jpg"
                 alt="Umidjon Ishmukhamedov"
-                className="w-72 h-auto lg:w-80 lg:h-auto object-cover object-top drop-shadow-2xl"
+                className="w-72 h-auto lg:w-80 lg:h-auto object-cover object-top drop-shadow-2xl rounded-lg"
                 style={{ clipPath: 'inset(0 0 15% 0)' }}
               />
             </div>
