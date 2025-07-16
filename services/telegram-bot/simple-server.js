@@ -169,12 +169,14 @@ app.post('/webhook', async (req, res) => {
       UF_CRM_1752622669492: ageRaw, // age field
     };
     
-    // Add phone field directly to contact creation with proper crm_multifield format (no + sign)
-    contactFields.PHONE = phone ? [{ VALUE: phone, VALUE_TYPE: 'WORK' }] : [];
+    // Add phone field with + sign as per Bitrix24 format requirement
     if (phone) {
-      console.log('[TELEGRAM-BOT] Adding phone field to contactFields:', phone);
+      const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
+      contactFields.PHONE = [{ VALUE: formattedPhone, VALUE_TYPE: 'WORK' }];
+      console.log('[TELEGRAM-BOT] Adding phone field to contactFields:', formattedPhone);
       console.log('[TELEGRAM-BOT] contactFields.PHONE after assignment:', contactFields.PHONE);
     } else {
+      contactFields.PHONE = [];
       console.log('[TELEGRAM-BOT] No phone number provided, using empty array');
     }
     
