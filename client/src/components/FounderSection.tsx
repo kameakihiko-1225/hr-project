@@ -21,7 +21,7 @@ export const FounderSection = () => {
       <div className="max-w-6xl mx-auto relative">
         <div className="grid lg:grid-cols-2 gap-8 items-start">
           {/* Left side - Founder Photo */}
-          <div className="flex flex-col items-center lg:items-center space-y-6 order-2 lg:order-1">
+          <div className="flex flex-col items-center lg:items-center space-y-3 order-2 lg:order-1">
             <div className="relative overflow-hidden">
               <img
                 src="/Umidjon_aka-removebg-preview_1752578772239.png"
@@ -31,8 +31,8 @@ export const FounderSection = () => {
               />
             </div>
             
-            <div className="text-center lg:text-left">
-              <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="text-center lg:text-center">
+              <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                 Umidjon Ishmukhamedov
               </h3>
               <p className="text-lg text-blue-600 dark:text-blue-400 font-semibold">
