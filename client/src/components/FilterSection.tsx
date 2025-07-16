@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Filter, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCompanies, getDepartments, getPositions } from "@/lib/api";
+import { useTranslation } from 'react-i18next';
 
 interface FilterSectionProps {
   selectedCompanies: string[];
@@ -30,6 +31,7 @@ export const FilterSection = ({
   setSelectedPositions,
   onFilterComplete
 }: FilterSectionProps) => {
+  const { t } = useTranslation();
   const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>([]);
   const [departmentOptions, setDepartmentOptions] = useState<DepartmentOption[]>([]);
   const [positionOptions, setPositionOptions] = useState<PositionOption[]>([]);
@@ -142,10 +144,10 @@ export const FilterSection = ({
       <div className="max-w-7xl mx-auto relative">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Find Your Perfect Role
+            {t('filter.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Use our intelligent filters to discover opportunities that match your skills and aspirations
+            {t('filter.subtitle')}
           </p>
         </div>
         
@@ -182,39 +184,39 @@ export const FilterSection = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700">
-                  Select Companies
+                  {t('filter.labels.companies')}
                 </label>
                 <MultiSelect
                   options={availableCompanies}
                   selected={selectedCompanies}
                   onChange={setSelectedCompanies}
-                  placeholder={isLoadingCompanies ? 'Loading...' : 'Choose companies...'}
+                  placeholder={isLoadingCompanies ? t('filter.placeholders.loading') : t('filter.placeholders.companies')}
                   disabled={isLoadingCompanies}
                 />
               </div>
 
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700">
-                  Select Departments
+                  {t('filter.labels.departments')}
                 </label>
                 <MultiSelect
                   options={availableDepartments}
                   selected={selectedDepartments}
                   onChange={setSelectedDepartments}
-                  placeholder={isLoadingDepartments ? 'Loading...' : 'Choose departments...'}
+                  placeholder={isLoadingDepartments ? t('filter.placeholders.loading') : t('filter.placeholders.departments')}
                   disabled={selectedCompanies.length === 0 || isLoadingDepartments}
                 />
               </div>
 
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700">
-                  Select Positions
+                  {t('filter.labels.positions')}
                 </label>
                 <MultiSelect
                   options={availablePositions}
                   selected={selectedPositions}
                   onChange={setSelectedPositions}
-                  placeholder={isLoadingPositions ? 'Loading...' : 'Choose positions...'}
+                  placeholder={isLoadingPositions ? t('filter.placeholders.loading') : t('filter.placeholders.positions')}
                   disabled={selectedDepartments.length === 0 || isLoadingPositions}
                 />
               </div>

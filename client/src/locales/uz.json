@@ -59,6 +59,11 @@
     "subtitle": "Millat Umidi bilan ishlang va mehnat bozorida eng yaxshi tajribaga ega bo'ling."
   },
   
+  "stats_title": "Nega Millat Umidi ni tanlash kerak?",
+  "stats_subtitle": "Millat Umidi bilan ishlang va mehnat bozorida eng yaxshi tajribaga ega bo'ling.",
+  "toggle_card": "Kartochka ko'rinishini ko'rsatish",
+  "toggle_compact": "Ixcham ko'rinishni ko'rsatish",
+  
   "company_logos_title": "Bizning ekotizimim",
   
   "footer": {
@@ -87,5 +92,83 @@
     "welcome": "Millat Umidi HR administrator portaliga xush kelibsiz"
   },
   
-  "footer_copyright": "Barcha huquqlar himoyalangan."
+  "footer_copyright": "Barcha huquqlar himoyalangan.",
+
+  "cta": {
+    "title": "O'sib borayotgan jamoamizga qo'shiling",
+    "subtitle": "Ta'sir qilishga tayyormisiz? Biz missiyamizga ishtiyoqli shaxslarni qidiryapmiz.",
+    "cta_full": "Bizga qo'shiling va o'sing",
+    "cta_short": "Qo'shilish",
+    "testimonials": {
+      "title": "Jamoamiz nima deydi",
+      "subtitle": "Xodimlarimizdan Millat Umidi dagi tajribalari haqida eshiting"
+    }
+  },
+
+  "filter": {
+    "title": "O'zingizga mos rolni toping",
+    "subtitle": "Ko'nikmalaringiz va intilishlaringizga mos imkoniyatlarni topish uchun aqlli filtrlarimizdan foydalaning",
+    "labels": {
+      "companies": "Kompaniyalarni tanlang",
+      "departments": "Bo'limlarni tanlang", 
+      "positions": "Lavozimlarni tanlang"
+    },
+    "placeholders": {
+      "companies": "Kompaniyalarni tanlang...",
+      "departments": "Bo'limlarni tanlang...",
+      "positions": "Lavozimlarni tanlang...",
+      "loading": "Yuklanmoqda..."
+    },
+    "search": "Ish qidirish",
+    "clear": "Barcha filtrlarni tozalash"
+  },
+
+  "position_card": {
+    "location": "Joylashuv",
+    "salary": "Maosh",
+    "type": "Ish turi",
+    "posted": "E'lon qilingan",
+    "apply": "Ariza yuborish",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "view_details": "Batafsil",
+    "company_info": "Kompaniya haqida",
+    "department_info": "Bo'lim haqida",
+    "delete_confirm": "Ushbu lavozimni o'chirishni xohlaysizmi?",
+    "delete_description": "Bu amalni bekor qilib bo'lmaydi."
+  },
+
+  "stats_cards": {
+    "companies": "Kompaniyalar",
+    "departments": "Bo'limlar", 
+    "positions": "Ochiq lavozimlar",
+    "applicants": "Ish izlovchilar"
+  },
+
+  "features_cards": {
+    "innovation": {
+      "title": "Innovatsiya asosida",
+      "description": "Ilg'or texnologiyalar va ijodiy yechimlar bilan ta'limni inqilob qilayotgan jamoaga qo'shiling."
+    },
+    "growth": {
+      "title": "Professional o'sish",
+      "description": "Keng qamrovli o'qitish dasturlari va murabbiylik imkoniyatlari bilan karerangizni rivojlantiring."
+    },
+    "impact": {
+      "title": "Mazmunli ta'sir",
+      "description": "Talabalar hayotiga haqiqiy farq qiling va O'zbekistonning ta'lim kelajagiga hissa qo'shing."
+    },
+    "culture": {
+      "title": "Inklyuziv madaniyat",
+      "description": "Har bir jamoa a'zosining noyob nuqtai nazarini qadrlagan xilma-xil, qo'llab-quvvatlovchi jamiyatning bir qismi bo'ling."
+    },
+    "benefits": {
+      "title": "Raqobatbardosh imtiyozlar",
+      "description": "Keng qamrovli sog'liqni saqlash, moslashuvchan ish sharoitlari va ishlash samaradorligiga asoslangan mukofotlardan bahramand bo'ling."
+    },
+    "mission": {
+      "title": "Umumiy missiya",
+      "description": "Mukammallikka intilishingizni baham ko'radigan ishtiyoqli pedagog va innovatorlar bilan birga ishlang."
+    }
+  }
 }

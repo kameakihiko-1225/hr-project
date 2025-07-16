@@ -15,38 +15,38 @@ export const FeaturesSection = () => {
   const features = [
     {
       icon: Target,
-      title: "Meaningful Mission",
-      description: "Shape the future of education in Uzbekistan with real impact.",
+      title: t('features_cards.mission.title'),
+      description: t('features_cards.mission.description'),
       color: "from-blue-500 to-blue-600"
     },
     {
       icon: TrendingUp,
-      title: "Growth Culture",
-      description: "We value initiative, fast learning, and give room to grow.",
+      title: t('features_cards.growth.title'),
+      description: t('features_cards.growth.description'),
       color: "from-green-500 to-green-600"
     },
     {
       icon: Ban,
-      title: "No Bureaucracy",
-      description: "Work directly, move fast, and see results.",
+      title: t('features_cards.culture.title'),
+      description: t('features_cards.culture.description'),
       color: "from-purple-500 to-purple-600"
     },
     {
       icon: Cpu,
-      title: "Tech-Driven Environment",
-      description: "We use AI and automation to make your work more focused and efficient.",
+      title: t('features_cards.innovation.title'),
+      description: t('features_cards.innovation.description'),
       color: "from-indigo-500 to-indigo-600"
     },
     {
       icon: Layers,
-      title: "Cross-Project Opportunities",
-      description: "Schools, universities, digital platforms — grow without leaving the ecosystem.",
+      title: t('features_cards.benefits.title'),
+      description: t('features_cards.benefits.description'),
       color: "from-orange-500 to-orange-600"
     },
     {
       icon: ThumbsUp,
-      title: "Candidate-Friendly Hiring",
-      description: "Apply via Telegram, get instant feedback, and go through a smooth hiring process.",
+      title: t('features_cards.impact.title'),
+      description: t('features_cards.impact.description'),
       color: "from-red-500 to-red-600"
     }
   ];

@@ -14,6 +14,7 @@ import { useClickCounter } from '@/contexts/ClickCounterContext';
 import { CompanyInfoModal } from './CompanyInfoModal';
 import { DepartmentInfoModal } from './DepartmentInfoModal';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 const logger = createLogger('positionCard');
 
@@ -25,6 +26,7 @@ interface PositionCardProps {
 }
 
 export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false }: PositionCardProps) {
+  const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);

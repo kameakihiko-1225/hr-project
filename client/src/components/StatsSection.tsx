@@ -19,9 +19,9 @@ export const StatsSection = () => {
   const { jobSeekers, applicants } = useClickCounter();
   
   const [stats, setStats] = useState([
-    { icon: Users, number: "-", label: "Job Seekers", description: "Applied via platform", color: "from-blue-500 to-blue-600" },
-    { icon: Building2, number: "-", label: "Companies", description: "Using our platform", color: "from-indigo-500 to-indigo-600" },
-    { icon: Briefcase, number: "-", label: "Open Positions", description: "Available roles", color: "from-green-500 to-green-600" },
+    { icon: Users, number: "-", label: t('stats_cards.applicants'), description: "Applied via platform", color: "from-blue-500 to-blue-600" },
+    { icon: Building2, number: "-", label: t('stats_cards.companies'), description: "Using our platform", color: "from-indigo-500 to-indigo-600" },
+    { icon: Briefcase, number: "-", label: t('stats_cards.positions'), description: "Available roles", color: "from-green-500 to-green-600" },
     { icon: Award, number: "24/7", label: "Apply Anytime", description: "Always available", color: "from-purple-500 to-purple-600" },
   ]);
 
@@ -44,12 +44,12 @@ export const StatsSection = () => {
           
           setStats(prev => prev.map(item => {
             switch (item.label) {
-              case 'Companies':
+              case t('stats_cards.companies'):
                 return { ...item, number: apiStats.companies.toString() };
-              case 'Job Seekers':
+              case t('stats_cards.applicants'):
                 // Use database-tracked applies + legacy counter for transition period
                 return { ...item, number: (clickStats.totalApplies + applicants).toString() };
-              case 'Open Positions':
+              case t('stats_cards.positions'):
                 return { ...item, number: apiStats.positions.toString() };
               default:
                 return item;

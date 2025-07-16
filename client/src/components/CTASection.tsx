@@ -5,6 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { useTranslation } from 'react-i18next';
 
 // Testimonial data structure
 interface Testimonial {
@@ -82,6 +83,7 @@ const testimonials: Testimonial[] = [
 ];
 
 export const CTASection = () => {
+  const { t } = useTranslation();
   const [api, setApi] = useState<any>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
@@ -126,7 +128,7 @@ export const CTASection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-4xl md:text-5xl lg:text-7xl font-bold text-gray-900 mb-4 md:mb-6">
-            Stories<span className="text-blue-600">.</span>
+{t('cta.testimonials.title')}<span className="text-blue-600">.</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
             Jamoamiz a’zolari Millat Umidi HR haqida o’z fikr va tajribalari bilan o’rtoqlashmoqda.

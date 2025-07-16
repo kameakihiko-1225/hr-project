@@ -59,6 +59,11 @@
     "subtitle": "Work with Millat Umidi and get the best experience in the job market."
   },
   
+  "stats_title": "Why Choose Millat Umidi?",
+  "stats_subtitle": "Work with Millat Umidi and get the best experience in the job market.",
+  "toggle_card": "Show Card View",
+  "toggle_compact": "Show Compact View",
+  
   "company_logos_title": "Our Ecosystem",
   
   "footer": {
@@ -87,5 +92,83 @@
     "welcome": "Welcome to the Millat Umidi HR admin portal"
   },
   
-  "footer_copyright": "All rights reserved."
+  "footer_copyright": "All rights reserved.",
+
+  "cta": {
+    "title": "Join Our Growing Team",
+    "subtitle": "Ready to make an impact? We're looking for passionate individuals to join our mission.",
+    "cta_full": "Join us and grow",
+    "cta_short": "Join",
+    "testimonials": {
+      "title": "What Our Team Says",
+      "subtitle": "Hear from our employees about their experience at Millat Umidi"
+    }
+  },
+
+  "filter": {
+    "title": "Find Your Perfect Role",
+    "subtitle": "Use our intelligent filters to discover opportunities that match your skills and aspirations",
+    "labels": {
+      "companies": "Select Companies",
+      "departments": "Select Departments", 
+      "positions": "Select Positions"
+    },
+    "placeholders": {
+      "companies": "Choose companies...",
+      "departments": "Choose departments...",
+      "positions": "Choose positions...",
+      "loading": "Loading..."
+    },
+    "search": "Search Jobs",
+    "clear": "Clear All Filters"
+  },
+
+  "position_card": {
+    "location": "Location",
+    "salary": "Salary",
+    "type": "Employment Type",
+    "posted": "Posted",
+    "apply": "Apply Now",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view_details": "View Details",
+    "company_info": "Company Info",
+    "department_info": "Department Info",
+    "delete_confirm": "Are you sure you want to delete this position?",
+    "delete_description": "This action cannot be undone."
+  },
+
+  "stats_cards": {
+    "companies": "Companies",
+    "departments": "Departments", 
+    "positions": "Open Positions",
+    "applicants": "Job Seekers"
+  },
+
+  "features_cards": {
+    "innovation": {
+      "title": "Innovation at Heart",
+      "description": "Join a team that's revolutionizing education with cutting-edge technology and creative solutions."
+    },
+    "growth": {
+      "title": "Professional Growth",
+      "description": "Advance your career with comprehensive training programs and mentorship opportunities."
+    },
+    "impact": {
+      "title": "Meaningful Impact",
+      "description": "Make a real difference in students' lives and contribute to Uzbekistan's educational future."
+    },
+    "culture": {
+      "title": "Inclusive Culture",
+      "description": "Be part of a diverse, supportive community that values every team member's unique perspective."
+    },
+    "benefits": {
+      "title": "Competitive Benefits",
+      "description": "Enjoy comprehensive healthcare, flexible work arrangements, and performance-based rewards."
+    },
+    "mission": {
+      "title": "Shared Mission",
+      "description": "Work alongside passionate educators and innovators who share your commitment to excellence."
+    }
+  }
 }
