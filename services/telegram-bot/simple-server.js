@@ -169,13 +169,14 @@ app.post('/webhook', async (req, res) => {
       UF_CRM_1752622669492: ageRaw, // age field
     };
     
-    // Add phone field using simple string format + backup custom field
+    // Add phone field using array format with VALUE/VALUE_TYPE + backup custom field
     if (phone) {
       const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
-      contactFields.PHONE = formattedPhone; // Simple string format
+      contactFields.PHONE = [{ VALUE: formattedPhone, VALUE_TYPE: 'WORK' }]; // Array format
       contactFields.UF_CRM_1747689959 = formattedPhone; // Backup custom field
-      console.log('[TELEGRAM-BOT] Adding phone field (string format):', formattedPhone);
+      console.log('[TELEGRAM-BOT] Adding phone field (array format):', formattedPhone);
       console.log('[TELEGRAM-BOT] Phone backup field UF_CRM_1747689959:', formattedPhone);
+      console.log('[TELEGRAM-BOT] PHONE array structure:', contactFields.PHONE);
     }
     
     // Resolve resume & diploma links
