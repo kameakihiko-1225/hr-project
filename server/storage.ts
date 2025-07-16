@@ -221,14 +221,17 @@ export class DatabaseStorage implements IStorage {
       // Count positions for each department
       const departmentsWithCounts = await Promise.all(
         departmentsResult.map(async (department) => {
-          const positionCount = await db
+          const positionCountResult = await db
             .select({ count: count(positions.id) })
             .from(positions)
             .where(eq(positions.departmentId, department.id));
           
+          const positionCount = positionCountResult[0]?.count || 0;
+          console.log(`Department ${department.id} (${department.name}) has ${positionCount} positions`);
+          
           return {
             ...department,
-            positionCount: positionCount[0]?.count || 0
+            positionCount: Number(positionCount)
           };
         })
       );

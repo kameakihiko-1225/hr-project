@@ -220,7 +220,7 @@ export default function PositionsPage() {
       title: typeof position.title === 'string' ? { en: position.title } : position.title,
       description: typeof position.description === 'string' ? { en: position.description } : position.description || { en: '' },
       salaryRange: typeof position.salaryRange === 'string' ? { en: position.salaryRange } : position.salaryRange || { en: '' },
-      employmentType: typeof position.employmentType === 'string' ? { en: position.employmentType } : position.employmentType || { en: '' },
+      employmentType: position.employmentType || 'Full-time',
       departmentId: position.departmentId || '',
       applyLink: typeof position.applyLink === 'string' ? { en: position.applyLink } : position.applyLink || { en: '' }
     });
