@@ -159,6 +159,7 @@ app.post('/webhook', async (req, res) => {
 
     const phone = normalizePhone(phoneRaw);
     console.log(`[TELEGRAM-BOT] Full name: "${fullName}", phone_raw: "${phoneRaw}", normalized_phone: "${phone}", age: "${ageRaw}"`);
+    console.log(`[TELEGRAM-BOT] Phone check: phone="${phone}", Boolean(phone)=${Boolean(phone)}`);
     const contactFields = {
       NAME: fullName || 'Unknown',
       UF_CRM_1752239621: data.position_uz, // position
@@ -168,10 +169,16 @@ app.post('/webhook', async (req, res) => {
       UF_CRM_1752622669492: ageRaw, // age field
     };
     
-    // Store phone for later processing - don't add to initial contact creation
-    let phoneNumber = null;
+    // Add phone field directly to contact creation with proper crm_multifield format
     if (phone) {
-      phoneNumber = `+${phone}`;
+      console.log('[TELEGRAM-BOT] Adding phone field to contactFields:', `+${phone}`);
+      contactFields.PHONE = [{ 
+        VALUE: `+${phone}`, 
+        VALUE_TYPE: 'WORK'
+      }];
+      console.log('[TELEGRAM-BOT] contactFields.PHONE after assignment:', contactFields.PHONE);
+    } else {
+      console.log('[TELEGRAM-BOT] No phone number provided');
     }
     
     // Resolve resume & diploma links
@@ -229,25 +236,23 @@ app.post('/webhook', async (req, res) => {
     // Prepare FormData for contact (no file buffers for resume/diploma/phase2)
     const contactForm = new FormData();
     
-    Object.entries(contactFields).forEach(([key, value]) => {
-      // Only skip null/undefined values, allow empty strings and other falsy values
+    // Add each field to FormData individually with proper formatting
+    for (const [key, value] of Object.entries(contactFields)) {
       if (value !== null && value !== undefined) {
-        // Stringify arrays/objects for Bitrix24
-        if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+        if (key === 'PHONE' && Array.isArray(value)) {
+          // Special handling for PHONE field - Bitrix24 multifield format
+          contactForm.append(`fields[${key}]`, JSON.stringify(value));
+          console.log(`[TELEGRAM-BOT] Added PHONE field to FormData: ${JSON.stringify(value)}`);
+        } else if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
           contactForm.append(`fields[${key}]`, JSON.stringify(value));
         } else {
           contactForm.append(`fields[${key}]`, String(value));
         }
       }
-    });
+    }
     
     contactForm.append('params[REGISTER_SONET_EVENT]', 'Y');
-    // Log outgoing FormData fields
-    console.log('[TELEGRAM-BOT] Contact FormData fields:', Object.keys(contactFields));
-    console.log('[TELEGRAM-BOT] PHONE field value:', JSON.stringify(contactFields.PHONE));
-    
-    // Log all contact field values for debugging
-    console.log('[TELEGRAM-BOT] All contact fields:', JSON.stringify(contactFields, null, 2));
+    console.log('[TELEGRAM-BOT] FormData prepared for Bitrix24 submission');
     
     // Check duplicate by phone and update if exists
     let contactId;
@@ -272,22 +277,6 @@ app.post('/webhook', async (req, res) => {
           console.log('[TELEGRAM-BOT] Bitrix24 API Error:', createResp.data.error);
         }
         contactId = createResp.data.result;
-        
-        // Add phone number via separate API call after contact creation
-        if (phoneNumber && contactId) {
-          try {
-            const phoneForm = new FormData();
-            phoneForm.append('id', contactId.toString());
-            phoneForm.append('fields[PHONE]', JSON.stringify([{ VALUE: phoneNumber, VALUE_TYPE: 'WORK' }]));
-            
-            const phoneResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, phoneForm, {
-              headers: phoneForm.getHeaders(),
-            });
-            console.log('[TELEGRAM-BOT] Phone update response:', phoneResp.data);
-          } catch (phoneError) {
-            console.error('[TELEGRAM-BOT] Failed to update phone:', phoneError.response?.data || phoneError.message);
-          }
-        }
       }
     } else {
       // No phone – always create
@@ -296,22 +285,6 @@ app.post('/webhook', async (req, res) => {
       });
       console.log('[TELEGRAM-BOT] Contact create response:', createResp.data);
       contactId = createResp.data.result;
-      
-      // Add phone number via separate API call after contact creation
-      if (phoneNumber && contactId) {
-        try {
-          const phoneForm = new FormData();
-          phoneForm.append('id', contactId.toString());
-          phoneForm.append('fields[PHONE]', JSON.stringify([{ VALUE: phoneNumber, VALUE_TYPE: 'WORK' }]));
-          
-          const phoneResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, phoneForm, {
-            headers: phoneForm.getHeaders(),
-          });
-          console.log('[TELEGRAM-BOT] Phone update response:', phoneResp.data);
-        } catch (phoneError) {
-          console.error('[TELEGRAM-BOT] Failed to update phone:', phoneError.response?.data || phoneError.message);
-        }
-      }
     }
 
     // 3. Prepare deal fields (always create new deal attached to contact)

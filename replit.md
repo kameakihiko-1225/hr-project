@@ -208,8 +208,12 @@ Preferred communication style: Simple, everyday language.
   - Phase2 text answers: `UF_CRM_1752241370` (Q1), `UF_CRM_1752241378` (Q2), `UF_CRM_1752241386` (Q3)
 - **Smart Answer Processing**: Implemented intelligent detection for phase2 questions - voice file IDs use voice fields, text answers and failed file retrievals use text fields
 - **File ID Detection**: Enhanced Telegram file ID validation to exclude text with spaces and improve accuracy
+- **Phone Number Integration Fix**: Resolved critical phone field issue by implementing proper Bitrix24 crm_multifield format during initial contact creation
+  - Phone field format: `[{"VALUE": "+998111222333", "VALUE_TYPE": "WORK"}]`
+  - Direct integration in contact creation payload (not separate update)
+  - Proper FormData handling for array-based phone field structure
 - **Favicon Update**: Updated website favicon to use Millat Umidi logo ("logo png.png") with proper Apple touch icon support
 - **Webhook URL**: Finalized webhook endpoint at domain.com/webhook with proxy forwarding to port 3001 (no port numbers needed in webhook configuration)
-- **Complete Integration**: Successfully tested end-to-end candidate data flow from Telegram bot to Bitrix24 CRM with proper field mapping and file handling
+- **Complete Integration**: Successfully tested end-to-end candidate data flow from Telegram bot to Bitrix24 CRM with proper field mapping, file handling, and phone number display
 
 The architecture emphasizes type safety, developer experience, and scalability while maintaining simplicity for rapid development and deployment.
