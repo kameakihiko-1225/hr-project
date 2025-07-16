@@ -22,11 +22,12 @@ export const FounderSection = () => {
         <div className="grid lg:grid-cols-2 gap-8 items-start">
           {/* Left side - Founder Photo */}
           <div className="flex flex-col items-center lg:items-center space-y-6 order-2 lg:order-1">
-            <div className="relative">
+            <div className="relative overflow-hidden">
               <img
                 src="/Umidjon_aka-removebg-preview_1752578772239.png"
                 alt="Umidjon Ishmukhamedov"
-                className="w-72 h-auto lg:w-80 lg:h-auto object-contain drop-shadow-2xl"
+                className="w-96 h-auto lg:w-[28rem] lg:h-auto object-contain drop-shadow-2xl"
+                style={{ clipPath: 'inset(0 0 20% 0)' }}
               />
             </div>
             
