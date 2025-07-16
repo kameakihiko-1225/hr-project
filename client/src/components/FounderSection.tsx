@@ -21,7 +21,7 @@ export const FounderSection = () => {
       <div className="max-w-6xl mx-auto relative">
         <div className="grid lg:grid-cols-2 gap-8 items-start">
           {/* Left side - Founder Photo */}
-          <div className="flex flex-col items-center lg:items-center space-y-3 order-2 lg:order-1">
+          <div className="flex flex-col items-center lg:items-center order-2 lg:order-1">
             <div className="relative overflow-hidden">
               <img
                 src="/Umidjon_aka-removebg-preview_1752578772239.png"
@@ -29,15 +29,6 @@ export const FounderSection = () => {
                 className="w-96 h-auto lg:w-[28rem] lg:h-auto object-contain drop-shadow-2xl"
                 style={{ clipPath: 'inset(0 0 20% 0)' }}
               />
-            </div>
-            
-            <div className="text-center lg:text-center">
-              <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                Umidjon Ishmukhamedov
-              </h3>
-              <p className="text-lg text-blue-600 dark:text-blue-400 font-semibold">
-                Founder of Millat Umidi Group
-              </p>
             </div>
           </div>
 
@@ -93,16 +84,14 @@ export const FounderSection = () => {
               </Button>
             </div>
 
-            {/* Optional: Add some stats or achievements */}
-            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">15+</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Years of Experience</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">1000+</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Students Impacted</div>
-              </div>
+            {/* Founder name and title positioned after button */}
+            <div className="text-center lg:text-left pt-4">
+              <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                Umidjon Ishmukhamedov
+              </h3>
+              <p className="text-lg text-blue-600 dark:text-blue-400 font-semibold">
+                Founder of Millat Umidi Group
+              </p>
             </div>
           </div>
         </div>
