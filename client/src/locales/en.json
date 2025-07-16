@@ -16,9 +16,10 @@
   "stories": "Stories",
   "hero_badge": "Careers at Millat Umidi",
   "hero_title_start": "Join",
-  "hero_title_highlight": "Uzbekistan’s Fastest-Growing Education Company",
+  "hero_title_highlight": "Millat Umidi Group",
   "hero_subtitle": "Millat Umidi is one of the biggest educational holdings in Uzbekistan. Our projects: Millat Umidi University, Millat Umidi School, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC",
   "hero_cta": "See Open Roles",
+  "hero_cta_short": "Roles",
   "hero_trust1": "Purpose-Driven Mission",
   "hero_trust2": "Dynamic, Growth-Oriented Team",
   "hero_trust3": "Opportunities in Education, Tech & Operations",
@@ -28,5 +29,119 @@
   "toggle_card": "Show Card View",
   "toggle_detailed": "Show Detailed View",
   "toggle_compact": "Show Compact View",
-  "footer_copyright": "All rights reserved."
-} 
+  "footer_copyright": "All rights reserved.",
+  "job_seekers": "Job Seekers",
+  "applied_via_platform": "Applied via platform",
+  "using_our_platform": "Using our platform",
+  "available_roles": "Available roles",
+  "apply_anytime": "Apply Anytime",
+  "always_available": "Always available",
+  
+  "navigation": {
+    "home": "Home",
+    "blog": "Blog", 
+    "contact": "Contact"
+  },
+  
+  "founder": {
+    "mission_title": "Join Our Mission to",
+    "mission_highlight": "Transform Education",
+    "name": "Umidjon Ishmukhamedov",
+    "title": "Founder of Millat Umidi Group",
+    "quote1": "At Millat Umidi, we believe that education is the foundation of a prosperous society. Our journey began with a simple vision: to create world-class educational institutions that nurture young minds and prepare them for tomorrow's challenges.",
+    "quote2": "We are not just building schools and universities; we are building dreams, shaping futures, and creating opportunities for the next generation. Every member of our team plays a crucial role in this transformative mission.",
+    "quote3": "Join us in making a lasting impact on education in Uzbekistan and beyond. Together, we can build a brighter future for our nation's youth.",
+    "cta": "Explore Career Opportunities",
+    "cta_short": "Careers",
+    "experience_years": "Years of Experience",
+    "students_impacted": "Students Impacted"
+  },
+  
+  "features": {
+    "title": "Why Choose Millat Umidi?",
+    "subtitle": "Work with us and get the best experience in the job market",
+    "career_growth": "Meaningful Mission",
+    "career_growth_desc": "Shape the future of education in Uzbekistan with real impact.",
+    "innovation": "Growth Culture",
+    "innovation_desc": "We value initiative, fast learning, and give room to grow.",
+    "work_life_balance": "No Bureaucracy",
+    "work_life_balance_desc": "Work directly, move fast, and see results.",
+    "competitive_benefits": "Tech-Driven Environment",
+    "competitive_benefits_desc": "We use AI and automation to make your work more focused and efficient."
+  },
+  
+  "positions": {
+    "title": "Open Positions",
+    "subtitle": "Find your perfect role",
+    "filter_by_company": "Filter by Company",
+    "filter_by_department": "Filter by Department",
+    "all_companies": "All Companies",
+    "all_departments": "All Departments",
+    "employment_type": "Employment Type",
+    "location": "Location",
+    "salary_range": "Salary Range",
+    "full_time": "Full-time",
+    "part_time": "Part-time",
+    "contract": "Contract",
+    "company_info": "Company Info",
+    "department_info": "Department Info",
+    "no_positions": "No positions match your filters",
+    "loading": "Loading positions..."
+  },
+  
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "Have questions? We'd love to hear from you.",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "office_hours": "Office Hours",
+    "monday_friday": "Monday - Friday: 9:00 AM - 6:00 PM",
+    "saturday": "Saturday: 10:00 AM - 4:00 PM",
+    "sunday_closed": "Sunday: Closed"
+  },
+  
+  "footer": {
+    "description": "Millat Umidi Group - Leading educational holding in Uzbekistan",
+    "quick_links": "Quick Links",
+    "our_projects": "Our Projects",
+    "connect": "Connect With Us",
+    "copyright": "All rights reserved.",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service"
+  },
+  
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "try_again": "Try again",
+    "search": "Search",
+    "filter": "Filter",
+    "clear_filters": "Clear filters",
+    "show_more": "Show more",
+    "show_less": "Show less",
+    "read_more": "Read more",
+    "close": "Close",
+    "open": "Open",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  
+  "admin": {
+    "dashboard": "Dashboard",
+    "manage_companies": "Manage Companies",
+    "manage_departments": "Manage Departments", 
+    "manage_positions": "Manage Positions",
+    "add_new": "Add New",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel"
+  }
+}

@@ -19,10 +19,10 @@ export const StatsSection = () => {
   const { jobSeekers, applicants } = useClickCounter();
   
   const [stats, setStats] = useState([
-    { icon: Users, number: "-", label: "Job Seekers", description: "Applied via platform", color: "from-blue-500 to-blue-600" },
-    { icon: Building2, number: "-", label: "Companies", description: "Using our platform", color: "from-indigo-500 to-indigo-600" },
-    { icon: Briefcase, number: "-", label: "Open Positions", description: "Available roles", color: "from-green-500 to-green-600" },
-    { icon: Award, number: "24/7", label: "Apply Anytime", description: "Always available", color: "from-purple-500 to-purple-600" },
+    { icon: Users, number: "-", label: "job_seekers", description: "applied_via_platform", color: "from-blue-500 to-blue-600" },
+    { icon: Building2, number: "-", label: "companies", description: "using_our_platform", color: "from-indigo-500 to-indigo-600" },
+    { icon: Briefcase, number: "-", label: "positions", description: "available_roles", color: "from-green-500 to-green-600" },
+    { icon: Award, number: "24/7", label: "apply_anytime", description: "always_available", color: "from-purple-500 to-purple-600" },
   ]);
 
   // Load live stats from database
@@ -44,12 +44,12 @@ export const StatsSection = () => {
           
           setStats(prev => prev.map(item => {
             switch (item.label) {
-              case 'Companies':
+              case 'companies':
                 return { ...item, number: apiStats.companies.toString() };
-              case 'Job Seekers':
+              case 'job_seekers':
                 // Use database-tracked applies + legacy counter for transition period
                 return { ...item, number: (clickStats.totalApplies + applicants).toString() };
-              case 'Open Positions':
+              case 'positions':
                 return { ...item, number: apiStats.positions.toString() };
               default:
                 return item;
@@ -84,8 +84,8 @@ export const StatsSection = () => {
           <h3 className="text-xl font-bold text-gray-900">{stat.number}</h3>
         </div>
         <div className="flex flex-col">
-          <h4 className="text-sm font-semibold text-gray-800 truncate">{stat.label}</h4>
-          <p className="text-xs text-gray-600 truncate">{stat.description}</p>
+          <h4 className="text-sm font-semibold text-gray-800 truncate">{t(stat.label)}</h4>
+          <p className="text-xs text-gray-600 truncate">{t(stat.description)}</p>
         </div>
       </div>
     </div>
@@ -102,8 +102,8 @@ export const StatsSection = () => {
         <stat.icon className="h-6 w-6 text-white" />
       </div>
       <h3 className="text-3xl font-bold text-gray-900 mb-1">{stat.number}</h3>
-      <h4 className="text-base font-semibold text-gray-800 mb-1">{stat.label}</h4>
-      <p className="text-gray-600 text-sm">{stat.description}</p>
+      <h4 className="text-base font-semibold text-gray-800 mb-1">{t(stat.label)}</h4>
+      <p className="text-gray-600 text-sm">{t(stat.description)}</p>
     </div>
   );
 

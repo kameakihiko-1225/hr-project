@@ -83,21 +83,21 @@ export const HeroSection = () => {
           {/* Content */}
           <div className="animate-fade-in max-w-4xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Join
+              {t('hero_title_start')}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 block">
-                Millat Umidi Group
+                {t('hero_title_highlight')}
               </span>
             </h1>
             
-            <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed max-w-4xl mx-auto"> Millat Umidi is one of the biggest educational holdings in Uzbekistan. Our projects: Millat Umidi University, Millat Umidi School, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC </p>
+            <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed max-w-4xl mx-auto">{t('hero_subtitle')}</p>
             
             <div className="flex justify-center mb-8">
               <button 
                 onClick={() => scrollToSection("filter-section")}
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group shadow-lg text-lg"
               >
-                <span className="hidden sm:inline">See Open Roles</span>
-                <span className="sm:hidden">Roles</span>
+                <span className="hidden sm:inline">{t('hero_cta')}</span>
+                <span className="sm:hidden">{t('hero_cta_short')}</span>
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>

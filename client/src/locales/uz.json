@@ -14,5 +14,134 @@
   "contact": "Aloqa",
   "apply_now": "Ariza yuborish",
   "stories": "Hikoyalar",
-  "footer_copyright": "Barcha huquqlar himoyalangan."
-} 
+  "hero_badge": "Millat Umidi da martaba",
+  "hero_title_start": "Qo'shiling",
+  "hero_title_highlight": "Millat Umidi Guruhiga",
+  "hero_subtitle": "Millat Umidi O'zbekistondagi eng yirik ta'lim holdinglaridan biridir. Bizning loyihalarimiz: Millat Umidi universiteti, Millat Umidi maktabi, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC",
+  "hero_cta": "Ochiq o'rinlarni ko'rish",
+  "hero_cta_short": "O'rinlar",
+  "hero_trust1": "Maqsadli missiya",
+  "hero_trust2": "Dinamik, o'sishga yo'naltirilgan jamoa",
+  "hero_trust3": "Ta'lim, texnologiya va operatsiyalarda imkoniyatlar",
+  "stats_title": "Nega Millat Umidi ni tanlash kerak?",
+  "company_logos_title": "Bizning ekotizimimiz",
+  "stats_subtitle": "Millat Umidi bilan ishlang va mehnat bozorida eng yaxshi tajribaga ega bo'ling.",
+  "toggle_card": "Kartochka ko'rinishini ko'rsatish",
+  "toggle_detailed": "Batafsil ko'rinishni ko'rsatish",
+  "toggle_compact": "Ixcham ko'rinishni ko'rsatish",
+  "footer_copyright": "Barcha huquqlar himoyalangan.",
+  "job_seekers": "Ish izlovchilar",
+  "applied_via_platform": "Platforma orqali ariza berganlar",
+  "using_our_platform": "Bizning platformamizdan foydalanuvchilar",
+  "available_roles": "Mavjud rollar",
+  "apply_anytime": "Istalgan vaqtda ariza bering",
+  "always_available": "Doimo mavjud",
+  
+  "navigation": {
+    "home": "Bosh sahifa",
+    "blog": "Blog", 
+    "contact": "Aloqa"
+  },
+  
+  "founder": {
+    "mission_title": "Bizning missiyamizga qo'shiling",
+    "mission_highlight": "Ta'limni o'zgartirish",
+    "name": "Umidjon Ishmuxamedov",
+    "title": "Millat Umidi Guruhi asoschisi",
+    "quote1": "Millat Umidi da biz ta'limni gullab-yashnagan jamiyatning asosi deb hisoblaymiz. Bizning yo'limiz oddiy ko'rinish bilan boshlandi: yosh aqllarni tarbiyalovchi va ularni ertangi qiyinchiliklarga tayyorlovchi dunyo darajasidagi ta'lim muassasalarini yaratish.",
+    "quote2": "Biz shunchaki maktablar va universitetlar qurmayapmiz; biz orzu-umidlar quryapmiz, kelajakni shakllantiryapmiz va keyingi avlod uchun imkoniyatlar yaratyapmiz. Jamoamizning har bir a'zosi ushbu o'zgaruvchan missiyada muhim rol o'ynaydi.",
+    "quote3": "O'zbekiston va undan tashqarida ta'limga uzoq muddatli ta'sir ko'rsatishda bizga qo'shiling. Birgalikda mamlakatimiz yoshlari uchun yorqinroq kelajak qurishimiz mumkin.",
+    "cta": "Martaba imkoniyatlarini o'rganish",
+    "cta_short": "Martaba",
+    "experience_years": "Yillik tajriba",
+    "students_impacted": "Talabalar ta'sir qilindi"
+  },
+  
+  "features": {
+    "title": "Nega Millat Umidi ni tanlash kerak?",
+    "subtitle": "Biz bilan ishlang va mehnat bozorida eng yaxshi tajribaga ega bo'ling",
+    "career_growth": "Mazmunli missiya",
+    "career_growth_desc": "O'zbekistonda ta'limning kelajagini haqiqiy ta'sir bilan shakllantiring.",
+    "innovation": "O'sish madaniyati",
+    "innovation_desc": "Biz tashabbusni, tez o'rganishni qadrlaymiz va o'sish uchun joy beramiz.",
+    "work_life_balance": "Byurokratiya yo'q",
+    "work_life_balance_desc": "To'g'ridan-to'g'ri ishlang, tez harakat qiling va natijalarni ko'ring.",
+    "competitive_benefits": "Texnologik muhit",
+    "competitive_benefits_desc": "Biz AI va avtomatlashtirish orqali ishingizni yanada diqqat bilan va samarali qilish uchun foydalanamiz."
+  },
+  
+  "positions": {
+    "title": "Ochiq pozitsiyalar",
+    "subtitle": "O'zingiz uchun mukammal rolni toping",
+    "filter_by_company": "Kompaniya bo'yicha filtrlash",
+    "filter_by_department": "Bo'lim bo'yicha filtrlash",
+    "all_companies": "Barcha kompaniyalar",
+    "all_departments": "Barcha bo'limlar",
+    "employment_type": "Bandlik turi",
+    "location": "Joylashuv",
+    "salary_range": "Maosh diapazoni",
+    "full_time": "To'liq vaqt",
+    "part_time": "Qisman vaqt",
+    "contract": "Shartnoma",
+    "company_info": "Kompaniya haqida ma'lumot",
+    "department_info": "Bo'lim haqida ma'lumot",
+    "no_positions": "Sizning filtrlaringizga mos pozitsiyalar yo'q",
+    "loading": "Pozitsiyalar yuklanmoqda..."
+  },
+  
+  "contact": {
+    "title": "Biz bilan bog'laning",
+    "subtitle": "Savollaringiz bormi? Sizdan eshitishni xohlaymiz.",
+    "address": "Manzil",
+    "phone": "Telefon",
+    "email": "Elektron pochta",
+    "office_hours": "Ish vaqti",
+    "monday_friday": "Dushanba - Juma: 9:00 - 18:00",
+    "saturday": "Shanba: 10:00 - 16:00",
+    "sunday_closed": "Yakshanba: Dam olish"
+  },
+  
+  "footer": {
+    "description": "Millat Umidi Guruhi - O'zbekistondagi yetakchi ta'lim holdingi",
+    "quick_links": "Tez havolalar",
+    "our_projects": "Bizning loyihalarimiz",
+    "connect": "Biz bilan bog'laning",
+    "copyright": "Barcha huquqlar himoyalangan.",
+    "privacy_policy": "Maxfiylik siyosati",
+    "terms_of_service": "Xizmat shartlari"
+  },
+  
+  "common": {
+    "loading": "Yuklanmoqda...",
+    "error": "Xato",
+    "try_again": "Qayta urinib ko'ring",
+    "search": "Qidirish",
+    "filter": "Filtrlash",
+    "clear_filters": "Filtrlarni tozalash",
+    "show_more": "Ko'proq ko'rsatish",
+    "show_less": "Kamroq ko'rsatish",
+    "read_more": "Ko'proq o'qish",
+    "close": "Yopish",
+    "open": "Ochish",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "confirm": "Tasdiqlash",
+    "back": "Orqaga",
+    "next": "Keyingi",
+    "previous": "Oldingi"
+  },
+  
+  "admin": {
+    "dashboard": "Boshqaruv paneli",
+    "manage_companies": "Kompaniyalarni boshqarish",
+    "manage_departments": "Bo'limlarni boshqarish", 
+    "manage_positions": "Pozitsiyalarni boshqarish",
+    "add_new": "Yangi qo'shish",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish"
+  }
+}

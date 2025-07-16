@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { MultiSelect } from "@/components/MultiSelect";
 import { Button } from "@/components/ui/button";
 import { Search, Filter, X } from "lucide-react";
@@ -30,6 +31,7 @@ export const FilterSection = ({
   setSelectedPositions,
   onFilterComplete
 }: FilterSectionProps) => {
+  const { t } = useTranslation();
   const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>([]);
   const [departmentOptions, setDepartmentOptions] = useState<DepartmentOption[]>([]);
   const [positionOptions, setPositionOptions] = useState<PositionOption[]>([]);
@@ -142,10 +144,10 @@ export const FilterSection = ({
       <div className="max-w-7xl mx-auto relative">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Find Your Perfect Role
+            {t('positions.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Use our intelligent filters to discover opportunities that match your skills and aspirations
+            {t('positions.subtitle')}
           </p>
         </div>
         
@@ -156,7 +158,7 @@ export const FilterSection = ({
             size="lg"
           >
             <Search className="mr-2 h-5 w-5" />
-            Search Positions
+            {t('positions.search_positions')}
           </Button>
           
           {hasActiveFilters && (
@@ -167,7 +169,7 @@ export const FilterSection = ({
               size="lg"
             >
               <X className="mr-2 h-5 w-5" />
-              Clear All Filters
+              {t('positions.clear_filters')}
             </Button>
           )}
         </div>
