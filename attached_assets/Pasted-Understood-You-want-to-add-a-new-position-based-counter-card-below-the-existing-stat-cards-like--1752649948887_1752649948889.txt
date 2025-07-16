@@ -1,0 +1,88 @@
+Understood. You want to add a new "position-based counter card" below the existing stat cards (like "15+ Years of Experience" and "1000+ Students Impacted" if they are kept, or below where they would be if removed, as per our previous discussion). This new card will display how many applicants there are for specific job positions, with the data pulled directly from the database.
+
+Here's a prompt for an AI code agent to implement this feature:
+
+AI Code Agent Prompt: Implement Position-Based Application Counter Card
+Goal: Add a dynamic "Position-Based Application Counter Card" in the hero section, positioned directly below the existing/conceptual stat cards ("15+ Years of Experience," "1000+ Students Impacted"). This card will display the number of applications received for specific job positions, fetching data directly from the database.
+
+Location: Below the "15+ Years of Experience" and "1000+ Students Impacted" cards (or where they would conceptually be if they are removed). This implies it will be near the "Umidjon Ishmukhamedov" text and "Explore Career Opportunities" button, but below the line of the stat cards.
+
+Data Source: Directly from the database.
+
+CRITICAL CONSTRAINTS (Reiterated):
+
+PRESERVE EXISTING UI/UX DESIGN (Overall Layout): The new card should be visually consistent with the existing design language. Its addition should not disrupt the overall layout of the hero section, the alignment of the image, heading, or button. It should integrate seamlessly.
+
+PRESERVE PROPER NOUNS: "Millat Umidi Group" (and any other proper nouns) must remain untranslated within the code/database queries.
+
+No Mock Data: All application counts must be fetched live from the database.
+
+Responsiveness: The new component must be fully responsive and display correctly on all screen sizes.
+
+Detailed Instructions for the AI Code Agent:
+
+Database Interaction & Data Retrieval:
+
+Identify Relevant Database Tables: Determine the exact database tables and columns that store job positions and associated application data (e.g., jobs table with position_name, applications table with job_id).
+
+Develop Database Query: Write an optimized query (SQL, ORM query, etc.) to:
+
+Retrieve a list of relevant job positions (e.g., top 3-5 most applied-for, or a predefined set of key positions).
+
+For each position, count the total number of applications.
+
+The query should be efficient and handle potential large datasets gracefully.
+
+API Endpoint/Server-Side Logic:
+
+If a client-side component, create or extend an API endpoint (e.g., /api/job-applications-count) that executes this query and returns the position names and their respective application counts.
+
+If server-side rendered, integrate the query directly into the page rendering logic.
+
+Component Development (Frontend):
+
+Create a New UI Component: Develop a new frontend component (e.g., PositionCounterCard or similar) dedicated to displaying this information.
+
+Styling:
+
+The card should visually align with the existing design elements. If the existing stat cards have a specific style (e.g., background, border, font), mimic this for consistency.
+
+The card should clearly display the "Position Name" and the "Number of Applicants" for that position.
+
+Consider a clear, readable font size and color scheme.
+
+Dynamic Data Display: The component must dynamically render the data fetched from the database/API.
+
+Error Handling/Loading States: Implement basic loading states (e.g., "Loading data...") and error handling (e.g., "Could not load application data") for robustness.
+
+Component Placement & Layout Integration:
+
+Strategic Positioning: Place the new PositionCounterCard component directly below the line of the "15+ Years of Experience" and "1000+ Students Impacted" cards in the hero section.
+
+Spacing: Ensure adequate vertical spacing between the new card and the elements above it (stat cards/Umidjon's name/button area) and any elements below it (if applicable). Maintain horizontal consistency with other elements in the section.
+
+Flexibility: The layout should allow for multiple position counters within the card, or the card itself could be designed to show multiple positions. Define if it's one card showing multiple positions, or multiple smaller cards. (Assume one card showing multiple if not specified).
+
+Localization (Initial Consideration):
+
+While the counts are numbers, ensure the "Position Name" labels are prepared for future localization (e.g., if you later want to display "Software Engineer" in Russian or Uzbek). Initially, they will likely be in the database's primary language.
+
+Testing:
+
+Unit Tests: Develop unit tests for the data retrieval logic and the frontend component to ensure correct data processing and rendering.
+
+Integration Tests: Test the end-to-end flow from database query to UI display.
+
+UI/UX Regression Testing: Manually and/or automatically verify that the addition of this card has not negatively impacted the existing UI/UX, alignments, or responsiveness of the hero section.
+
+Deliverables:
+
+Backend code (database query, API endpoint if needed) for fetching application counts by position.
+
+Frontend UI component for the "Position-Based Application Counter Card."
+
+Integration of the new component into the hero section's layout.
+
+Confirmation of responsiveness across devices.
+
+Basic error handling and loading states.

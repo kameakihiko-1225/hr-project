@@ -19,7 +19,7 @@
     "badge": "Millat Umidida Karyera",
     "title_start": "Bizga qo'shiling",
     "title_highlight": "Millat Umidi Group",
-    "subtitle": "Millat Umidi O'zbekistondagi eng yirik ta'lim xoldinglaridan biridir. Loyihalarimiz: Millat Umidi Universiteti, Millat Umidi Maktabi, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC",
+    "subtitle": "Millat Umidi O'zbekistondagi eng yirik ta'lim xoldinglaridan biridir. Loyihalarimiz: Millat Umidi Universiteti, Millat Umidi Maktabi, Khan Academy, Edu Action Study Abroad, Edu Action Exams Center(IDP IELTS)",
     "cta_full": "Ochiq ish o'rinlarini ko'rish",
     "cta_short": "Ish o'rinlari",
     "trust1": "Maqsadga yo'naltirilgan missiya",
@@ -45,9 +45,9 @@
 
   "features": {
     "badge": "Millat Umidida Karyera",
-    "title_start": "Nima uchun qo'shilish kerak",
+    "title_start": "Nima uchun",
     "title_highlight": "Millat Umidi?",
-    "subtitle": "Biz bilan karyerangizni qurishning asosiy afzalliklarini bilib oling.",
+    "subtitle": "Biz bilan karyerangizni quring.",
     "cta_full": "Bizga qo'shiling va o'sing!",
     "cta_short": "Bizga qo'shiling",
     "toggle_detailed": "Batafsil ko'rinishni ko'rsatish",
@@ -124,8 +124,8 @@
     "edit": "Tahrirlash",
     "delete": "O'chirish",
     "view_details": "Batafsil",
-    "company_info": "Kompaniya ma'lumotlari",
-    "department_info": "Bo'lim ma'lumotlari",
+    "company_info": "Kompaniya haqida",
+    "department_info": "Bo'lim haqida",
     "delete_confirm": "Ushbu lavozimni o'chirishga ishonchingiz komilmi?",
     "delete_description": "Bu harakatni bekor qilib bo'lmaydi."
   },
@@ -198,26 +198,55 @@
     "get_started": "Boshlash",
     "testimonials_data": {
       "ziyoda": {
-        "quote": "Millat Umidi menga nafaqat yaxshi ish o'rnini, balki o'z ustimda ishlash va o'sish uchun kuchli muhit yaratdi. Dars berish jarayoni zamonaviy texnologiyalar bilan integratsiyalashgan, bu esa bizga va o'quvchilarga ko'proq imkoniyatlar yaratadi."
+        "quote": "Millat Umidi menga nafaqat yaxshi ish o'rnini, balki o'z ustimda ishlash va o'sish uchun kuchli muhit yaratdi. Dars berish jarayoni zamonaviy texnologiyalar bilan integratsiyalashgan, bu esa bizga va o'quvchilarga ko'proq imkoniyatlar yaratadi.",
+        "name": "Ziyoda Raxmonova",
+        "title": "Ingliz tili o'qituvchisi",
+        "organization": "Millat Umidi xususiy maktabi"
       },
       "ulugbek": {
-        "quote": "Tashkilotda har bir g'oya qadrlanadi. Millat Umidi universitetida ishlash – bu faqat maosh emas, balki o'z missiyangni topganing degani. Bu yerda haqiqiy jamoaviy ruh mavjud."
+        "quote": "Tashkilotda har bir g'oya qadrlanadi. Millat Umidi universitetida ishlash – bu faqat maosh emas, balki o'z missiyangni topganing degani. Bu yerda haqiqiy jamoaviy ruh mavjud.",
+        "name": "Ulug'bek Karimov",
+        "title": "Kompyuter fanlari professori",
+        "organization": "Millat Umidi universiteti"
       },
       "jamshid": {
-        "quote": "Millat Umidi menga fan va ta'lim sohasida global yondashuv bilan ishlash imkonini berdi. Har bir loyiha – yangi tajriba. Har bir o'qituvchi – o'sish yo'lidagi hamrohingiz."
+        "quote": "Millat Umidi menga fan va ta'lim sohasida global yondashuv bilan ishlash imkonini berdi. Har bir loyiha – yangi tajriba. Har bir o'qituvchi – o'sish yo'lidagi hamrohingiz.",
+        "name": "Jamshid Abdullayev",
+        "title": "Tadqiqot direktori",
+        "organization": "Millat Umidi universiteti"
       },
       "dilorom": {
-        "quote": "Biz har bir nomzodga individual yondashamiz. Ishga olish jarayonlari tez, tushunarli va insoniy. Bu kompaniyada ishlash — qadriyatlar asosida jamoa bo'lish demak."
+        "quote": "Biz har bir nomzodga individual yondashamiz. Ishga olish jarayonlari tez, tushunarli va insoniy. Bu kompaniyada ishlash — qadriyatlar asosida jamoa bo'lish demak.",
+        "name": "Dilorom Nazarova",
+        "title": "HR menejer",
+        "organization": "Millat Umidi Group"
       },
       "mohira": {
-        "quote": "Men har kuni bolalarning o'sishiga bevosita hissa qo'shayotganimni his qilaman. Maktabdagi ijobiy muhit va pedagogik yondashuv o'quvchilar bilan ishlashni ilhomlantiradi."
+        "quote": "Men har kuni bolalarning o'sishiga bevosita hissa qo'shayotganimni his qilaman. Maktabdagi ijobiy muhit va pedagogik yondashuv o'quvchilar bilan ishlashni ilhomlantiradi.",
+        "name": "Mohira Toshpulatova",
+        "title": "Boshlang'ich sinf o'qituvchisi",
+        "organization": "Millat Umidi xususiy maktabi"
       },
       "shaxzod": {
-        "quote": "Millat Umidi har bir xodimni o'stirishga sodiq. Treninglar, ustozlik tizimi va doimiy qo'llab-quvvatlash orqali biz o'qituvchilarning yutuqlariga zamin yaratamiz."
+        "quote": "Millat Umidi har bir xodimni o'stirishga sodiq. Treninglar, ustozlik tizimi va doimiy qo'llab-quvvatlash orqali biz o'qituvchilarning yutuqlariga zamin yaratamiz.",
+        "name": "Shaxzod Rahimov",
+        "title": "Kasbiy rivojlanish koordinatori",
+        "organization": "Millat Umidi Group"
       },
       "umidjon": {
-        "quote": "Millat Umidi — bu nafaqat ta'lim tashkiloti, balki kelajak avlodining taqdiriga mas'ul bo'lgan jamoaning uyidir. Har bir xodimimiz bizning umumiy missiyamiz — O'zbekistonda sifatli ta'limni rivojlantirishda muhim rol o'ynaydi."
+        "quote": "Millat Umidi — bu nafaqat ta'lim tashkiloti, balki kelajak avlodining taqdiriga mas'ul bo'lgan jamoaning uyidir. Har bir xodimimiz bizning umumiy missiyamiz — O'zbekistonda sifatli ta'limni rivojlantirishda muhim rol o'ynaydi.",
+        "name": "Umidjon Ishmukhamedov",
+        "title": "Asoschisi va bosh direktor",
+        "organization": "Millat Umidi Group"
       }
     }
+  },
+
+  "position_counter": {
+    "title": "Eng ko'p ariza topshirilgan lavozimlar",
+    "applicants": "Arizachilar",
+    "loading": "Lavozim ma'lumotlari yuklanmoqda...",
+    "error": "Lavozim ma'lumotlarini yuklab bo'lmadi",
+    "no_data": "Ariza ma'lumotlari mavjud emas"
   }
 }

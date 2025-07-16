@@ -1013,6 +1013,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dashboard endpoint for position applicant counts
+  app.get("/api/dashboard/position-applicant-counts", async (req, res) => {
+    try {
+      const applicantCounts = await storage.getPositionApplicantCounts();
+      res.json({ success: true, data: applicantCounts });
+    } catch (error) {
+      console.error('Error getting dashboard position applicant counts:', error);
+      res.status(500).json({ success: false, error: "Failed to get position applicant counts" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // Initialize gallery data on startup

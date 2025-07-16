@@ -1,0 +1,97 @@
+Add a dynamic "Position-Based Application Counter Card" in the hero section, positioned directly below the existing/conceptual stat cards. This card will display the number of applications received for specific job positions, with all text content localized for English, Russian, and Uzbek, fetching data directly from the database.
+
+Location: Below the "15+ Years of Experience" and "1000+ Students Impacted" cards (or where they would conceptually be if they are removed).
+
+Data Source: Directly from the database.
+
+CRITICAL CONSTRAINTS (Reiterated & Expanded for Localization):
+
+PRESERVE EXISTING UI/UX DESIGN (Overall Layout): The new card should be visually consistent with the existing design language. Its addition should not disrupt the overall layout of the hero section, the alignment of the image, heading, or button. It should integrate seamlessly. Minimal adjustments for text length are allowed only to prevent overflow.
+
+PRESERVE PROPER NOUNS: "Millat Umidi" and "Millat Umidi Group" must remain untranslated. Ensure this applies to any database content or display text.
+
+No Mock Data: All application counts must be fetched live from the database.
+
+Responsiveness: The new component must be fully responsive and display correctly on all screen sizes across all three languages.
+
+Full Localization: All textual elements within this new component (e.g., "Position Name", "Applicants", any titles/labels for the card) must be translatable into English, Russian, and Uzbek.
+
+Detailed Instructions for the AI Code Agent:
+
+Database Interaction & Data Retrieval:
+
+Identify Relevant Database Tables: Determine the exact database tables and columns that store job positions and associated application data (e.g., jobs table with position_name, applications table with job_id).
+
+Develop Database Query: Write an optimized query (SQL, ORM query, etc.) to:
+
+Retrieve a list of relevant job positions (e.g., top 3-5 most applied-for, or a predefined set of key positions).
+
+For each position, count the total number of applications.
+
+The query should be efficient and handle potential large datasets gracefully.
+
+API Endpoint/Server-Side Logic:
+
+If a client-side component, create or extend an API endpoint (e.g., /api/job-applications-count) that executes this query and returns the position names (in a language-agnostic ID/key form if possible, or primary language) and their respective application counts.
+
+If server-side rendered, integrate the query directly into the page rendering logic.
+
+Component Development (Frontend) with Localization:
+
+Create a New UI Component: Develop a new frontend component (e.g., PositionCounterCard or similar) dedicated to displaying this information.
+
+Styling:
+
+The card should visually align with the existing design elements (background, border, font, etc.) for consistency, respecting UI/UX preservation.
+
+The card should clearly display the "Position Name" and the "Number of Applicants" for that position.
+
+Dynamic Data Display & Localization Integration:
+
+The component must dynamically render the data fetched from the database/API.
+
+For Position Names: If position names are stored as simple strings in the database, these strings need to be run through the existing internationalization (i18n) system to retrieve their localized versions. If the database stores a 'key' for each position, use that key with the i18n system.
+
+For Labels/Titles: All static text within the card (e.g., "Applicants", "Applications Received for:", "Job Title") must be passed through the i18n system, ensuring translation keys are created for them (e.g., job_counter.applicants_label, job_counter.card_title).
+
+Translations: Populate the en.json, ru.json, and uz.json (or TMS entries) with accurate and contextually appropriate translations for all new keys introduced by this component.
+
+Ensure numbers are displayed correctly for the locale (e.g., thousands separators).
+
+Error Handling/Loading States: Implement basic loading states (e.g., "Loading data...") and error handling (e.g., "Could not load application data") for robustness, with these messages also being localizable.
+
+Component Placement & Layout Integration:
+
+Strategic Positioning: Place the new PositionCounterCard component directly below the line of the "15+ Years of Experience" and "1000+ Students Impacted" cards in the hero section.
+
+Spacing: Ensure adequate vertical spacing between the new card and the elements above it (stat cards/Umidjon's name/button area) and any elements below it (if applicable). Maintain horizontal consistency with other elements in the section.
+
+Responsiveness & Layout Adaptations: Ensure the component is fully responsive. As text length varies across languages (e.g., "Software Engineer" vs. "Инженер-программист"), the component's internal layout must gracefully adapt without breaking the overall hero section's UI/UX. Use flexible layouts (flexbox, grid) to accommodate this.
+
+Testing:
+
+Unit Tests: Develop unit tests for the data retrieval logic and the frontend component to ensure correct data processing and rendering.
+
+Localization Tests: Crucially, implement tests to verify that:
+
+The component correctly switches languages for position names and labels.
+
+Text expansion/contraction due to translation does not break the layout.
+
+Integration Tests: Test the end-to-end flow from database query to UI display for all three languages.
+
+UI/UX Regression Testing: Manually and/or automatically verify that the addition of this card has not negatively impacted the existing UI/UX, alignments, or responsiveness of the hero section for any language.
+
+Deliverables:
+
+Backend code (database query, API endpoint if needed) for fetching application counts by position.
+
+Frontend UI component for the "Position-Based Application Counter Card" with full localization support.
+
+New translation keys and their respective translations in en.json, ru.json, and uz.json (or TMS).
+
+Integration of the new component into the hero section's layout, maintaining UI/UX constraints.
+
+Confirmation of responsiveness across devices for all languages.
+
+Localized error handling and loading states.

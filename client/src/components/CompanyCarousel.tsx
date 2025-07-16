@@ -6,7 +6,6 @@ const LOGO_FILES = [
   "idp_ielts_logo.svg",
   "logo-light.png",
   "mu-logo.png",
-  "result.webp",
   "school.png",
   "khan_academy_logo.png"
 ];

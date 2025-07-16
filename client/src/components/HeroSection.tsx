@@ -5,6 +5,7 @@ import { getPositions, getDepartments, getCompanies } from "@/lib/api";
 import { useClickCounter } from "@/contexts/ClickCounterContext";
 import { API_BASE_URL } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PositionCounterCard } from "@/components/PositionCounterCard";
 
 interface Stats {
   companies: number;
@@ -152,6 +153,9 @@ export const HeroSection = () => {
                 <div className="text-sm text-gray-600">{t('stats_cards.applicants')}</div>
               </div>
             </div>
+
+            {/* Position-Based Application Counter Card */}
+            <PositionCounterCard />
           </div>
         </div>
       </div>

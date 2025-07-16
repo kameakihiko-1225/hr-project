@@ -19,7 +19,7 @@
     "badge": "Careers at Millat Umidi",
     "title_start": "Join",
     "title_highlight": "Millat Umidi Group",
-    "subtitle": "Millat Umidi is one of the biggest educational holdings in Uzbekistan. Our projects: Millat Umidi University, Millat Umidi School, Khan Academy, Edu Action Study Abroad, IDP IELTS (Exams.uz), Result LC",
+    "subtitle": "Millat Umidi is one of the biggest educational holdings in Uzbekistan. Our projects: Millat Umidi University, Millat Umidi School, Khan Academy, Edu Action Study Abroad, Edu Action Exams Center(IDP IELTS)",
     "cta_full": "See Open Roles",
     "cta_short": "Roles",
     "trust1": "Purpose-Driven Mission",
@@ -211,26 +211,63 @@
     "get_started": "Get Started",
     "testimonials_data": {
       "ziyoda": {
-        "quote": "Millat Umidi provided me not only with a good job, but also created a strong environment for self-development and growth. The teaching process is integrated with modern technologies, which creates more opportunities for us and students."
+        "quote": "Millat Umidi provided me not only with a good job, but also created a strong environment for self-development and growth. The teaching process is integrated with modern technologies, which creates more opportunities for us and students.",
+        "name": "Ziyoda Rakhmonova",
+        "title": "English Teacher",
+        "organization": "Millat Umidi Private School"
       },
       "ulugbek": {
-        "quote": "Every idea is valued in the organization. Working at Millat Umidi University is not just about salary, but about finding your mission. There is a real team spirit here."
+        "quote": "Every idea is valued in the organization. Working at Millat Umidi University is not just about salary, but about finding your mission. There is a real team spirit here.",
+        "name": "Ulugbek Karimov",
+        "title": "Computer Science Professor",
+        "organization": "Millat Umidi University"
       },
       "jamshid": {
-        "quote": "Millat Umidi gave me the opportunity to work with a global approach in the field of science and education. Every project is a new experience. Every teacher is your companion on the path of growth."
+        "quote": "Millat Umidi gave me the opportunity to work with a global approach in the field of science and education. Every project is a new experience. Every teacher is your companion on the path of growth.",
+        "name": "Jamshid Abdullayev", 
+        "title": "Research Director",
+        "organization": "Millat Umidi University"
       },
       "dilorom": {
-        "quote": "We take an individual approach to each candidate. Hiring processes are fast, clear and humane. Working in this company means being a team based on values."
+        "quote": "We take an individual approach to each candidate. Hiring processes are fast, clear and humane. Working in this company means being a team based on values.",
+        "name": "Dilorom Nazarova",
+        "title": "HR Manager", 
+        "organization": "Millat Umidi Group"
       },
       "mohira": {
-        "quote": "I feel that I contribute directly to the growth of children every day. The positive environment and pedagogical approach at school inspires working with students."
+        "quote": "I feel that I contribute directly to the growth of children every day. The positive environment and pedagogical approach at school inspires working with students.",
+        "name": "Mohira Toshpulatova",
+        "title": "Elementary School Teacher",
+        "organization": "Millat Umidi Private School"
       },
       "shaxzod": {
-        "quote": "Millat Umidi is committed to developing every employee. Through trainings, mentoring system and continuous support, we create the foundation for teachers' achievements."
+        "quote": "Millat Umidi is committed to developing every employee. Through trainings, mentoring system and continuous support, we create the foundation for teachers' achievements.",
+        "name": "Shaxzod Rakhimov",
+        "title": "Professional Development Coordinator", 
+        "organization": "Millat Umidi Group"
       },
       "umidjon": {
-        "quote": "Millat Umidi is not just an educational organization, but the home of a team responsible for the future of generations. Each of our employees plays an important role in our common mission - developing quality education in Uzbekistan."
+        "quote": "Millat Umidi is not just an educational organization, but the home of a team responsible for the future of generations. Each of our employees plays an important role in our common mission - developing quality education in Uzbekistan.",
+        "name": "Umidjon Ishmukhamedov",
+        "title": "Founder & CEO",
+        "organization": "Millat Umidi Group"
       }
     }
+  },
+
+  "position_counter": {
+    "title": "Top Applied Positions",
+    "applicants": "Applicants",
+    "loading": "Loading position data...",
+    "error": "Unable to load position data",
+    "no_data": "No application data available"
+  },
+
+  "position_counter": {
+    "title": "Top Positions by Application Count",
+    "applicants": "Applicants",
+    "loading": "Loading position data...",
+    "error": "Failed to load position data",
+    "no_data": "No application data available"
   }
 }
