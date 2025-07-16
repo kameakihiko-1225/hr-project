@@ -381,15 +381,23 @@ export class DatabaseStorage implements IStorage {
   // Gallery item methods
   async getAllGalleryItems(category?: string, language: SupportedLanguage = 'en'): Promise<GalleryItem[]> {
     try {
+      let items: GalleryItem[];
       if (category) {
-        return await db.select().from(galleryItems)
+        items = await db.select().from(galleryItems)
           .where(and(eq(galleryItems.isActive, true), eq(galleryItems.category, category)))
           .orderBy(galleryItems.sortOrder, galleryItems.createdAt);
       } else {
-        return await db.select().from(galleryItems)
+        items = await db.select().from(galleryItems)
           .where(eq(galleryItems.isActive, true))
           .orderBy(galleryItems.sortOrder, galleryItems.createdAt);
       }
+      
+      // Apply localization to title and description
+      return items.map(item => ({
+        ...item,
+        title: getLocalizedContent(item.title, language),
+        description: getLocalizedContent(item.description, language)
+      }));
     } catch (error) {
       console.error("Error fetching gallery items:", error);
       return [];
@@ -399,7 +407,14 @@ export class DatabaseStorage implements IStorage {
   async getGalleryItemById(id: number, language: SupportedLanguage = 'en'): Promise<GalleryItem | undefined> {
     try {
       const [item] = await db.select().from(galleryItems).where(eq(galleryItems.id, id));
-      return item || undefined;
+      if (!item) return undefined;
+      
+      // Apply localization to title and description
+      return {
+        ...item,
+        title: getLocalizedContent(item.title, language),
+        description: getLocalizedContent(item.description, language)
+      };
     } catch (error) {
       console.error("Error fetching gallery item:", error);
       return undefined;
@@ -443,7 +458,14 @@ export class DatabaseStorage implements IStorage {
   // Industry tag methods
   async getAllIndustryTags(language: SupportedLanguage = 'en'): Promise<IndustryTag[]> {
     try {
-      return await db.select().from(industryTags);
+      const tags = await db.select().from(industryTags);
+      
+      // Apply localization to name and description
+      return tags.map(tag => ({
+        ...tag,
+        name: getLocalizedContent(tag.name, language),
+        description: getLocalizedContent(tag.description, language)
+      }));
     } catch (error) {
       console.error('Error fetching industry tags:', error);
       return [];
@@ -453,7 +475,14 @@ export class DatabaseStorage implements IStorage {
   async getIndustryTagById(id: number, language: SupportedLanguage = 'en'): Promise<IndustryTag | undefined> {
     try {
       const [tag] = await db.select().from(industryTags).where(eq(industryTags.id, id));
-      return tag || undefined;
+      if (!tag) return undefined;
+      
+      // Apply localization to name and description
+      return {
+        ...tag,
+        name: getLocalizedContent(tag.name, language),
+        description: getLocalizedContent(tag.description, language)
+      };
     } catch (error) {
       console.error('Error fetching industry tag:', error);
       return undefined;

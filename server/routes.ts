@@ -420,7 +420,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Industry tags endpoints
   app.get("/api/industry-tags", async (req, res) => {
     try {
-      const tags = await storage.getAllIndustryTags();
+      const language = req.query.language as string || 'en';
+      const tags = await storage.getAllIndustryTags(language);
       res.json({ success: true, data: tags });
     } catch (error) {
       console.error('Error fetching industry tags:', error);
@@ -827,7 +828,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/gallery", async (req, res) => {
     try {
       const category = req.query.category as string | undefined;
-      const galleryItems = await storage.getAllGalleryItems(category);
+      const language = req.query.language as string || 'en';
+      const galleryItems = await storage.getAllGalleryItems(category, language);
       res.json({ success: true, data: galleryItems });
     } catch (error) {
       console.error('Error fetching gallery items:', error);
@@ -838,7 +840,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/gallery/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const galleryItem = await storage.getGalleryItemById(id);
+      const language = req.query.language as string || 'en';
+      const galleryItem = await storage.getGalleryItemById(id, language);
       
       if (!galleryItem) {
         return res.status(404).json({ success: false, error: "Gallery item not found" });
