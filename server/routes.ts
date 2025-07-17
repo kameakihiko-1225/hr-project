@@ -484,6 +484,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.set('ETag', `"departments-${Date.now()}"`);
       
       const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
+      
+      // Debug logging for companyId parsing
+      console.log('[Departments API] Raw companyId query:', req.query.companyId);
+      console.log('[Departments API] Parsed companyId:', companyId);
       const includePositions = req.query.includePositions === 'true';
       const language = req.query.language as string || 'en';
       const rawData = req.query.raw === 'true'; // For admin interface
