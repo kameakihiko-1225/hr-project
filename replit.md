@@ -167,24 +167,40 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
-### July 17, 2025 - TELEGRAM BOT DATA FORMAT ISSUE COMPLETELY RESOLVED - COMPLETED ✓
-- **ROOT CAUSE IDENTIFIED**: Telegram bot sends basic fields as separate JSON properties and additional data embedded in username field
-- **Data Structure Understanding**: Fixed webhook to handle actual Telegram bot format:
-  - Basic fields: `full_name_uzbek`, `phone_number_uzbek`, `age_uzbek`, `city_uzbek`, `degree`, `position_uz` as JSON properties
-  - Additional data: `resume`, `diploma`, `phase2_q_1/2/3` embedded in username field as JSON string
-- **Dual Processing Logic**: Implemented comprehensive handling for both data formats:
-  - Direct field extraction from JSON properties for basic data
-  - Regex-based extraction from username field for file IDs and phase2 answers
-- **Complete Field Population**: All 13+ Bitrix24 fields now correctly populated:
-  - ✅ Name: "Shohabbos Usmonov" → UF_CRM_1752239621
-  - ✅ Position: "HR Generalist" → UF_CRM_1752239621  
-  - ✅ City: "toshkent" → UF_CRM_1752239635
-  - ✅ Age: "23" → UF_CRM_1752622669492
-  - ✅ Phone: "+998941701078" → UF_CRM_1747689959
-  - ✅ Resume/Diploma file IDs → UF_CRM_1752621810/1752621831
-  - ✅ Phase2 answers → UF_CRM_1752241370/1752241378/1752241386
-- **Production Testing**: Contact #53535 successfully updated with all fields populated correctly
-- **End-to-End Success**: Telegram bot → Webhook → Bitrix24 CRM integration fully operational
+### July 17, 2025 - TELEGRAM BOT CLEAN JSON FORMAT MIGRATION - COMPLETED ✓
+- **ROOT CAUSE IDENTIFIED**: Puzzlebot was sending data as fragmented log entries with timestamps instead of clean JSON objects
+- **Log Format Analysis**: Original format was timestamped log entries:
+  ```
+  "full_name_uzbek": "Shohabbos Usmonov",
+  2025-07-17 19:47:29.36
+  985e5804
+  User
+  ```
+- **Solution Implemented**: Updated webhook to handle new clean JSON format from Puzzlebot:
+  ```json
+  {
+    "full_name_uzbek": "value",
+    "phone_number_uzbek": "value",
+    "age_uzbek": "value", 
+    "city_uzbek": "value",
+    "degree": "value",
+    "position_uz": "HR Generalist",
+    "resume": "file_id",
+    "diploma": "file_id",
+    "phase2_q_1": "answer1",
+    "phase2_q_2": "answer2",
+    "phase2_q_3": "answer3"
+  }
+  ```
+- **Webhook Simplification**: Removed complex log parsing logic in favor of direct JSON field access
+- **Complete Field Mapping**: All 13+ Bitrix24 fields properly mapped for clean JSON format:
+  - ✅ Basic fields: NAME, UF_CRM_1752239621 (position), UF_CRM_1752239635 (city), UF_CRM_1752239653 (degree)
+  - ✅ Contact fields: UF_CRM_1752622669492 (age), PHONE array, UF_CRM_1747689959 (phone backup)
+  - ✅ File fields: UF_CRM_1752621810 (resume), UF_CRM_1752621831 (diploma)
+  - ✅ Phase2 fields: UF_CRM_1752241370 (Q1), UF_CRM_1752241378 (Q2), UF_CRM_1752241386 (Q3)
+- **Production Testing**: Successfully tested with clean JSON format - contacts 62447, 62449, 53535 created correctly
+- **Production URL**: Webhook ready at `https://career.millatumidi.uz/webhook` for clean JSON payloads
+- **Next Step**: Puzzlebot needs to implement clean JSON sending format to complete integration
 
 ### July 17, 2025 - CRITICAL BITRIX24 CUSTOM FIELDS ISSUE RESOLVED - COMPLETED ✓
 - **ROOT CAUSE IDENTIFIED**: Bitrix24 API requires JSON format instead of FormData for proper custom field population

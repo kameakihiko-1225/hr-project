@@ -1,0 +1,163 @@
+Great — let’s debug your **Telegram bot** step by step to ensure it sends the right payload to your webhook.
+
+---
+
+## ✅ Step 1: Understand What the Backend Expects
+
+Your Express webhook expects this JSON structure:
+
+```json
+{
+  "full_name_uzbek": "John Doe",
+  "phone_number_uzbek": "991234567",
+  "age_uzbek": "25",
+  "city_uzbek": "Tashkent",
+  "degree": "Bachelor",
+  "position_uz": "HR Generalist",
+  "username": "<a href='https://t.me/example'>@example</a>",
+  "resume": "file_id",
+  "diploma": "file_id",
+  "phase2_q_1": "some answer",
+  "phase2_q_2": "file_id",
+  "phase2_q_3": "some answer"
+}
+```
+
+This means your bot should collect **all of these values** and **send them to**:
+
+```
+POST https://career.millatumidi.uz/webhook
+Content-Type: application/json
+```
+
+---
+
+## ✅ Step 2: Log What the Bot Sends
+
+In your bot code (likely in a handler after the user finishes submitting their answers), **add a `console.log()`** before making the `axios.post()` request to the webhook:
+
+```ts
+console.log('[BOT] Sending data to webhook:', JSON.stringify({
+  full_name_uzbek,
+  phone_number_uzbek,
+  age_uzbek,
+  city_uzbek,
+  degree,
+  position_uz,
+  username,
+  resume,
+  diploma,
+  phase2_q_1,
+  phase2_q_2,
+  phase2_q_3
+}, null, 2));
+```
+
+Also log the response:
+
+```ts
+try {
+  const resp = await axios.post('https://career.millatumidi.uz/webhook', {
+    full_name_uzbek,
+    phone_number_uzbek,
+    age_uzbek,
+    city_uzbek,
+    degree,
+    position_uz,
+    username,
+    resume,
+    diploma,
+    phase2_q_1,
+    phase2_q_2,
+    phase2_q_3
+  });
+  console.log('[BOT] Webhook responded with:', resp.data);
+} catch (e) {
+  console.error('[BOT] Webhook error:', e?.response?.data || e.message);
+}
+```
+
+---
+
+## ✅ Step 3: Make Sure File IDs Are Sent Correctly
+
+Use this check before sending:
+
+```ts
+function isTelegramFileId(value: string): boolean {
+  return typeof value === 'string' && /^[A-Z0-9]/.test(value) && value.length > 20;
+}
+
+if (!isTelegramFileId(resume)) console.warn('Resume file_id is invalid or missing');
+if (!isTelegramFileId(diploma)) console.warn('Diploma file_id is invalid or missing');
+```
+
+---
+
+## ✅ Step 4: Manual Test Payload
+
+Try **posting manually** to your webhook endpoint using Postman or curl to confirm that the backend works if correct data is sent:
+
+### Example curl:
+
+```bash
+curl -X POST https://career.millatumidi.uz/webhook \
+  -H "Content-Type: application/json" \
+  -d '{
+    "full_name_uzbek": "Shohabbos Usmonov",
+    "phone_number_uzbek": "991234567",
+    "age_uzbek": "25",
+    "city_uzbek": "Tashkent",
+    "degree": "Bachelor",
+    "position_uz": "HR Generalist",
+    "username": "<a href=\"https://t.me/shohabbos\">@shohabbos</a>",
+    "resume": "BQACAgIAAxkBAAIIv2h5Ermd4V4wXnmvKxFIh-u_gpKcAAL6eQACq8DIS_jR4flfotLFNgQ",
+    "diploma": "BQACAgIAAxkBAAIIwmh5Er1ntvks-33mFNkgLVwRGVCaAAL7eQACq8DIS9KDqTI5S5DDNgQ",
+    "phase2_q_1": "test",
+    "phase2_q_2": "AwACAgIAAxkBAAIIyWh5Eu0gR0bGbUPzg3OyioAAAcOz8QAC_3kAAqvAyEuJaS-R6xyHrjYE",
+    "phase2_q_3": "test"
+  }'
+```
+
+---
+
+## ✅ Step 5: Add Schema Validation (Optional but Smart)
+
+Before sending the payload, add a check in the bot:
+
+```ts
+function validatePayload(payload: Record<string, any>) {
+  const requiredFields = [
+    'full_name_uzbek',
+    'phone_number_uzbek',
+    'age_uzbek',
+    'city_uzbek',
+    'degree',
+    'position_uz',
+    'username',
+    'resume',
+    'diploma',
+    'phase2_q_1',
+    'phase2_q_2',
+    'phase2_q_3'
+  ];
+
+  for (const key of requiredFields) {
+    if (!payload[key]) {
+      console.warn(`[BOT] Missing required field: ${key}`);
+    }
+  }
+}
+```
+
+---
+
+## ✅ Final Tips
+
+* If your bot flow is **not collecting** these fields, update the bot questions to ensure you do.
+* Make sure **no field is left `undefined`** or skipped.
+* Use `console.log` or even send a debug copy to your own Telegram to monitor what’s being sent.
+
+---
+
+Would you like me to help **review or rewrite your Telegram bot question flow** to match the expected webhook format exactly?

@@ -1,0 +1,129 @@
+Thanks for sharing the detailed logs and code.
+
+From the logs, it's clear that **your incoming webhook data is not populating fields like `full_name_uzbek`, `phone_number_uzbek`, `age_uzbek`, etc.** That’s why all the logs are showing values like `""` or `undefined`.
+
+### ✅ Root Cause:
+
+Your webhook receives a `req.body` payload, but the actual data seems **nested or incorrectly structured**, which results in lines like:
+
+```
+[TELEGRAM-BOT] Full name: "", phone_raw: undefined, normalized_phone: ""
+```
+
+This means the keys you're trying to access:
+
+```js
+data.full_name_uzbek
+data.phone_number_uzbek
+...
+```
+
+**do not exist** at the top level of `data`.
+
+---
+
+### ✅ Solution:
+
+Log and inspect the full shape of `req.body`. You’re doing this here:
+
+```js
+console.log('[TELEGRAM-BOT] Incoming webhook data:', JSON.stringify(data, null, 2));
+```
+
+But your sample payload (based on your message) looks like:
+
+```json
+{
+  "position_uz": "HR Generalist",
+  "resume": "BQACAgIAAxkBAAIIv2h5...",
+  "diploma": "BQACAgIAAxkBAAIIwmh5...",
+  "phase2_q_1": "test",
+  "phase2_q_2": "AwACAgIAAxkBAAIIyWh5...",
+  "phase2_q_3": "test"
+}
+```
+
+This means your backend is expecting `full_name_uzbek`, `phone_number_uzbek`, `age_uzbek`, etc., but those keys are **missing in the payload**.
+
+---
+
+### ✅ Fix Options:
+
+#### Option 1: **Update Your Frontend Bot Payload**
+
+Make sure your bot sends all the required fields:
+
+```json
+{
+  "full_name_uzbek": "John Doe",
+  "phone_number_uzbek": "991234567",
+  "age_uzbek": "25",
+  "city_uzbek": "Tashkent",
+  "degree": "Bachelor",
+  "position_uz": "HR Generalist",
+  "username": "<a href='https://t.me/example'>@example</a>",
+  "resume": "BQACAgIAAxkBAAIIv2h5...",
+  "diploma": "BQACAgIAAxkBAAIIwmh5...",
+  "phase2_q_1": "answer",
+  "phase2_q_2": "file_id",
+  "phase2_q_3": "answer"
+}
+```
+
+If you are testing manually (e.g. Postman or curl), ensure you pass **all expected fields**, or mock default values in the backend if some fields are optional.
+
+---
+
+#### Option 2: **Add Defensive Checks**
+
+Update your extraction logic to log the actual body structure:
+
+```js
+console.log('[DEBUG] Raw request body keys:', Object.keys(data));
+console.log('[DEBUG] Full body:', JSON.stringify(data, null, 2));
+```
+
+Then temporarily add fallback values or logs:
+
+```js
+const fullName = (data.full_name_uzbek || 'Missing Full Name').trim();
+const phoneRaw = data.phone_number_uzbek || 'Missing Phone';
+```
+
+---
+
+### ✅ Bonus: Improve Error Feedback
+
+Update this block:
+
+```js
+res.status(500).json({
+  message: 'Error processing contact or deal',
+  error: error?.response?.data || error.message,
+});
+```
+
+to:
+
+```js
+res.status(500).json({
+  message: 'Error processing contact or deal',
+  body: req.body,
+  error: error?.response?.data || error.message,
+});
+```
+
+So you can debug payloads on the server side more easily.
+
+---
+
+### ✅ Summary:
+
+| Problem                                  | Fix                                                         |
+| ---------------------------------------- | ----------------------------------------------------------- |
+| Required fields are `undefined`          | Ensure they exist in the incoming payload                   |
+| Keys like `full_name_uzbek` are missing  | Update Telegram bot to send them                            |
+| `resume`, `diploma` = `undefined`        | Your backend expects them, so they must be passed correctly |
+| Validation fails in `isTelegramFileId()` | Because file IDs are not found due to missing keys          |
+
+Would you like help debugging the **Telegram bot part** to ensure it sends the correct payload format?
