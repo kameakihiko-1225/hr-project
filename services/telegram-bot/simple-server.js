@@ -127,6 +127,90 @@ async function findDealIdByContact(contactId) {
   }
 }
 
+// Phone number fallback function - verify and add phone if missing
+async function ensurePhoneNumberSet(contactId, phone) {
+  if (!contactId || !phone) {
+    console.log('[TELEGRAM-BOT] Skipping phone verification - missing contactId or phone');
+    return;
+  }
+
+  try {
+    console.log(`[TELEGRAM-BOT] Verifying phone number for contact ${contactId}...`);
+    
+    // Get contact details to check if phone was set
+    const getResp = await axios.post(`${BITRIX_BASE}/crm.contact.get.json`, {
+      id: contactId,
+      select: ['PHONE']
+    });
+    
+    if (!getResp.data.result || !getResp.data.result.PHONE || getResp.data.result.PHONE.length === 0) {
+      console.log(`[TELEGRAM-BOT] Phone number missing from contact ${contactId}, adding manually...`);
+      
+      // Try to add phone number using different API methods
+      const phoneData = {
+        VALUE: phone,
+        VALUE_TYPE: 'MOBILE'
+      };
+      
+      // Method 1: Direct contact update with phone array
+      try {
+        const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, {
+          id: contactId,
+          fields: {
+            PHONE: [phoneData]
+          }
+        });
+        console.log('[TELEGRAM-BOT] Phone added via contact update:', updateResp.data);
+        if (updateResp.data.result) {
+          console.log('[TELEGRAM-BOT] Phone number successfully added to contact');
+          return;
+        }
+      } catch (updateError) {
+        console.log('[TELEGRAM-BOT] Direct phone update failed:', updateError?.response?.data || updateError.message);
+      }
+      
+      // Method 2: Add phone via multifield API
+      try {
+        const multifieldResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, {
+          id: contactId,
+          fields: {
+            PHONE: JSON.stringify([phoneData])
+          }
+        });
+        console.log('[TELEGRAM-BOT] Phone added via multifield:', multifieldResp.data);
+        if (multifieldResp.data.result) {
+          console.log('[TELEGRAM-BOT] Phone number successfully added via multifield method');
+          return;
+        }
+      } catch (multifieldError) {
+        console.log('[TELEGRAM-BOT] Multifield phone update failed:', multifieldError?.response?.data || multifieldError.message);
+      }
+      
+      // Method 3: Try with backup phone field
+      try {
+        const backupResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, {
+          id: contactId,
+          fields: {
+            UF_CRM_1747689959: phone // Backup phone field
+          }
+        });
+        console.log('[TELEGRAM-BOT] Phone added to backup field:', backupResp.data);
+        if (backupResp.data.result) {
+          console.log('[TELEGRAM-BOT] Phone number successfully added to backup field');
+        }
+      } catch (backupError) {
+        console.log('[TELEGRAM-BOT] Backup phone field update failed:', backupError?.response?.data || backupError.message);
+      }
+      
+    } else {
+      console.log(`[TELEGRAM-BOT] Phone number already present for contact ${contactId}`);
+    }
+    
+  } catch (error) {
+    console.error(`[TELEGRAM-BOT] Error during phone verification for contact ${contactId}:`, error?.response?.data || error.message);
+  }
+}
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
