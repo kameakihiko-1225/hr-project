@@ -115,7 +115,7 @@ export default function DepartmentsPage() {
       (description && description.toLowerCase().includes(searchTerm.toLowerCase()));
     
     // If selectedCompanyId is 'all', show all departments
-    const matchesCompany = selectedCompanyId === 'all' || department.companyId === selectedCompanyId;
+    const matchesCompany = selectedCompanyId === 'all' || department.companyId === parseInt(selectedCompanyId);
     
     return matchesSearch && matchesCompany;
   });

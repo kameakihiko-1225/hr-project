@@ -537,6 +537,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/departments", async (req, res) => {
     try {
       let departmentData = req.body;
+      console.log('[Department Create] Raw request data:', JSON.stringify(departmentData, null, 2));
+      
+      // Convert companyId to number if it's a string
+      if (departmentData.companyId && typeof departmentData.companyId === 'string') {
+        departmentData.companyId = parseInt(departmentData.companyId);
+      }
       
       // Inherit fields from company if not provided
       if (departmentData.companyId && (!departmentData.city || !departmentData.country)) {
@@ -551,11 +557,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      console.log('[Department Create] Data before validation:', JSON.stringify(departmentData, null, 2));
+      
       const validatedData = insertDepartmentSchema.parse(departmentData);
+      console.log('[Department Create] Validated data:', JSON.stringify(validatedData, null, 2));
+      
       const department = await storage.createDepartment(validatedData);
+      console.log('[Department Create] Created department:', department);
+      
       res.json({ success: true, data: department });
     } catch (error) {
       console.error('Error creating department:', error);
+      console.error('Error details:', error.message);
+      if (error.errors) {
+        console.error('Validation errors:', error.errors);
+      }
       res.status(400).json({ success: false, error: error.message || "Failed to create department" });
     }
   });
@@ -623,6 +639,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const language = req.query.language as string || 'en';
+      
+      // Check if ID is valid
+      if (isNaN(id)) {
+        console.error('Invalid position ID:', req.params.id);
+        return res.status(400).json({ success: false, error: "Invalid position ID" });
+      }
+      
       const position = await storage.getPositionById(id, language);
       if (!position) {
         return res.status(404).json({ success: false, error: "Position not found" });
