@@ -122,6 +122,8 @@ export class DatabaseStorage implements IStorage {
   async getAllCompanies(language?: SupportedLanguage): Promise<CompanyWithIndustries[]> {
     try {
       const companiesData = await db.select().from(companies);
+      console.log(`[Storage] getAllCompanies: Found ${companiesData.length} companies in database`);
+      console.log(`[Storage] getAllCompanies: Company IDs: ${companiesData.map(c => c.id).join(', ')}`);
       
       // Fetch industry tags and conditionally localize each company
       const companiesWithTags = await Promise.all(
@@ -150,6 +152,7 @@ export class DatabaseStorage implements IStorage {
         })
       );
       
+      console.log(`[Storage] getAllCompanies: Returning ${companiesWithTags.length} companies with tags`);
       return companiesWithTags;
     } catch (error) {
       console.error('Error fetching companies:', error);

@@ -99,20 +99,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Companies endpoints with caching headers
   app.get("/api/companies", async (req, res) => {
     try {
-      // Set cache headers for better performance
-      res.set('Cache-Control', 'public, max-age=1800, s-maxage=3600'); // 30 min client, 1 hour CDN
-      res.set('ETag', `"companies-${Date.now()}"`);
+      // Disable cache headers to prevent caching issues
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
       
       const language = req.query.language as string || 'en';
       const rawData = req.query.raw === 'true'; // For admin interface
       
+      console.log(`[Companies API] Raw data requested: ${rawData}, language: ${language}`);
+      
       if (rawData) {
         // Return raw LocalizedContent objects for admin editing
         const companies = await storage.getAllCompanies(); // No language parameter
+        console.log(`[Companies API] Raw companies count: ${companies.length}`);
+        console.log(`[Companies API] Raw companies IDs: ${companies.map(c => c.id).join(', ')}`);
+        console.log(`[Companies API] Full response data:`, JSON.stringify({ success: true, data: companies }, null, 2));
         res.json({ success: true, data: companies });
       } else {
         // Return localized content for public use
         const companies = await storage.getAllCompanies(language);
+        console.log(`[Companies API] Localized companies count: ${companies.length}`);
         res.json({ success: true, data: companies });
       }
     } catch (error) {

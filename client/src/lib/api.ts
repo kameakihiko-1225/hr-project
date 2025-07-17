@@ -459,6 +459,13 @@ class ApiClient {
         const responseData = await response.json();
         
         if (response.ok) {
+          if (endpoint.includes('/companies')) {
+            console.log(`[API Client] Companies endpoint response for ${endpoint}:`, responseData);
+            if (responseData.data && Array.isArray(responseData.data)) {
+              console.log(`[API Client] Companies count: ${responseData.data.length}`);
+              console.log(`[API Client] Company IDs: ${responseData.data.map(c => c.id).join(', ')}`);
+            }
+          }
           return responseData;
         } else {
           logger.warn(`API error: ${responseData.error || response.statusText}`);
