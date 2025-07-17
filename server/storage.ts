@@ -157,7 +157,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getCompanyById(id: number, language: SupportedLanguage = 'en'): Promise<CompanyWithIndustries | undefined> {
+  async getCompanyById(id: number, language?: SupportedLanguage): Promise<CompanyWithIndustries | undefined> {
     try {
       const result = await db.select().from(companies).where(eq(companies.id, id));
       const company = result[0];
@@ -165,18 +165,26 @@ export class DatabaseStorage implements IStorage {
       if (company) {
         const industries = await this.getCompanyIndustryTags(company.id, language);
         
-        // Localize company fields
-        const localizedCompany = {
-          ...company,
-          name: getLocalizedContent(company.name, language),
-          description: getLocalizedContent(company.description, language),
-          address: getLocalizedContent(company.address, language),
-          city: getLocalizedContent(company.city, language),
-          country: getLocalizedContent(company.country, language),
-          industries,
-        };
-        
-        return localizedCompany as CompanyWithIndustries;
+        if (language) {
+          // Localize company fields for public API
+          const localizedCompany = {
+            ...company,
+            name: getLocalizedContent(company.name, language),
+            description: getLocalizedContent(company.description, language),
+            address: getLocalizedContent(company.address, language),
+            city: getLocalizedContent(company.city, language),
+            country: getLocalizedContent(company.country, language),
+            industries,
+          };
+          
+          return localizedCompany as CompanyWithIndustries;
+        } else {
+          // Return raw LocalizedContent objects for admin interface
+          return {
+            ...company,
+            industries,
+          } as CompanyWithIndustries;
+        }
       }
       
       return undefined;
@@ -202,7 +210,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Department methods
-  async getAllDepartments(companyId?: number, language: SupportedLanguage = 'en'): Promise<Department[]> {
+  async getAllDepartments(companyId?: number, language?: SupportedLanguage): Promise<Department[]> {
     let result;
     if (companyId) {
       result = await db.select().from(departments).where(eq(departments.companyId, companyId));
@@ -210,17 +218,22 @@ export class DatabaseStorage implements IStorage {
       result = await db.select().from(departments);
     }
     
-    // Localize department fields
-    return result.map(department => ({
-      ...department,
-      name: getLocalizedContent(department.name, language),
-      description: getLocalizedContent(department.description, language),
-    }));
+    if (language) {
+      // Localize department fields for public API
+      return result.map(department => ({
+        ...department,
+        name: getLocalizedContent(department.name, language),
+        description: getLocalizedContent(department.description, language),
+      }));
+    } else {
+      // Return raw LocalizedContent objects for admin interface
+      return result;
+    }
   }
 
-  async getAllDepartmentsWithPositionCounts(companyId?: number, language: SupportedLanguage = 'en'): Promise<(Department & { positionCount: number })[]> {
+  async getAllDepartmentsWithPositionCounts(companyId?: number, language?: SupportedLanguage): Promise<(Department & { positionCount: number })[]> {
     try {
-      console.log('Executing getAllDepartmentsWithPositionCounts with companyId:', companyId);
+      console.log('Executing getAllDepartmentsWithPositionCounts with companyId:', companyId, 'language:', language);
       
       // Get all departments first
       const departmentsResult = await this.getAllDepartments(companyId, language);
@@ -234,7 +247,9 @@ export class DatabaseStorage implements IStorage {
             .where(eq(positions.departmentId, department.id));
           
           const positionCount = positionCountResult[0]?.count || 0;
-          console.log(`Department ${department.id} (${department.name}) has ${positionCount} positions`);
+          const departmentName = language ? department.name : 
+            (typeof department.name === 'object' ? department.name.en || 'Unknown' : department.name);
+          console.log(`Department ${department.id} (${departmentName}) has ${positionCount} positions`);
           
           return {
             ...department,
@@ -282,7 +297,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Position methods
-  async getAllPositions(departmentId?: number, language: SupportedLanguage = 'en'): Promise<Position[]> {
+  async getAllPositions(departmentId?: number, language?: SupportedLanguage): Promise<Position[]> {
     try {
       let result;
       if (departmentId) {
@@ -291,20 +306,25 @@ export class DatabaseStorage implements IStorage {
         result = await db.select().from(positions);
       }
       
-      // Localize position fields
-      return result.map(position => ({
-        ...position,
-        title: getLocalizedContent(position.title, language),
-        description: getLocalizedContent(position.description, language),
-        location: getLocalizedContent(position.location, language),
-        city: getLocalizedContent(position.city, language),
-        country: getLocalizedContent(position.country, language),
-        salaryRange: getLocalizedContent(position.salaryRange, language),
-        employmentType: getLocalizedContent(position.employmentType, language),
-        languageRequirements: getLocalizedContent(position.languageRequirements, language),
-        qualifications: getLocalizedContent(position.qualifications, language),
-        responsibilities: getLocalizedContent(position.responsibilities, language),
-      }));
+      if (language) {
+        // Localize position fields for public API
+        return result.map(position => ({
+          ...position,
+          title: getLocalizedContent(position.title, language),
+          description: getLocalizedContent(position.description, language),
+          location: getLocalizedContent(position.location, language),
+          city: getLocalizedContent(position.city, language),
+          country: getLocalizedContent(position.country, language),
+          salaryRange: getLocalizedContent(position.salaryRange, language),
+          employmentType: getLocalizedContent(position.employmentType, language),
+          languageRequirements: getLocalizedContent(position.languageRequirements, language),
+          qualifications: getLocalizedContent(position.qualifications, language),
+          responsibilities: getLocalizedContent(position.responsibilities, language),
+        }));
+      } else {
+        // Return raw LocalizedContent objects for admin interface
+        return result;
+      }
     } catch (error) {
       console.error('Database error in getAllPositions:', error);
       // Return empty array if there's a database error

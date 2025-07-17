@@ -124,11 +124,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const language = req.query.language as string || 'en';
-      const company = await storage.getCompanyById(id, language);
-      if (!company) {
-        return res.status(404).json({ success: false, error: "Company not found" });
+      const rawData = req.query.raw === 'true'; // For admin interface
+      
+      if (rawData) {
+        // Return raw LocalizedContent objects for admin editing
+        const company = await storage.getCompanyById(id); // No language parameter
+        if (!company) {
+          return res.status(404).json({ success: false, error: "Company not found" });
+        }
+        res.json({ success: true, data: company });
+      } else {
+        // Return localized content for public use
+        const company = await storage.getCompanyById(id, language);
+        if (!company) {
+          return res.status(404).json({ success: false, error: "Company not found" });
+        }
+        res.json({ success: true, data: company });
       }
-      res.json({ success: true, data: company });
     } catch (error) {
       console.error('Error fetching company:', error);
       res.status(500).json({ success: false, error: "Failed to fetch company" });
@@ -474,19 +486,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
       const includePositions = req.query.includePositions === 'true';
       const language = req.query.language as string || 'en';
+      const rawData = req.query.raw === 'true'; // For admin interface
       
-      console.log('[Departments API] Request params:', { companyId, includePositions, language, query: req.query });
+      console.log('[Departments API] Request params:', { companyId, includePositions, language, raw: rawData, query: req.query });
       
       if (includePositions) {
         console.log('[Departments API] Fetching departments with position counts');
-        const departments = await storage.getAllDepartmentsWithPositionCounts(companyId, language);
-        console.log('[Departments API] Returning departments with counts:', departments);
-        res.json({ success: true, data: departments });
+        if (rawData) {
+          const departments = await storage.getAllDepartmentsWithPositionCounts(companyId); // No language parameter for raw data
+          console.log('[Departments API] Returning raw departments with counts:', departments);
+          res.json({ success: true, data: departments });
+        } else {
+          const departments = await storage.getAllDepartmentsWithPositionCounts(companyId, language);
+          console.log('[Departments API] Returning localized departments with counts:', departments);
+          res.json({ success: true, data: departments });
+        }
       } else {
         console.log('[Departments API] Fetching departments without position counts');
-        const departments = await storage.getAllDepartments(companyId, language);
-        console.log('[Departments API] Returning departments without counts:', departments);
-        res.json({ success: true, data: departments });
+        if (rawData) {
+          const departments = await storage.getAllDepartments(companyId); // No language parameter for raw data
+          console.log('[Departments API] Returning raw departments without counts:', departments);
+          res.json({ success: true, data: departments });
+        } else {
+          const departments = await storage.getAllDepartments(companyId, language);
+          console.log('[Departments API] Returning localized departments without counts:', departments);
+          res.json({ success: true, data: departments });
+        }
       }
     } catch (error) {
       console.error('Error fetching departments:', error);
@@ -573,8 +598,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const departmentId = req.query.departmentId ? parseInt(req.query.departmentId as string) : undefined;
       const language = req.query.language as string || 'en';
-      const positions = await storage.getAllPositions(departmentId, language);
-      res.json({ success: true, data: positions });
+      const rawData = req.query.raw === 'true'; // For admin interface
+      
+      console.log('[Positions API] Request params:', { departmentId, language, raw: rawData, query: req.query });
+      
+      if (rawData) {
+        // Return raw LocalizedContent objects for admin editing
+        const positions = await storage.getAllPositions(departmentId); // No language parameter for raw data
+        console.log('[Positions API] Returning raw positions:', positions);
+        res.json({ success: true, data: positions });
+      } else {
+        // Return localized content for public use
+        const positions = await storage.getAllPositions(departmentId, language);
+        console.log('[Positions API] Returning localized positions:', positions);
+        res.json({ success: true, data: positions });
+      }
     } catch (error) {
       console.error('Error fetching positions:', error);
       res.status(500).json({ success: false, error: "Failed to fetch positions" });

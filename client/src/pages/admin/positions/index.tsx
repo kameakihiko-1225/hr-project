@@ -70,8 +70,8 @@ export default function PositionsPage() {
       try {
         // Fetch departments, positions, and applicant counts in parallel for better performance
         const [departmentsData, positionsData, applicantCountsData] = await Promise.allSettled([
-          getDepartments(undefined, true, i18n.language), // Include position counts for department cards
-          getPositions(undefined, i18n.language), // Always fetch all positions, filter on frontend
+          getDepartments(undefined, true, undefined, true), // Use raw=true for admin interface
+          getPositions(undefined, undefined, true), // Use raw=true for admin interface
           fetch('/api/all-applied-positions').then(res => res.json())
         ]);
 

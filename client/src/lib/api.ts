@@ -739,9 +739,10 @@ class ApiClient {
 
 
 // Legacy exports for backward compatibility
-export const getCompanies = async (language?: string) => {
+export const getCompanies = async (language?: string, raw?: boolean) => {
   const params = new URLSearchParams();
   if (language) params.append('language', language);
+  if (raw) params.append('raw', 'true');
   
   const url = `${API_BASE_URL}/companies${params.toString() ? `?${params.toString()}` : ''}`;
   const response = await fetch(url, {
@@ -751,14 +752,15 @@ export const getCompanies = async (language?: string) => {
   return await response.json();
 };
 
-export const getDepartments = async (companyId?: string, includePositions?: boolean, language?: string) => {
+export const getDepartments = async (companyId?: string, includePositions?: boolean, language?: string, raw?: boolean) => {
   const params = new URLSearchParams();
   if (companyId) params.append('companyId', companyId);
   if (includePositions) params.append('includePositions', 'true');
   if (language) params.append('language', language);
+  if (raw) params.append('raw', 'true');
   
   const url = `${API_BASE_URL}/departments${params.toString() ? `?${params.toString()}` : ''}`;
-  console.log('[getDepartments] URL:', url, 'includePositions:', includePositions, 'language:', language);
+  console.log('[getDepartments] URL:', url, 'includePositions:', includePositions, 'language:', language, 'raw:', raw);
   
   const response = await fetch(url, {
     headers: getAuthHeaders()
@@ -769,17 +771,21 @@ export const getDepartments = async (companyId?: string, includePositions?: bool
   return data.data || [];
 };
 
-export const getPositions = async (departmentId?: string, language?: string) => {
+export const getPositions = async (departmentId?: string, language?: string, raw?: boolean) => {
   const params = new URLSearchParams();
   if (departmentId) params.append('departmentId', departmentId);
   if (language) params.append('language', language);
+  if (raw) params.append('raw', 'true');
   
   const url = `${API_BASE_URL}/positions${params.toString() ? `?${params.toString()}` : ''}`;
+  console.log('[getPositions] URL:', url, 'departmentId:', departmentId, 'language:', language, 'raw:', raw);
+  
   const response = await fetch(url, {
     headers: getAuthHeaders()
   });
   if (!response.ok) throw new Error('Failed to fetch positions');
   const data = await response.json();
+  console.log('[getPositions] Response data:', data.data);
   return data.data || [];
 };
 

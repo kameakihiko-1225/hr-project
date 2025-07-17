@@ -50,7 +50,7 @@ export default function DepartmentsPage() {
       try {
         // Fetch companies first
         try {
-          const companiesResponse = await getCompanies(i18n.language);
+          const companiesResponse = await getCompanies(undefined, true); // Use raw=true for admin interface
           // Ensure companies is an array
           if (companiesResponse && companiesResponse.data && Array.isArray(companiesResponse.data)) {
             setCompanies(companiesResponse.data);
@@ -76,7 +76,7 @@ export default function DepartmentsPage() {
         // Then fetch departments, filtered by company if selected
         try {
           // Always request position counts for admin/department page
-          const departmentsData = await getDepartments(selectedCompanyId !== 'all' ? selectedCompanyId : undefined, true, i18n.language);
+          const departmentsData = await getDepartments(selectedCompanyId !== 'all' ? selectedCompanyId : undefined, true, undefined, true); // Use raw=true for admin interface
           console.log('[DepartmentsPage] departmentsData with position counts:', departmentsData);
           setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
         } catch (error) {
