@@ -1,11 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema, insertIndustryTagSchema, fileAttachments } from "@shared/schema";
+import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema, insertIndustryTagSchema, fileAttachments, departments, companies } from "@shared/schema";
 import bcrypt from "bcryptjs";
 import { initializeGalleryData } from "./init-gallery-data";
 import { uploadSingle } from "./middleware/upload";
 import { db } from "./db";
+import { eq } from "drizzle-orm";
 import path from "path";
 import express from "express";
 
@@ -668,8 +669,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Inherit fields from department if not provided
       if (positionData.departmentId && (!positionData.city || !positionData.country)) {
-        const department = await storage.getDepartmentById(parseInt(positionData.departmentId), 'en');
-        if (department) {
+        // Get raw department data (without localization) to preserve LocalizedContent objects
+        const rawDepartment = await db.select().from(departments).where(eq(departments.id, parseInt(positionData.departmentId)));
+        if (rawDepartment[0]) {
+          const department = rawDepartment[0];
           positionData = {
             ...positionData,
             city: positionData.city || department.city,
@@ -679,8 +682,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // If department doesn't have location, inherit from company
           if (department.companyId && (!positionData.city || !positionData.country)) {
-            const company = await storage.getCompanyById(department.companyId, 'en');
-            if (company) {
+            const rawCompany = await db.select().from(companies).where(eq(companies.id, department.companyId));
+            if (rawCompany[0]) {
+              const company = rawCompany[0];
               positionData = {
                 ...positionData,
                 city: positionData.city || company.city,
@@ -691,6 +695,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+
       const validatedData = insertPositionSchema.parse(positionData);
       const position = await storage.createPosition(validatedData);
       res.json({ success: true, data: position });
