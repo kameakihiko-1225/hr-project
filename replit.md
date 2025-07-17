@@ -167,6 +167,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 17, 2025 - Complete Webhook Integration & ES Module Migration - COMPLETED ✓
+- **Module System Migration**: Successfully converted webhook from CommonJS to ES modules to eliminate "require is not defined" errors
+- **Direct Server Integration**: Moved webhook processing from separate port 3001 service to main Express server (port 5000)
+- **Dynamic Import Solution**: Implemented dynamic imports for axios and form-data to resolve module loading issues in production
+- **Complete Field Testing**: Verified all 13+ Bitrix24 field mappings working correctly:
+  - Basic fields: name, phone, age, city, degree, position, username ✓
+  - File attachments: resume (UF_CRM_1752621810), diploma (UF_CRM_1752621831) ✓
+  - Phase2 answers: Q1-Q3 (UF_CRM_1752241370/1752241378/1752241386) ✓
+- **Production URL**: Webhook now accessible at `https://career.millatumidi.uz/webhook`
+- **Contact/Deal Creation**: Successfully tested with contacts 62269, 62273 and deals 83147, 83149
+- **Phone Formatting**: Proper E.164 international format (+998xxxxxxxxx) integration working
+- **Service Consolidation**: Disabled conflicting telegram bot service, all webhook processing now unified
+
 ### July 17, 2025 - Telegram Webhook Data Processing Analysis - COMPLETED ✓
 - **Root Cause Identified**: BOM Character corruption in JSON payload causing field extraction failures
 - **Data Processing Verification**: Webhook successfully extracts and processes all fields correctly:
