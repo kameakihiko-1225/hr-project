@@ -257,7 +257,22 @@ export default function AdminBlog() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleSubmit = (data: InsertGalleryItem) => {
+    // For new items, require an image file or URL
+    if (!editingItem && !selectedFile && !data.imageUrl) {
+      toast({
+        title: "Validation Error",
+        description: "Please upload an image file or provide an image URL.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // For updates, allow preserving existing image if no new file or URL is provided
     if (editingItem) {
+      // If no new file and no new URL provided, preserve existing imageUrl
+      if (!selectedFile && !data.imageUrl) {
+        data.imageUrl = editingItem.imageUrl;
+      }
       updateGalleryItem(editingItem.id, data, selectedFile || undefined);
     } else {
       createBlogItem(data, selectedFile || undefined);
@@ -267,6 +282,7 @@ export default function AdminBlog() {
 
   const handleEdit = (item: GalleryItem) => {
     setEditingItem(item);
+    setSelectedFile(null); // Clear any previously selected file
     form.reset({
       title: typeof item.title === 'string' ? { en: item.title } : item.title as LocalizedContent,
       description: typeof item.description === 'string' ? { en: item.description } : item.description as LocalizedContent,
@@ -316,6 +332,7 @@ export default function AdminBlog() {
               <Button 
                 onClick={() => {
                   setEditingItem(null);
+                  setSelectedFile(null); // Clear any previously selected file
                   form.reset({
                     title: { en: '' } as LocalizedContent,
                     description: { en: '' } as LocalizedContent,
@@ -390,9 +407,22 @@ export default function AdminBlog() {
                     name="imageUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Image</FormLabel>
+                        <FormLabel>Image {editingItem ? '(Optional - leave empty to keep current image)' : ''}</FormLabel>
                         <FormControl>
                           <div className="space-y-2">
+                            {editingItem && editingItem.imageUrl && (
+                              <div className="space-y-2">
+                                <div className="text-sm text-gray-600 dark:text-gray-400">Current image:</div>
+                                <div className="w-32 h-24 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                                  <img 
+                                    src={editingItem.imageUrl} 
+                                    alt="Current"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="text-sm text-gray-500">Upload a new image to replace the current one:</div>
+                              </div>
+                            )}
                             <Input 
                               type="file" 
                               accept="image/*"
@@ -406,7 +436,7 @@ export default function AdminBlog() {
                                 }
                               }}
                             />
-                            <div className="text-sm text-gray-500">Or</div>
+                            <div className="text-sm text-gray-500">Or enter an image URL:</div>
                             <Input 
                               placeholder="https://example.com/image.jpg" 
                               value={field.value || ''}
@@ -416,7 +446,10 @@ export default function AdminBlog() {
                           </div>
                         </FormControl>
                         <FormDescription>
-                          Upload an image file or enter an image URL
+                          {editingItem 
+                            ? 'Leave empty to keep the current image, or upload/enter a new one to replace it'
+                            : 'Upload an image file or enter an image URL (required)'
+                          }
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
