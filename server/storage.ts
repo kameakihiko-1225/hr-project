@@ -128,25 +128,34 @@ export class DatabaseStorage implements IStorage {
       // Fetch industry tags and conditionally localize each company
       const companiesWithTags = await Promise.all(
         companiesData.map(async (company) => {
-          const industries = await this.getCompanyIndustryTags(company.id, language);
-          
-          if (language) {
-            // Localize company fields for public API
-            const localizedCompany = {
-              ...company,
-              name: getLocalizedContent(company.name, language),
-              description: getLocalizedContent(company.description, language),
-              address: getLocalizedContent(company.address, language),
-              city: getLocalizedContent(company.city, language),
-              country: getLocalizedContent(company.country, language),
-              industries,
-            };
-            return localizedCompany as CompanyWithIndustries;
-          } else {
-            // Return raw data for admin interface
+          try {
+            const industries = await this.getCompanyIndustryTags(company.id, language);
+            
+            if (language) {
+              // Localize company fields for public API
+              const localizedCompany = {
+                ...company,
+                name: getLocalizedContent(company.name, language),
+                description: getLocalizedContent(company.description, language),
+                address: getLocalizedContent(company.address, language),
+                city: getLocalizedContent(company.city, language),
+                country: getLocalizedContent(company.country, language),
+                industries,
+              };
+              return localizedCompany as CompanyWithIndustries;
+            } else {
+              // Return raw data for admin interface
+              return {
+                ...company,
+                industries,
+              } as CompanyWithIndustries;
+            }
+          } catch (error) {
+            console.error(`[Storage] Error processing company ${company.id}:`, error);
+            // Return company without industries if there's an error
             return {
               ...company,
-              industries,
+              industries: [],
             } as CompanyWithIndustries;
           }
         })
@@ -552,6 +561,7 @@ export class DatabaseStorage implements IStorage {
   // Company-industry tag association methods
   async getCompanyIndustryTags(companyId: number, language: SupportedLanguage = 'en'): Promise<IndustryTag[]> {
     try {
+      console.log(`[Storage] getCompanyIndustryTags: Fetching tags for company ${companyId}`);
       const results = await db
         .select({
           id: industryTags.id,
@@ -563,6 +573,8 @@ export class DatabaseStorage implements IStorage {
         .innerJoin(industryTags, eq(companyIndustryTags.industryTagId, industryTags.id))
         .where(eq(companyIndustryTags.companyId, companyId));
       
+      console.log(`[Storage] getCompanyIndustryTags: Found ${results.length} tags for company ${companyId}`);
+      
       // Localize industry tag fields
       return results.map(tag => ({
         ...tag,
@@ -570,7 +582,7 @@ export class DatabaseStorage implements IStorage {
         description: getLocalizedContent(tag.description, language),
       }));
     } catch (error) {
-      console.error('Error fetching company industry tags:', error);
+      console.error(`[Storage] Error fetching company industry tags for company ${companyId}:`, error);
       return [];
     }
   }

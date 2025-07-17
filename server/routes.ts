@@ -114,8 +114,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const companies = await storage.getAllCompanies(); // No language parameter
         console.log(`[Companies API] Raw companies count: ${companies.length}`);
         console.log(`[Companies API] Raw companies IDs: ${companies.map(c => c.id).join(', ')}`);
-        console.log(`[Companies API] Full response data:`, JSON.stringify({ success: true, data: companies }, null, 2));
-        res.json({ success: true, data: companies });
+        
+        // Create a simple test response with just essential data
+        const simplifiedCompanies = companies.map(company => ({
+          id: company.id,
+          name: company.name,
+          description: company.description,
+          logoUrl: company.logoUrl,
+          color: company.color,
+          address: company.address,
+          phone: company.phone,
+          email: company.email,
+          city: company.city,
+          country: company.country,
+          adminId: company.adminId,
+          createdAt: company.createdAt,
+          industries: company.industries.map(industry => ({
+            id: industry.id,
+            name: industry.name,
+            description: industry.description,
+            createdAt: industry.createdAt
+          }))
+        }));
+        
+        const responseData = { success: true, data: simplifiedCompanies };
+        const responseJson = JSON.stringify(responseData);
+        console.log(`[Companies API] Response size: ${responseJson.length} characters`);
+        
+        res.json(responseData);
       } else {
         // Return localized content for public use
         const companies = await storage.getAllCompanies(language);
