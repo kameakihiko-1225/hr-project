@@ -1,0 +1,105 @@
+Error creating position: ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "object",
+    "received": "string",
+    "path": [
+      "city"
+    ],
+    "message": "Expected object, received string"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "object",
+    "received": "string",
+    "path": [
+      "country"
+    ],
+    "message": "Expected object, received string"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "object",
+    "received": "string",
+    "path": [
+      "employmentType"
+    ],
+    "message": "Expected object, received string"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "object",
+    "path": [
+      "applyLink"
+    ],
+    "message": "Expected string, received object"
+  }
+]
+    at get error [as error] (file:///home/runner/workspace/node_modules/zod/lib/index.mjs:587:31)
+    at ZodObject.parse (file:///home/runner/workspace/node_modules/zod/lib/index.mjs:663:22)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:694:50)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  issues: [
+    {
+      code: 'invalid_type',
+      expected: 'object',
+      received: 'string',
+      path: [Array],
+      message: 'Expected object, received string'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'object',
+      received: 'string',
+      path: [Array],
+      message: 'Expected object, received string'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'object',
+      received: 'string',
+      path: [Array],
+      message: 'Expected object, received string'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'object',
+      path: [Array],
+      message: 'Expected string, received object'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_type',
+      expected: 'object',
+      received: 'string',
+      path: [Array],
+      message: 'Expected object, received string'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'object',
+      received: 'string',
+      path: [Array],
+      message: 'Expected object, received string'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'object',
+      received: 'string',
+      path: [Array],
+      message: 'Expected object, received string'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'object',
+      path: [Array],
+      message: 'Expected string, received object'
+    }
+  ]
+}

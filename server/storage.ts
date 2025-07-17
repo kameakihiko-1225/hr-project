@@ -737,9 +737,13 @@ export class DatabaseStorage implements IStorage {
           .limit(1);
         
         if (position.length > 0) {
+          // Extract localized title from JSON - title is a LocalizedContent object
+          const titleJson = position[0].title as LocalizedContent;
+          const positionTitle = typeof titleJson === 'string' ? titleJson : (titleJson.en || titleJson.ru || titleJson.uz || 'Unknown Position');
+          
           results.push({
             positionId: appliedPos.positionId,
-            positionTitle: position[0].title,
+            positionTitle: positionTitle,
             appliedCount: Number(appliedPos.appliedCount)
           });
         }
@@ -777,9 +781,13 @@ export class DatabaseStorage implements IStorage {
           .limit(1);
         
         if (position.length > 0) {
+          // Extract localized title from JSON - title is a LocalizedContent object
+          const titleJson = position[0].title as LocalizedContent;
+          const positionTitle = typeof titleJson === 'string' ? titleJson : (titleJson.en || titleJson.ru || titleJson.uz || 'Unknown Position');
+          
           results.push({
             positionId: appliedPos.positionId,
-            positionTitle: position[0].title,
+            positionTitle: positionTitle,
             appliedCount: Number(appliedPos.appliedCount)
           });
         }

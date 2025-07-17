@@ -187,13 +187,13 @@ export const insertPositionSchema = z.object({
   city: localizedContentSchema.optional(),
   country: localizedContentSchema.optional(),
   salaryRange: localizedContentSchema.optional(),
-  employmentType: localizedContentSchema.optional(),
+  employmentType: localizedContentSchema.optional(), // LocalizedContent to match database
   expectedStartDate: z.string().optional(),
   languageRequirements: localizedContentSchema.optional(),
   qualifications: localizedContentSchema.optional(),
   responsibilities: localizedContentSchema.optional(),
   departmentId: z.number(),
-  applyLink: z.string().optional(),
+  applyLink: localizedContentSchema.optional(), // LocalizedContent to match database
 });
 
 export const insertCandidateSchema = createInsertSchema(candidates).omit({

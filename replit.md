@@ -382,6 +382,16 @@ Preferred communication style: Simple, everyday language.
 - **Position Creation/Editing**: All departments now properly appear in position creation dropdown and department filter
 - **Real-time Updates**: Eliminated caching issues that prevented real-time updates when switching between company filters
 
+### July 17, 2025 - Position Creation Schema Validation Fix - COMPLETED ✓
+- **Zod Schema Validation Issue**: Fixed critical position creation error due to mismatch between frontend form data structure and backend validation schema
+- **Form Data Structure Updates**: Corrected frontend form to handle employmentType as LocalizedContent object instead of string
+- **Backend Schema Alignment**: Ensured insertPositionSchema properly validates applyLink as LocalizedContent object to match database table structure
+- **Form Handler Improvements**: Updated handleSelectChange to properly convert employmentType string values to LocalizedContent format
+- **Form Population Fix**: Fixed form edit handler to properly handle existing position data with correct LocalizedContent structure
+- **Select Component Display**: Fixed employment type dropdown display to properly extract string values from LocalizedContent objects
+- **API Testing**: Verified position creation works correctly with proper LocalizedContent structure for all multilingual fields
+- **Frontend Integration**: All position creation and editing forms now properly handle multilingual content validation
+
 ### July 16, 2025 - Complete Multilingual System Implementation & Testing - COMPLETED ✓
 - **Backend Audit Results**: Conducted comprehensive backend audit revealing 85% completion with excellent architectural foundation
   - Database schema fully supports multilingual JSON with proper LocalizedContent validation

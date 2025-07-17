@@ -1187,8 +1187,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Top Applied Positions endpoint (up to 3 positions with most apply clicks)
   app.get("/api/top-applied-positions", async (req, res) => {
     try {
+      const language = req.query.language as string || 'en';
       const topPositions = await storage.getTopAppliedPositions();
-      res.json({ success: true, data: topPositions });
+      
+      // Extract localized titles from the JSON objects
+      const localizedResults = topPositions.map(pos => ({
+        positionId: pos.positionId,
+        positionTitle: typeof pos.positionTitle === 'string' ? pos.positionTitle : 
+          (pos.positionTitle[language] || pos.positionTitle.en || pos.positionTitle.ru || pos.positionTitle.uz || 'Unknown Position'),
+        appliedCount: pos.appliedCount
+      }));
+      
+      res.json({ success: true, data: localizedResults });
     } catch (error) {
       console.error('Error getting top applied positions:', error);
       res.status(500).json({ success: false, error: "Failed to get top applied positions" });
@@ -1198,8 +1208,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // All Applied Positions endpoint (full list of all positions with apply clicks)
   app.get("/api/all-applied-positions", async (req, res) => {
     try {
+      const language = req.query.language as string || 'en';
       const result = await storage.getAllAppliedPositions();
-      res.json({ success: true, data: result });
+      
+      // Extract localized titles from the JSON objects  
+      const localizedResults = result.map(pos => ({
+        positionId: pos.positionId,
+        positionTitle: typeof pos.positionTitle === 'string' ? pos.positionTitle :
+          (pos.positionTitle[language] || pos.positionTitle.en || pos.positionTitle.ru || pos.positionTitle.uz || 'Unknown Position'),
+        appliedCount: pos.appliedCount
+      }));
+      
+      res.json({ success: true, data: localizedResults });
     } catch (error) {
       console.error('Error getting all applied positions:', error);
       res.status(500).json({ success: false, error: "Failed to get all applied positions" });

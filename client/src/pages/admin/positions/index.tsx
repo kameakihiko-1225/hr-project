@@ -49,7 +49,7 @@ export default function PositionsPage() {
     title: { en: '' } as LocalizedContent,
     description: { en: '' } as LocalizedContent,
     salaryRange: { en: '' } as LocalizedContent,
-    employmentType: 'Full-time',
+    employmentType: { en: 'Full-time' } as LocalizedContent,
     departmentId: '',
     applyLink: { en: '' } as LocalizedContent
   });
@@ -181,7 +181,12 @@ export default function PositionsPage() {
 
   // Handle select changes
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'employmentType') {
+      // Convert employmentType to LocalizedContent
+      setFormData(prev => ({ ...prev, [name]: { en: value } as LocalizedContent }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   // Handle create position
@@ -230,7 +235,7 @@ export default function PositionsPage() {
       title: typeof position.title === 'string' ? { en: position.title } : position.title,
       description: typeof position.description === 'string' ? { en: position.description } : position.description || { en: '' },
       salaryRange: typeof position.salaryRange === 'string' ? { en: position.salaryRange } : position.salaryRange || { en: '' },
-      employmentType: position.employmentType || 'Full-time',
+      employmentType: typeof position.employmentType === 'string' ? { en: position.employmentType } : position.employmentType || { en: 'Full-time' },
       departmentId: position.departmentId || '',
       applyLink: typeof position.applyLink === 'string' ? { en: position.applyLink } : position.applyLink || { en: '' }
     });
@@ -309,7 +314,7 @@ export default function PositionsPage() {
       title: { en: '' } as LocalizedContent,
       description: { en: '' } as LocalizedContent,
       salaryRange: { en: '' } as LocalizedContent,
-      employmentType: { en: '' } as LocalizedContent,
+      employmentType: { en: 'Full-time' } as LocalizedContent,
       departmentId: '',
       applyLink: { en: '' } as LocalizedContent
     });
@@ -459,7 +464,7 @@ export default function PositionsPage() {
                 Employment Type
               </label>
               <Select
-                value={formData.employmentType}
+                value={getLocalizedContent(formData.employmentType)}
                 onValueChange={(value) => handleSelectChange('employmentType', value)}
               >
                 <SelectTrigger>
@@ -538,7 +543,7 @@ export default function PositionsPage() {
                 Employment Type
               </label>
               <Select
-                value={formData.employmentType}
+                value={getLocalizedContent(formData.employmentType)}
                 onValueChange={(value) => handleSelectChange('employmentType', value)}
               >
                 <SelectTrigger>
