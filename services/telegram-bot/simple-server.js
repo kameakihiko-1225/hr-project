@@ -144,7 +144,24 @@ app.get('/', (req, res) => {
 // Main webhook handler
 app.post('/webhook', async (req, res) => {
   try {
-    const data = req.body;
+    const rawData = req.body;
+    
+    // Sanitize data by removing BOM characters and other unicode issues
+    const data = {};
+    for (const [rawKey, rawValue] of Object.entries(rawData)) {
+      // Clean both keys and values
+      const key = typeof rawKey === 'string' ? rawKey.replace(/[\uFEFF\u200B-\u200D]/g, '').trim() : rawKey;
+      
+      if (typeof rawValue === 'string') {
+        // Remove BOM characters (﻿), zero-width characters, and trim
+        data[key] = rawValue.replace(/[\uFEFF\u200B-\u200D]/g, '').trim();
+      } else {
+        data[key] = rawValue;
+      }
+    }
+    
+    console.log('[TELEGRAM-BOT] Data after sanitization:', JSON.stringify(data, null, 2));
+    
     // Log the full incoming data for troubleshooting
     console.log('[TELEGRAM-BOT] Incoming webhook data:', JSON.stringify(data, null, 2));
     
