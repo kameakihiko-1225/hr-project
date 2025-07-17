@@ -724,7 +724,7 @@ export default function CompaniesPage() {
               Confirm Deletion
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <strong>{companyToDelete?.name}</strong>? This action cannot be undone.
+              Are you sure you want to delete <strong>{companyToDelete ? getLocalizedContent(companyToDelete.name) : ''}</strong>? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

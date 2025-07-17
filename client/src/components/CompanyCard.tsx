@@ -146,7 +146,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
             </div>
             {company.city && company.country && (
               <p className="text-sm text-gray-500 truncate mt-1">
-                {company.city}, {company.country}
+                {getLocalizedContent(company.city)}, {getLocalizedContent(company.country)}
               </p>
             )}
           </div>
@@ -241,8 +241,8 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
                     <span className="text-sm font-medium w-20">Location:</span>
                     <span className="text-sm text-gray-700">
                       {company.city && company.country 
-                        ? `${company.city}, ${company.country}` 
-                        : company.city || company.country || "Not specified"}
+                        ? `${getLocalizedContent(company.city)}, ${getLocalizedContent(company.country)}` 
+                        : getLocalizedContent(company.city) || getLocalizedContent(company.country) || "Not specified"}
                     </span>
                   </div>
                 )}
@@ -271,7 +271,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
                   </div>
                 )}
                 
-                {!company.email && !company.phone && !company.city && !company.country && (
+                {!company.email && !company.phone && !getLocalizedContent(company.city) && !getLocalizedContent(company.country) && (
                   <p className="text-sm text-gray-500">No contact information available</p>
                 )}
               </div>
