@@ -414,7 +414,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/companies/:id/industry-tags", async (req, res) => {
     try {
       const companyId = parseInt(req.params.id);
-      const industryTags = await storage.getCompanyIndustryTags(companyId);
+      const language = req.query.language as string || 'en';
+      const industryTags = await storage.getCompanyIndustryTags(companyId, language);
       
       res.json({ 
         success: true, 

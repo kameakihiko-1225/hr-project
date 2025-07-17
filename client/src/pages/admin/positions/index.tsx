@@ -15,11 +15,19 @@ import { Loader2, Plus, Briefcase, Search } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { MultilingualInput } from '../../../components/ui/multilingual-input';
 import { LocalizedContent } from '@shared/schema';
+import { useTranslation } from 'react-i18next';
 
 export default function PositionsPage() {
   const [location] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { i18n } = useTranslation();
+  
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | LocalizedContent): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as keyof LocalizedContent] || content.en || '';
+  };
   
   const [positions, setPositions] = useState<Position[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -62,8 +70,8 @@ export default function PositionsPage() {
       try {
         // Fetch departments, positions, and applicant counts in parallel for better performance
         const [departmentsData, positionsData, applicantCountsData] = await Promise.allSettled([
-          getDepartments(undefined, true), // Include position counts for department cards
-          getPositions(), // Always fetch all positions, filter on frontend
+          getDepartments(undefined, true, i18n.language), // Include position counts for department cards
+          getPositions(undefined, i18n.language), // Always fetch all positions, filter on frontend
           fetch('/api/all-applied-positions').then(res => res.json())
         ]);
 
@@ -342,7 +350,7 @@ export default function PositionsPage() {
               <SelectItem value="all">All Departments</SelectItem>
               {Array.isArray(departments) && departments.map((department) => (
                 <SelectItem key={department.id} value={department.id}>
-                  {department.name}
+                  {getLocalizedContent(department.name)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -414,7 +422,7 @@ export default function PositionsPage() {
                 <SelectContent>
                   {Array.isArray(departments) && departments.map((department) => (
                     <SelectItem key={department.id} value={department.id}>
-                      {department.name} {department.company ? `(${department.company.name})` : ''}
+                      {getLocalizedContent(department.name)} {department.company ? `(${getLocalizedContent(department.company.name)})` : ''}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -561,10 +569,10 @@ export default function PositionsPage() {
                 <div className="flex items-center gap-2 p-2 rounded-md bg-muted">
                   <Briefcase className="h-4 w-4 text-muted-foreground" />
                   <span>
-                    {currentPosition.department.name}
+                    {getLocalizedContent(currentPosition.department.name)}
                     {currentPosition.department.company && (
                       <span className="text-muted-foreground ml-1">
-                        ({currentPosition.department.company.name})
+                        ({getLocalizedContent(currentPosition.department.company.name)})
                       </span>
                     )}
                   </span>
