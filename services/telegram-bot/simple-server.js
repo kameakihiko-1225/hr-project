@@ -9,22 +9,17 @@ app.use(express.json());
 const BITRIX_BASE = 'https://millatumidi.bitrix24.kz/rest/21/wx0c9lt1mxcwkhz9';
 
 // Telegram file_id patterns vary by file type. Accept any file_id that starts with
-// an uppercase letter/number and is reasonably long ( > 20 chars) and doesn't contain spaces
+// an uppercase letter/number and is reasonably long ( > 20 chars)
 function isTelegramFileId(value) {
-  return typeof value === 'string' && /^[A-Za-z0-9]/.test(value) && value.length > 20 && !value.includes(' ');
+  return typeof value === 'string' && /^[A-Z0-9]/.test(value) && value.length > 20;
 }
 
 function normalizePhone(phone) {
-  if (!phone) return '';
-  // Remove all non-digits
-  const cleaned = phone.replace(/\D/g, '');
-  // Ensure proper E.164 format for Uzbekistan numbers
-  if (cleaned.startsWith('998')) {
-    return `+${cleaned}`;
-  } else if (cleaned.length >= 9) {
-    return `+998${cleaned}`;
-  }
-  return cleaned ? `+998${cleaned}` : '';
+  return (phone || '').replace(/\D/g, '');
+}
+
+function normalizeEmail(email) {
+  return (email || '').trim().toLowerCase();
 }
 
 function extractInnerTextFromHtmlLink(value) {
@@ -42,7 +37,7 @@ async function getTelegramFileUrl(fileId) {
     const TELEGRAM_BOT_TOKEN = getBotToken();
     const fileInfoResp = await axios.get(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getFile?file_id=${fileId}`);
     if (!fileInfoResp.data.ok || !fileInfoResp.data.result?.file_path) return null;
-    return `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfoResp.data.result.file_path}`;
+    return `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${encodeURI(fileInfoResp.data.result.file_path)}`;
   } catch {
     return null;
   }
@@ -62,10 +57,11 @@ async function getFileBufferFromTelegram(fileId, fieldName) {
       return { buffer: null, url: null };
     }
     const filePath = fileInfoResp.data.result.file_path;
-    const fileUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${filePath}`;
+    const fileUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${encodeURI(filePath)}`;
     console.log(`[TELEGRAM-BOT] Fetching file from: ${fileUrl}`);
 
-    // Use fetch for file downloads
+    // Some proxies return 404 when using axios on binary endpoints. Use node-fetch which
+    // mirrors the behaviour of Telegram examples. Retry once on failure.
     const fetch = (await import('node-fetch')).default;
     let attempt = 0;
     while (attempt < 2) {
@@ -127,7 +123,7 @@ async function findDealIdByContact(contactId) {
   }
 }
 
-// Phone number fallback function - verify and add phone if missing
+// Phone number fallback function - verify and add phone if missing after contact creation
 async function ensurePhoneNumberSet(contactId, phone) {
   if (!contactId || !phone) {
     console.log('[TELEGRAM-BOT] Skipping phone verification - missing contactId or phone');
@@ -146,64 +142,44 @@ async function ensurePhoneNumberSet(contactId, phone) {
     if (!getResp.data.result || !getResp.data.result.PHONE || getResp.data.result.PHONE.length === 0) {
       console.log(`[TELEGRAM-BOT] Phone number missing from contact ${contactId}, adding manually...`);
       
-      // Try to add phone number using different API methods
-      const phoneData = {
-        VALUE: phone,
-        VALUE_TYPE: 'MOBILE'
-      };
+      // Try multiple methods to add phone number
+      const phoneData = { VALUE: phone, VALUE_TYPE: 'MOBILE' };
       
       // Method 1: Direct contact update with phone array
       try {
         const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, {
           id: contactId,
-          fields: {
-            PHONE: [phoneData]
-          }
+          fields: { PHONE: [phoneData] }
         });
         console.log('[TELEGRAM-BOT] Phone added via contact update:', updateResp.data);
         if (updateResp.data.result) {
-          console.log('[TELEGRAM-BOT] Phone number successfully added to contact');
+          console.log('[TELEGRAM-BOT] ✅ Phone number successfully added to contact');
           return;
         }
       } catch (updateError) {
         console.log('[TELEGRAM-BOT] Direct phone update failed:', updateError?.response?.data || updateError.message);
       }
       
-      // Method 2: Add phone via multifield API
+      // Method 2: FormData approach (same as initial creation)
       try {
-        const multifieldResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, {
-          id: contactId,
-          fields: {
-            PHONE: JSON.stringify([phoneData])
-          }
+        const phoneForm = new FormData();
+        phoneForm.append('id', contactId);
+        phoneForm.append('fields[PHONE]', JSON.stringify([phoneData]));
+        
+        const formResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, phoneForm, {
+          headers: phoneForm.getHeaders(),
         });
-        console.log('[TELEGRAM-BOT] Phone added via multifield:', multifieldResp.data);
-        if (multifieldResp.data.result) {
-          console.log('[TELEGRAM-BOT] Phone number successfully added via multifield method');
+        console.log('[TELEGRAM-BOT] Phone added via FormData:', formResp.data);
+        if (formResp.data.result) {
+          console.log('[TELEGRAM-BOT] ✅ Phone number successfully added via FormData method');
           return;
         }
-      } catch (multifieldError) {
-        console.log('[TELEGRAM-BOT] Multifield phone update failed:', multifieldError?.response?.data || multifieldError.message);
-      }
-      
-      // Method 3: Try with backup phone field
-      try {
-        const backupResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, {
-          id: contactId,
-          fields: {
-            UF_CRM_1747689959: phone // Backup phone field
-          }
-        });
-        console.log('[TELEGRAM-BOT] Phone added to backup field:', backupResp.data);
-        if (backupResp.data.result) {
-          console.log('[TELEGRAM-BOT] Phone number successfully added to backup field');
-        }
-      } catch (backupError) {
-        console.log('[TELEGRAM-BOT] Backup phone field update failed:', backupError?.response?.data || backupError.message);
+      } catch (formError) {
+        console.log('[TELEGRAM-BOT] FormData phone update failed:', formError?.response?.data || formError.message);
       }
       
     } else {
-      console.log(`[TELEGRAM-BOT] Phone number already present for contact ${contactId}`);
+      console.log(`[TELEGRAM-BOT] ✅ Phone number already present for contact ${contactId}`);
     }
     
   } catch (error) {
@@ -225,49 +201,28 @@ app.get('/', (req, res) => {
   res.send('Millat Umidi Telegram Bot Service - Ready!');
 });
 
-// Main webhook handler
+// GET webhook info endpoint
+app.get('/webhook', (req, res) => {
+  res.json({ 
+    status: 'Webhook endpoint is active',
+    url: 'https://career.millatumidi.uz/webhook',
+    method: 'POST',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Main webhook handler - follows exact NestJS logic
 app.post('/webhook', async (req, res) => {
   try {
-    const rawData = req.body;
-    
-    // Sanitize data by removing BOM characters and other unicode issues
-    const data = {};
-    for (const [rawKey, rawValue] of Object.entries(rawData)) {
-      // Clean both keys and values
-      const key = typeof rawKey === 'string' ? rawKey.replace(/[\uFEFF\u200B-\u200D]/g, '').trim() : rawKey;
-      
-      if (typeof rawValue === 'string') {
-        // Remove BOM characters (﻿), zero-width characters, and trim
-        data[key] = rawValue.replace(/[\uFEFF\u200B-\u200D]/g, '').trim();
-      } else {
-        data[key] = rawValue;
-      }
-    }
-    
-    console.log('[TELEGRAM-BOT] Data after sanitization:', JSON.stringify(data, null, 2));
+    const data = req.body;
     
     // Log the full incoming data for troubleshooting
     console.log('[TELEGRAM-BOT] Incoming webhook data:', JSON.stringify(data, null, 2));
     
-    // Debug field extraction
-    console.log(`[TELEGRAM-BOT] Field extraction debug:`);
-    console.log(`- full_name_uzbek: "${data.full_name_uzbek}" (type: ${typeof data.full_name_uzbek})`);
-    console.log(`- phone_number_uzbek: "${data.phone_number_uzbek}" (type: ${typeof data.phone_number_uzbek})`);
-    console.log(`- age_uzbek: "${data.age_uzbek}" (type: ${typeof data.age_uzbek})`);
-    console.log(`- city_uzbek: "${data.city_uzbek}" (type: ${typeof data.city_uzbek})`);
-    console.log(`- degree: "${data.degree}" (type: ${typeof data.degree})`);
-    console.log(`- position_uz: "${data.position_uz}" (type: ${typeof data.position_uz})`);
-    console.log(`- username: "${data.username}" (type: ${typeof data.username})`);
-    console.log(`- resume: "${data.resume}" (type: ${typeof data.resume})`);
-    console.log(`- diploma: "${data.diploma}" (type: ${typeof data.diploma})`);
-    console.log(`- phase2_q_1: "${data.phase2_q_1}" (type: ${typeof data.phase2_q_1})`);
-    console.log(`- phase2_q_2: "${data.phase2_q_2}" (type: ${typeof data.phase2_q_2})`);
-    console.log(`- phase2_q_3: "${data.phase2_q_3}" (type: ${typeof data.phase2_q_3})`);
-    console.log(`[TELEGRAM-BOT] All data keys: ${Object.keys(data)}`);
-    
     // 1. Download resume and diploma files as buffers (log file IDs)
     console.log(`[TELEGRAM-BOT] Resume file_id: ${data.resume}`);
     console.log(`[TELEGRAM-BOT] Diploma file_id: ${data.diploma}`);
+    
     const resumeResult = isTelegramFileId(data.resume)
       ? await getFileBufferFromTelegram(data.resume, 'resume')
       : { buffer: null, url: null };
@@ -281,28 +236,19 @@ app.post('/webhook', async (req, res) => {
     const firstName = nameParts[0] || 'Unknown';
     const lastName = nameParts.slice(1).join(' ');
     const phoneRaw = data.phone_number_uzbek || '';
-    const ageRaw = data.age_uzbek || data.user_age || data.age || data.age_ru;
+    const ageRaw = data.user_age || data.age || data.age_uzbek || data.age_ru;
 
     const phone = normalizePhone(phoneRaw);
     console.log(`[TELEGRAM-BOT] Full name: "${fullName}", phone_raw: "${phoneRaw}", normalized_phone: "${phone}", age: "${ageRaw}"`);
-    console.log(`[TELEGRAM-BOT] Phone check: phone="${phone}", Boolean(phone)=${Boolean(phone)}`);
+    
     const contactFields = {
       NAME: fullName || 'Unknown',
+      PHONE: phone ? [{ VALUE: phone, VALUE_TYPE: 'WORK' }] : [],
       UF_CRM_1752239621: data.position_uz, // position
       UF_CRM_1752239635: data.city_uzbek,  // city
       UF_CRM_1752239653: data.degree,      // degree
       UF_CRM_CONTACT_1745579971270: extractInnerTextFromHtmlLink(data.username), // telegram username
-      UF_CRM_1752622669492: ageRaw, // age field
     };
-    
-    // Add phone field using array format with VALUE/VALUE_TYPE + backup custom field
-    if (phone) {
-      contactFields.PHONE = [{ VALUE: phone, VALUE_TYPE: 'MOBILE' }]; // E.164 format with MOBILE type
-      contactFields.UF_CRM_1747689959 = phone; // Backup custom field
-      console.log('[TELEGRAM-BOT] Adding phone field (E.164 format):', phone);
-      console.log('[TELEGRAM-BOT] Phone backup field UF_CRM_1747689959:', phone);
-      console.log('[TELEGRAM-BOT] PHONE array structure:', contactFields.PHONE);
-    }
     
     // Resolve resume & diploma links
     const resumeLink = data.resume ? (resumeResult.url || (isTelegramFileId(data.resume) ? await getTelegramFileUrl(data.resume) : null) || data.resume) : null;
@@ -310,13 +256,13 @@ app.post('/webhook', async (req, res) => {
 
     // Add link fields required by Bitrix24
     if (resumeLink) {
-      contactFields['UF_CRM_1752621810'] = resumeLink; // resume link field
+      contactFields['UF_CRM_1752239677'] = resumeLink; // resume link field
     }
     if (diplomaLink) {
-      contactFields['UF_CRM_1752621831'] = diplomaLink; // diploma link field
+      contactFields['UF_CRM_1752239690'] = diplomaLink; // diploma link field
     }
 
-    // Build Comments with links and age (phone now handled separately)
+    // Build Comments with links and age
     const commentsParts = [];
     if (resumeLink) commentsParts.push(`Resume: ${resumeLink}`);
     if (diplomaLink) commentsParts.push(`Diploma: ${diplomaLink}`);
@@ -329,9 +275,9 @@ app.post('/webhook', async (req, res) => {
 
     // Handle Phase2 text or voice answers (store as text/link)
     const phase2 = [
-      { val: data.phase2_q_1, textField: 'UF_CRM_1752241370', voiceField: 'UF_CRM_1752621857', filename: 'q1.ogg', label: 'phase2_q_1' },
-      { val: data.phase2_q_2, textField: 'UF_CRM_1752241378', voiceField: 'UF_CRM_1752621874', filename: 'q2.ogg', label: 'phase2_q_2' },
-      { val: data.phase2_q_3, textField: 'UF_CRM_1752241386', voiceField: 'UF_CRM_1752621887', filename: 'q3.ogg', label: 'phase2_q_3' },
+      { val: data.phase2_q_1, textField: 'UF_CRM_1752241370', fileField: 'UF_CRM_1752245274', filename: 'q1.ogg', label: 'phase2_q_1' },
+      { val: data.phase2_q_2, textField: 'UF_CRM_1752241378', fileField: 'UF_CRM_1752245286', filename: 'q2.ogg', label: 'phase2_q_2' },
+      { val: data.phase2_q_3, textField: 'UF_CRM_1752241386', fileField: 'UF_CRM_1752245298', filename: 'q3.ogg', label: 'phase2_q_3' },
     ];
     const phase2Log = [];
     for (const q of phase2) {
@@ -339,48 +285,34 @@ app.post('/webhook', async (req, res) => {
       if (isTelegramFileId(q.val)) {
         const link = await getTelegramFileUrl(q.val);
         if (link) {
-          contactFields[q.voiceField] = link; // Use voice field for valid file IDs
+          contactFields[q.textField] = link;
           commentsParts.push(`${q.label}: ${link}`);
-          phase2Log.push(`${q.label} (voice file link): ${link}`);
+          phase2Log.push(`${q.label} (file link): ${link}`);
         } else {
-          // If file ID cannot be resolved, treat as text and use text field
-          contactFields[q.textField] = q.val;
-          commentsParts.push(`${q.label} (text fallback): ${q.val}`);
-          phase2Log.push(`${q.label} (file_id unresolved, saved as text): ${q.val}`);
+          phase2Log.push(`${q.label} file_id unresolved`);
         }
       } else {
-        contactFields[q.textField] = q.val; // Use text field for simple text
-        commentsParts.push(`${q.label} (text): ${q.val}`);
+        contactFields[q.textField] = q.val;
         phase2Log.push(`${q.label} (text): ${q.val}`);
       }
     }
     console.log('[TELEGRAM-BOT] Phase2 answers log:', phase2Log.join(' | '));
-    
+
     // Prepare FormData for contact (no file buffers for resume/diploma/phase2)
     const contactForm = new FormData();
-    
-    // Add each field to FormData individually with proper formatting
-    for (const [key, value] of Object.entries(contactFields)) {
-      if (value !== null && value !== undefined) {
-        if (key === 'PHONE' && Array.isArray(value)) {
-          // Special handling for PHONE field - Bitrix24 multifield format
-          contactForm.append(`fields[${key}]`, JSON.stringify(value));
-          console.log(`[TELEGRAM-BOT] Added PHONE field to FormData: ${JSON.stringify(value)}`);
-        } else if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
-          contactForm.append(`fields[${key}]`, JSON.stringify(value));
-        } else {
-          contactForm.append(`fields[${key}]`, String(value));
-        }
+    Object.entries(contactFields).forEach(([key, value]) => {
+      // Stringify arrays/objects for Bitrix24
+      if (Array.isArray(value) || typeof value === 'object') {
+        contactForm.append(`fields[${key}]`, JSON.stringify(value));
+      } else {
+        contactForm.append(`fields[${key}]`, value || '');
       }
-    }
-    
+    });
     contactForm.append('params[REGISTER_SONET_EVENT]', 'Y');
-    console.log('[TELEGRAM-BOT] FormData prepared for Bitrix24 submission');
-    
-    // Debug: Log contactFields object before FormData conversion
-    console.log('[TELEGRAM-BOT] Contact fields being sent to Bitrix24:');
-    console.log(JSON.stringify(contactFields, null, 2));
-    
+
+    // Log outgoing FormData fields
+    console.log('[TELEGRAM-BOT] Contact FormData fields:', Object.keys(contactFields));
+
     // Check duplicate by phone and update if exists
     let contactId;
     if (phone) {
@@ -398,65 +330,7 @@ app.post('/webhook', async (req, res) => {
           headers: contactForm.getHeaders(),
         });
         console.log('[TELEGRAM-BOT] Contact create response:', createResp.data);
-        
-        // Log any errors in the response
-        if (createResp.data.error) {
-          console.log('[TELEGRAM-BOT] Bitrix24 API Error:', createResp.data.error);
-        }
         contactId = createResp.data.result;
-        
-        // Verify contact creation by reading it back from Bitrix24
-        try {
-          const verifyResp = await axios.get(`${BITRIX_BASE}/crm.contact.get.json?id=${contactId}`);
-          console.log('[TELEGRAM-BOT] Contact verification - stored data in Bitrix24:');
-          const storedContact = verifyResp.data.result;
-          console.log(`  - NAME: ${storedContact.NAME || 'NOT STORED'}`);
-          console.log(`  - Position (UF_CRM_1752239621): ${storedContact.UF_CRM_1752239621 || 'NOT STORED'}`);
-          console.log(`  - City (UF_CRM_1752239635): ${storedContact.UF_CRM_1752239635 || 'NOT STORED'}`);
-          console.log(`  - Degree (UF_CRM_1752239653): ${storedContact.UF_CRM_1752239653 || 'NOT STORED'}`);
-          console.log(`  - Age (UF_CRM_1752622669492): ${storedContact.UF_CRM_1752622669492 || 'NOT STORED'}`);
-          console.log(`  - Username (UF_CRM_CONTACT_1745579971270): ${storedContact.UF_CRM_CONTACT_1745579971270 || 'NOT STORED'}`);
-          console.log(`  - Resume (UF_CRM_1752621810): ${storedContact.UF_CRM_1752621810 || 'NOT STORED'}`);
-          console.log(`  - Diploma (UF_CRM_1752621831): ${storedContact.UF_CRM_1752621831 || 'NOT STORED'}`);
-          console.log(`  - Phase2 Q1 (UF_CRM_1752241370): ${storedContact.UF_CRM_1752241370 || 'NOT STORED'}`);
-          console.log(`  - Phase2 Q2 (UF_CRM_1752241378): ${storedContact.UF_CRM_1752241378 || 'NOT STORED'}`);
-          console.log(`  - Phase2 Q3 (UF_CRM_1752241386): ${storedContact.UF_CRM_1752241386 || 'NOT STORED'}`);
-          console.log(`  - Phone backup (UF_CRM_1747689959): ${storedContact.UF_CRM_1747689959 || 'NOT STORED'}`);
-          console.log(`  - PHONE array: ${JSON.stringify(storedContact.PHONE) || 'NOT STORED'}`);
-          console.log(`  - COMMENTS: ${storedContact.COMMENTS || 'NOT STORED'}`);
-        } catch (verifyError) {
-          console.log('[TELEGRAM-BOT] Error verifying contact:', verifyError.message);
-        }
-        
-        // Verify phone field was added by fetching the contact back
-        if (contactId && phone) {
-          try {
-            const verifyResp = await axios.get(`${BITRIX_BASE}/crm.contact.get.json?ID=${contactId}`);
-            const contact = verifyResp.data.result;
-            if (contact && contact.PHONE && contact.PHONE.length > 0) {
-              console.log('[TELEGRAM-BOT] Phone field verified in contact:', contact.PHONE);
-            } else {
-              console.log('[TELEGRAM-BOT] WARNING: Phone field not found in created contact, adding phone number manually');
-              
-              // Add phone number using update API
-              const phoneUpdateForm = new FormData();
-              phoneUpdateForm.append('ID', contactId);
-              phoneUpdateForm.append('fields[PHONE][0][VALUE]', phone);
-              phoneUpdateForm.append('fields[PHONE][0][VALUE_TYPE]', 'MOBILE');
-              
-              try {
-                const phoneUpdateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, phoneUpdateForm, {
-                  headers: phoneUpdateForm.getHeaders(),
-                });
-                console.log('[TELEGRAM-BOT] Phone field manually added via update:', phoneUpdateResp.data);
-              } catch (phoneUpdateError) {
-                console.log('[TELEGRAM-BOT] Failed to manually add phone field:', phoneUpdateError.message);
-              }
-            }
-          } catch (verifyError) {
-            console.log('[TELEGRAM-BOT] Could not verify contact phone field:', verifyError.message);
-          }
-        }
       }
     } else {
       // No phone – always create
@@ -465,6 +339,11 @@ app.post('/webhook', async (req, res) => {
       });
       console.log('[TELEGRAM-BOT] Contact create response:', createResp.data);
       contactId = createResp.data.result;
+    }
+
+    // PHONE NUMBER FALLBACK: Verify and add phone if missing after contact creation
+    if (phone && contactId) {
+      await ensurePhoneNumberSet(contactId, phone);
     }
 
     // 3. Prepare deal fields (always create new deal attached to contact)
@@ -503,23 +382,25 @@ app.post('/webhook', async (req, res) => {
     console.log(`[TELEGRAM-BOT] DealId processed: ${dealId}`);
 
     // 4. Return success response
-    return res.status(200).json({
+    res.status(200).json({
       message: 'Contact and Deal created in Bitrix24',
       contactId,
       dealId,
     });
+
   } catch (error) {
     console.error('[TELEGRAM-BOT] Error processing contact or deal:', error?.response?.data || error.message);
-    return res.status(500).json({
+    res.status(500).json({
       message: 'Error processing contact or deal',
       error: error?.response?.data || error.message,
     });
   }
 });
 
-const port = process.env.TELEGRAM_BOT_PORT || 3001;
-app.listen(port, () => {
-  console.log(`[TELEGRAM-BOT] Service running on port ${port}`);
-  console.log(`[TELEGRAM-BOT] Webhook endpoint: http://localhost:${port}/webhook`);
-  console.log(`[TELEGRAM-BOT] Health check: http://localhost:${port}/health`);
+// Start the server
+const PORT = process.env.TELEGRAM_BOT_PORT || 3001;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[TELEGRAM-BOT] Service running on port ${PORT}`);
+  console.log(`[TELEGRAM-BOT] Webhook endpoint: http://localhost:${PORT}/webhook`);
+  console.log(`[TELEGRAM-BOT] Health check: http://localhost:${PORT}/health`);
 });
