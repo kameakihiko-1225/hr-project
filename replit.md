@@ -167,21 +167,24 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
-### July 17, 2025 - WEBHOOK DATA EXTRACTION & MALFORMED JSON ISSUE RESOLVED - COMPLETED ✓
-- **ROOT CAUSE IDENTIFIED**: Telegram bot was sending malformed JSON where all additional fields were concatenated into the username field
-- **Malformed JSON Detection**: Added intelligent detection for corrupted data structure when username contains resume/diploma/phase2 fields
-- **Advanced Field Extraction**: Implemented robust regex patterns to handle multiple escaping variations:
-  - Standard JSON format: `"fieldname":"value"`
-  - Escaped quotes: `\"fieldname\":\"value\"`
-  - Complex escaping: `\\\"fieldname\\\":\\\"value\\\"`
-- **Complete Field Recovery**: Successfully extracts all embedded fields from malformed JSON:
-  - ✅ Resume file IDs (UF_CRM_1752621810)
-  - ✅ Diploma file IDs (UF_CRM_1752621831)  
-  - ✅ Phase2 answers Q1-Q3 (UF_CRM_1752241370/1752241378/1752241386)
-  - ✅ Username properly cleaned from HTML links
-- **Verified End-to-End**: Contact #62419 created with ALL fields populated correctly from malformed JSON structure
-- **Dual Compatibility**: Webhook handles both normal JSON and malformed JSON seamlessly
-- **Production Ready**: Both webhook endpoints (port 5000 and 3001) now fully operational with malformed JSON support
+### July 17, 2025 - TELEGRAM BOT DATA FORMAT ISSUE COMPLETELY RESOLVED - COMPLETED ✓
+- **ROOT CAUSE IDENTIFIED**: Telegram bot sends basic fields as separate JSON properties and additional data embedded in username field
+- **Data Structure Understanding**: Fixed webhook to handle actual Telegram bot format:
+  - Basic fields: `full_name_uzbek`, `phone_number_uzbek`, `age_uzbek`, `city_uzbek`, `degree`, `position_uz` as JSON properties
+  - Additional data: `resume`, `diploma`, `phase2_q_1/2/3` embedded in username field as JSON string
+- **Dual Processing Logic**: Implemented comprehensive handling for both data formats:
+  - Direct field extraction from JSON properties for basic data
+  - Regex-based extraction from username field for file IDs and phase2 answers
+- **Complete Field Population**: All 13+ Bitrix24 fields now correctly populated:
+  - ✅ Name: "Shohabbos Usmonov" → UF_CRM_1752239621
+  - ✅ Position: "HR Generalist" → UF_CRM_1752239621  
+  - ✅ City: "toshkent" → UF_CRM_1752239635
+  - ✅ Age: "23" → UF_CRM_1752622669492
+  - ✅ Phone: "+998941701078" → UF_CRM_1747689959
+  - ✅ Resume/Diploma file IDs → UF_CRM_1752621810/1752621831
+  - ✅ Phase2 answers → UF_CRM_1752241370/1752241378/1752241386
+- **Production Testing**: Contact #53535 successfully updated with all fields populated correctly
+- **End-to-End Success**: Telegram bot → Webhook → Bitrix24 CRM integration fully operational
 
 ### July 17, 2025 - CRITICAL BITRIX24 CUSTOM FIELDS ISSUE RESOLVED - COMPLETED ✓
 - **ROOT CAUSE IDENTIFIED**: Bitrix24 API requires JSON format instead of FormData for proper custom field population

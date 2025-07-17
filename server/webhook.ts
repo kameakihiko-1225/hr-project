@@ -65,13 +65,74 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   
   let cleanedData = data;
 
-  // Handle malformed JSON case where Telegram bot sends all data as a single concatenated string
-  if (typeof data.username === 'string' && (data.username.includes('resume') || data.username.includes('diploma') || data.username.includes('phase2'))) {
-    console.log('[TELEGRAM-BOT] Detected malformed JSON structure, attempting to parse...');
-    console.log('[TELEGRAM-BOT] Malformed username field:', data.username);
+  // Handle case where Telegram bot sends data as individual field strings instead of proper JSON
+  if (typeof data === 'string' || (data && Object.keys(data).some(key => typeof data[key] === 'string' && data[key].includes('"')))) {
+    console.log('[TELEGRAM-BOT] Detected individual field format, attempting to parse...');
+    
     try {
-      // Try to reconstruct the JSON from the malformed string
-      const malformedString = data.username;
+      // Convert the entire data object to a string to search for individual fields
+      const dataString = JSON.stringify(data);
+      console.log('[TELEGRAM-BOT] Full data string for parsing:', dataString);
+      
+      // Extract individual fields using more flexible patterns
+      const extractFieldFromText = (fieldName: string, text: string): string => {
+        const patterns = [
+          // Look for "fieldname": "value" patterns
+          new RegExp(`"${fieldName}"\\s*:\\s*"([^"]*)"`, 'gi'),
+          // Look for fieldname_uzbek: value patterns
+          new RegExp(`"${fieldName}_uzbek"\\s*:\\s*"([^"]*)"`, 'gi'),
+          // Look for simple fieldname patterns
+          new RegExp(`"${fieldName}"\\s*:\\s*"([^"]*)"`, 'gi')
+        ];
+        
+        for (const pattern of patterns) {
+          const matches = [...text.matchAll(pattern)];
+          if (matches.length > 0) {
+            const value = matches[matches.length - 1][1]; // Get last match
+            console.log(`[TELEGRAM-BOT] Extracted ${fieldName}: "${value}"`);
+            return value;
+          }
+        }
+        console.log(`[TELEGRAM-BOT] Failed to extract ${fieldName} from text`);
+        return '';
+      };
+
+      // Try to extract from the raw data string and individual object values
+      let fullText = dataString;
+      Object.values(data).forEach(value => {
+        if (typeof value === 'string') {
+          fullText += ' ' + value;
+        }
+      });
+
+      cleanedData = {
+        full_name_uzbek: extractFieldFromText('full_name', fullText) || data.full_name_uzbek || '',
+        phone_number_uzbek: extractFieldFromText('phone_number', fullText) || data.phone_number_uzbek || '',
+        age_uzbek: extractFieldFromText('age', fullText) || data.age_uzbek || '',
+        city_uzbek: extractFieldFromText('city', fullText) || data.city_uzbek || '',
+        degree: extractFieldFromText('degree', fullText) || data.degree || '',
+        position_uz: extractFieldFromText('position', fullText) || data.position_uz || '',
+        username: extractFieldFromText('username', fullText) || data.username || '',
+        resume: extractFieldFromText('resume', fullText) || data.resume || '',
+        diploma: extractFieldFromText('diploma', fullText) || data.diploma || '',
+        phase2_q_1: extractFieldFromText('phase2_q_1', fullText) || data.phase2_q_1 || '',
+        phase2_q_2: extractFieldFromText('phase2_q_2', fullText) || data.phase2_q_2 || '',
+        phase2_q_3: extractFieldFromText('phase2_q_3', fullText) || data.phase2_q_3 || ''
+      };
+
+      console.log('[TELEGRAM-BOT] Reconstructed data from field parsing:', JSON.stringify(cleanedData, null, 2));
+    } catch (error) {
+      console.log('[TELEGRAM-BOT] Failed to parse field format, using original data');
+    }
+  }
+
+  // Handle username field that contains embedded JSON data
+  if (data.username && typeof data.username === 'string' && (data.username.includes('resume') || data.username.includes('diploma') || data.username.includes('phase2'))) {
+    console.log('[TELEGRAM-BOT] Detected embedded JSON in username field, attempting to parse...');
+    console.log('[TELEGRAM-BOT] Username field contains:', data.username);
+    try {
+      // Try to extract JSON fields from the username string
+      const embeddedDataString = data.username;
       
       // Extract individual fields using regex patterns
       const extractField = (fieldName: string, str: string): string => {
@@ -98,20 +159,20 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
         return '';
       };
       
-      // Reconstruct the cleaned data object
+      // Extract embedded data and merge with existing cleanedData
+      const extractedData = {
+        username: extractField('username', embeddedDataString) || data.username,
+        resume: extractField('resume', embeddedDataString),
+        diploma: extractField('diploma', embeddedDataString),
+        phase2_q_1: extractField('phase2_q_1', embeddedDataString),
+        phase2_q_2: extractField('phase2_q_2', embeddedDataString),
+        phase2_q_3: extractField('phase2_q_3', embeddedDataString)
+      };
+      
+      // Merge extracted data with cleanedData (keeping existing basic fields)
       cleanedData = {
-        full_name_uzbek: data.full_name_uzbek || '',
-        phone_number_uzbek: data.phone_number_uzbek || '',
-        age_uzbek: data.age_uzbek || '',
-        city_uzbek: data.city_uzbek || '',
-        degree: data.degree || '',
-        position_uz: data.position_uz || '',
-        username: extractField('username', malformedString) || data.username,
-        resume: extractField('resume', malformedString),
-        diploma: extractField('diploma', malformedString),
-        phase2_q_1: extractField('phase2_q_1', malformedString),
-        phase2_q_2: extractField('phase2_q_2', malformedString),
-        phase2_q_3: extractField('phase2_q_3', malformedString)
+        ...cleanedData,
+        ...extractedData
       };
       
       console.log('[TELEGRAM-BOT] Reconstructed data from malformed JSON:', JSON.stringify(cleanedData, null, 2));
@@ -157,11 +218,16 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   const resumeFileId = cleanedData.resume;
   const diplomaFileId = cleanedData.diploma;
   
+  console.log(`[TELEGRAM-BOT] Resume file ID extracted: "${resumeFileId}" (is valid file ID: ${isTelegramFileId(resumeFileId)})`);
+  console.log(`[TELEGRAM-BOT] Diploma file ID extracted: "${diplomaFileId}" (is valid file ID: ${isTelegramFileId(diplomaFileId)})`);
+  
   if (resumeFileId && isTelegramFileId(resumeFileId)) {
     contactFields.UF_CRM_1752621810 = resumeFileId;
+    console.log(`[TELEGRAM-BOT] Added resume file ID to UF_CRM_1752621810: ${resumeFileId}`);
   }
   if (diplomaFileId && isTelegramFileId(diplomaFileId)) {
     contactFields.UF_CRM_1752621831 = diplomaFileId;
+    console.log(`[TELEGRAM-BOT] Added diploma file ID to UF_CRM_1752621831: ${diplomaFileId}`);
   }
 
   // Handle phase2 answers
@@ -169,9 +235,20 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   const phase2_q2 = cleanedData.phase2_q_2 || '';
   const phase2_q3 = cleanedData.phase2_q_3 || '';
 
-  if (phase2_q1) contactFields.UF_CRM_1752241370 = phase2_q1;
-  if (phase2_q2) contactFields.UF_CRM_1752241378 = phase2_q2;
-  if (phase2_q3) contactFields.UF_CRM_1752241386 = phase2_q3;
+  console.log(`[TELEGRAM-BOT] Phase2 answers extracted - Q1: "${phase2_q1}", Q2: "${phase2_q2}", Q3: "${phase2_q3}"`);
+
+  if (phase2_q1) {
+    contactFields.UF_CRM_1752241370 = phase2_q1;
+    console.log(`[TELEGRAM-BOT] Added phase2 Q1 to UF_CRM_1752241370: ${phase2_q1}`);
+  }
+  if (phase2_q2) {
+    contactFields.UF_CRM_1752241378 = phase2_q2;
+    console.log(`[TELEGRAM-BOT] Added phase2 Q2 to UF_CRM_1752241378: ${phase2_q2}`);
+  }
+  if (phase2_q3) {
+    contactFields.UF_CRM_1752241386 = phase2_q3;
+    console.log(`[TELEGRAM-BOT] Added phase2 Q3 to UF_CRM_1752241386: ${phase2_q3}`);
+  }
 
   // Add comments
   const comments = [];
