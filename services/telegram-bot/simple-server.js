@@ -165,6 +165,22 @@ app.post('/webhook', async (req, res) => {
     // Log the full incoming data for troubleshooting
     console.log('[TELEGRAM-BOT] Incoming webhook data:', JSON.stringify(data, null, 2));
     
+    // Debug field extraction
+    console.log(`[TELEGRAM-BOT] Field extraction debug:`);
+    console.log(`- full_name_uzbek: "${data.full_name_uzbek}" (type: ${typeof data.full_name_uzbek})`);
+    console.log(`- phone_number_uzbek: "${data.phone_number_uzbek}" (type: ${typeof data.phone_number_uzbek})`);
+    console.log(`- age_uzbek: "${data.age_uzbek}" (type: ${typeof data.age_uzbek})`);
+    console.log(`- city_uzbek: "${data.city_uzbek}" (type: ${typeof data.city_uzbek})`);
+    console.log(`- degree: "${data.degree}" (type: ${typeof data.degree})`);
+    console.log(`- position_uz: "${data.position_uz}" (type: ${typeof data.position_uz})`);
+    console.log(`- username: "${data.username}" (type: ${typeof data.username})`);
+    console.log(`- resume: "${data.resume}" (type: ${typeof data.resume})`);
+    console.log(`- diploma: "${data.diploma}" (type: ${typeof data.diploma})`);
+    console.log(`- phase2_q_1: "${data.phase2_q_1}" (type: ${typeof data.phase2_q_1})`);
+    console.log(`- phase2_q_2: "${data.phase2_q_2}" (type: ${typeof data.phase2_q_2})`);
+    console.log(`- phase2_q_3: "${data.phase2_q_3}" (type: ${typeof data.phase2_q_3})`);
+    console.log(`[TELEGRAM-BOT] All data keys: ${Object.keys(data)}`);
+    
     // 1. Download resume and diploma files as buffers (log file IDs)
     console.log(`[TELEGRAM-BOT] Resume file_id: ${data.resume}`);
     console.log(`[TELEGRAM-BOT] Diploma file_id: ${data.diploma}`);
@@ -277,6 +293,10 @@ app.post('/webhook', async (req, res) => {
     contactForm.append('params[REGISTER_SONET_EVENT]', 'Y');
     console.log('[TELEGRAM-BOT] FormData prepared for Bitrix24 submission');
     
+    // Debug: Log contactFields object before FormData conversion
+    console.log('[TELEGRAM-BOT] Contact fields being sent to Bitrix24:');
+    console.log(JSON.stringify(contactFields, null, 2));
+    
     // Check duplicate by phone and update if exists
     let contactId;
     if (phone) {
@@ -300,6 +320,29 @@ app.post('/webhook', async (req, res) => {
           console.log('[TELEGRAM-BOT] Bitrix24 API Error:', createResp.data.error);
         }
         contactId = createResp.data.result;
+        
+        // Verify contact creation by reading it back from Bitrix24
+        try {
+          const verifyResp = await axios.get(`${BITRIX_BASE}/crm.contact.get.json?id=${contactId}`);
+          console.log('[TELEGRAM-BOT] Contact verification - stored data in Bitrix24:');
+          const storedContact = verifyResp.data.result;
+          console.log(`  - NAME: ${storedContact.NAME || 'NOT STORED'}`);
+          console.log(`  - Position (UF_CRM_1752239621): ${storedContact.UF_CRM_1752239621 || 'NOT STORED'}`);
+          console.log(`  - City (UF_CRM_1752239635): ${storedContact.UF_CRM_1752239635 || 'NOT STORED'}`);
+          console.log(`  - Degree (UF_CRM_1752239653): ${storedContact.UF_CRM_1752239653 || 'NOT STORED'}`);
+          console.log(`  - Age (UF_CRM_1752622669492): ${storedContact.UF_CRM_1752622669492 || 'NOT STORED'}`);
+          console.log(`  - Username (UF_CRM_CONTACT_1745579971270): ${storedContact.UF_CRM_CONTACT_1745579971270 || 'NOT STORED'}`);
+          console.log(`  - Resume (UF_CRM_1752621810): ${storedContact.UF_CRM_1752621810 || 'NOT STORED'}`);
+          console.log(`  - Diploma (UF_CRM_1752621831): ${storedContact.UF_CRM_1752621831 || 'NOT STORED'}`);
+          console.log(`  - Phase2 Q1 (UF_CRM_1752241370): ${storedContact.UF_CRM_1752241370 || 'NOT STORED'}`);
+          console.log(`  - Phase2 Q2 (UF_CRM_1752241378): ${storedContact.UF_CRM_1752241378 || 'NOT STORED'}`);
+          console.log(`  - Phase2 Q3 (UF_CRM_1752241386): ${storedContact.UF_CRM_1752241386 || 'NOT STORED'}`);
+          console.log(`  - Phone backup (UF_CRM_1747689959): ${storedContact.UF_CRM_1747689959 || 'NOT STORED'}`);
+          console.log(`  - PHONE array: ${JSON.stringify(storedContact.PHONE) || 'NOT STORED'}`);
+          console.log(`  - COMMENTS: ${storedContact.COMMENTS || 'NOT STORED'}`);
+        } catch (verifyError) {
+          console.log('[TELEGRAM-BOT] Error verifying contact:', verifyError.message);
+        }
         
         // Verify phone field was added by fetching the contact back
         if (contactId && phone) {
