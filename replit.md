@@ -167,6 +167,22 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 17, 2025 - WEBHOOK DATA EXTRACTION & MALFORMED JSON ISSUE RESOLVED - COMPLETED ✓
+- **ROOT CAUSE IDENTIFIED**: Telegram bot was sending malformed JSON where all additional fields were concatenated into the username field
+- **Malformed JSON Detection**: Added intelligent detection for corrupted data structure when username contains resume/diploma/phase2 fields
+- **Advanced Field Extraction**: Implemented robust regex patterns to handle multiple escaping variations:
+  - Standard JSON format: `"fieldname":"value"`
+  - Escaped quotes: `\"fieldname\":\"value\"`
+  - Complex escaping: `\\\"fieldname\\\":\\\"value\\\"`
+- **Complete Field Recovery**: Successfully extracts all embedded fields from malformed JSON:
+  - ✅ Resume file IDs (UF_CRM_1752621810)
+  - ✅ Diploma file IDs (UF_CRM_1752621831)  
+  - ✅ Phase2 answers Q1-Q3 (UF_CRM_1752241370/1752241378/1752241386)
+  - ✅ Username properly cleaned from HTML links
+- **Verified End-to-End**: Contact #62419 created with ALL fields populated correctly from malformed JSON structure
+- **Dual Compatibility**: Webhook handles both normal JSON and malformed JSON seamlessly
+- **Production Ready**: Both webhook endpoints (port 5000 and 3001) now fully operational with malformed JSON support
+
 ### July 17, 2025 - CRITICAL BITRIX24 CUSTOM FIELDS ISSUE RESOLVED - COMPLETED ✓
 - **ROOT CAUSE IDENTIFIED**: Bitrix24 API requires JSON format instead of FormData for proper custom field population
 - **Main Webhook Fixed**: Converted main Express webhook from FormData to JSON format with `{ fields: { FIELDNAME: value } }` structure

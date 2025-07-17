@@ -61,16 +61,64 @@ async function findDealIdByContact(contactId: string): Promise<string | null> {
 
 export async function processWebhookData(data: any): Promise<{ message: string; contactId: string; dealId: string }> {
   console.log('[TELEGRAM-BOT] Processing webhook data...');
+  console.log('[TELEGRAM-BOT] Raw data received:', JSON.stringify(data, null, 2));
   
-  // Dependencies are already imported statically above
+  let cleanedData = data;
 
-  // Enhanced data sanitization for BOM characters
-  const cleanedData: Record<string, any> = {};
-  Object.keys(data).forEach(key => {
-    const cleanKey = sanitizeFromBOM(key);
-    const cleanValue = sanitizeFromBOM(data[key]);
-    cleanedData[cleanKey] = cleanValue;
-  });
+  // Handle malformed JSON case where Telegram bot sends all data as a single concatenated string
+  if (typeof data.username === 'string' && (data.username.includes('resume') || data.username.includes('diploma') || data.username.includes('phase2'))) {
+    console.log('[TELEGRAM-BOT] Detected malformed JSON structure, attempting to parse...');
+    console.log('[TELEGRAM-BOT] Malformed username field:', data.username);
+    try {
+      // Try to reconstruct the JSON from the malformed string
+      const malformedString = data.username;
+      
+      // Extract individual fields using regex patterns
+      const extractField = (fieldName: string, str: string): string => {
+        // Handle different quote variations and escaping patterns
+        const patterns = [
+          // Standard JSON format: "fieldname":"value"
+          new RegExp(`"${fieldName}"\\s*:\\s*"([^"]*)"`, 'i'),
+          // Escaped quotes: \"fieldname\":\"value\"
+          new RegExp(`\\\\"${fieldName}\\\\"\\s*:\\s*\\\\"([^\\\\]*)\\\\"`, 'i'),
+          // With extra escaping: \\\"fieldname\\\":\\\"value\\\"
+          new RegExp(`\\\\\\\\"${fieldName}\\\\\\\\"\\s*:\\s*\\\\\\\\"([^\\\\]*)\\\\\\\\"`, 'i'),
+          // Mixed escaping: \"fieldname\":\"value with possible content\"
+          new RegExp(`\\\\"${fieldName}\\\\"\\s*:\\s*\\\\"([^\\\\]+(?:\\\\.[^\\\\]*)*)\\\\"`, 'i')
+        ];
+        
+        for (const pattern of patterns) {
+          const match = str.match(pattern);
+          if (match && match[1]) {
+            console.log(`[TELEGRAM-BOT] Extracted ${fieldName}: ${match[1]}`);
+            return match[1];
+          }
+        }
+        console.log(`[TELEGRAM-BOT] Failed to extract ${fieldName} from: ${str.substring(0, 200)}...`);
+        return '';
+      };
+      
+      // Reconstruct the cleaned data object
+      cleanedData = {
+        full_name_uzbek: data.full_name_uzbek || '',
+        phone_number_uzbek: data.phone_number_uzbek || '',
+        age_uzbek: data.age_uzbek || '',
+        city_uzbek: data.city_uzbek || '',
+        degree: data.degree || '',
+        position_uz: data.position_uz || '',
+        username: extractField('username', malformedString) || data.username,
+        resume: extractField('resume', malformedString),
+        diploma: extractField('diploma', malformedString),
+        phase2_q_1: extractField('phase2_q_1', malformedString),
+        phase2_q_2: extractField('phase2_q_2', malformedString),
+        phase2_q_3: extractField('phase2_q_3', malformedString)
+      };
+      
+      console.log('[TELEGRAM-BOT] Reconstructed data from malformed JSON:', JSON.stringify(cleanedData, null, 2));
+    } catch (error) {
+      console.log('[TELEGRAM-BOT] Failed to parse malformed JSON, using original data');
+    }
+  }
 
   console.log('[TELEGRAM-BOT] Field extraction debug:');
   Object.keys(cleanedData).forEach(key => {

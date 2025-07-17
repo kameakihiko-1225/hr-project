@@ -1,0 +1,105 @@
+
+"full_name_uzbek": "Shohabbos Usmonov",
+2025-07-17 19:47:29.36
+985e5804
+User
+"phone_number_uzbek": "998941701078",
+2025-07-17 19:47:29.36
+985e5804
+User
+"age_uzbek": "23",
+2025-07-17 19:47:29.36
+985e5804
+User
+"city_uzbek": "toshkent",
+2025-07-17 19:47:29.36
+985e5804
+User
+"degree": "Unfinished Bachelor's",
+2025-07-17 19:47:29.36
+985e5804
+User
+"position_uz": "HR Generalist",
+2025-07-17 19:47:29.36
+985e5804
+User
+"username":"<a href: "\\\"tg:\\/\\/resolve?domain=shohabbos_usmonov\\\">shohabbos_usmonov<\\/a>\",\n \"resume\":\"BQACAgIAAxkBAAIInmh5DO0VCgw8IE-BGqsPHNpnvEhPAAKyeQACq8DIS9eYUOVLO-xmNgQ\" ,\n \"diploma\": \"BQACAgIAAxkBAAIIoWh5DPKdY3MOhDm-rQbTYHti1_0pAAK0eQACq8DIS2uqSxckyViiNgQ\",\n \"phase2_q_1\":\"test\",\n \"phase2_q_2\":\"AwACAgIAAxkBAAIIqGh5DP4L-pvlg2QWEoHX5VNgeJxRAAK2eQACq8DIS7fza09DTAglNgQ\",\n \"phase2_q_3\":\"test\"\n }" (type: string)
+2025-07-17 19:47:29.36
+985e5804
+User
+[TELEGRAM-BOT] Full name: "", phone_raw: undefined, normalized_phone: "", age: ""
+2025-07-17 19:47:29.36
+985e5804
+User
+[TELEGRAM-BOT] Contact fields being sent to Bitrix24:
+2025-07-17 19:47:29.36
+985e5804
+User
+{
+2025-07-17 19:47:29.36
+985e5804
+User
+"NAME": "",
+2025-07-17 19:47:29.36
+985e5804
+User
+"UF_CRM_1752239621": "",
+2025-07-17 19:47:29.36
+985e5804
+User
+"UF_CRM_1752239635": "",
+2025-07-17 19:47:29.36
+985e5804
+User
+"UF_CRM_1752239653": "",
+2025-07-17 19:47:29.36
+985e5804
+User
+"UF_CRM_CONTACT_1745579971270": "",
+2025-07-17 19:47:29.36
+985e5804
+User
+"UF_CRM_1752622669492": ""
+2025-07-17 19:47:29.36
+985e5804
+User
+}
+2025-07-17 19:47:29.36
+985e5804
+User
+[TELEGRAM-BOT] Contact JSON payload being sent to Bitrix24:
+2025-07-17 19:47:29.36
+985e5804
+User
+{
+2025-07-17 19:47:29.36
+985e5804
+User
+"fields": {
+2025-07-17 19:47:29.36
+985e5804
+User
+"NAME": "",
+2025-07-17 19:47:29.36
+985e5804
+User
+"UF_CRM_1752239621": "",
+2025-07-17 19:47:29.36
+985e5804
+User
+"UF_CRM_1752239635": "",
+2025-07-17 19:47:29.36
+985e5804
+User
+"UF_CRM_1752239653": "",
+2025-07-17 19:47:29.36
+985e5804
+User
+"UF_CRM_CONTACT_1745579971270": "",
+2025-07-17 19:47:29.36
+985e5804
+User
+"UF_CRM_1752622669492": ""
+2025-07-17 19:47:29.36
+985e5804
+User
