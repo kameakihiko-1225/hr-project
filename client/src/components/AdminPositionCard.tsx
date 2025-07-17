@@ -223,7 +223,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
         {/* Salary after description */}
         {position.salaryRange && (
           <p className="text-xs font-medium text-foreground flex items-center gap-1 mt-1">
-            <DollarSign className="h-3 w-3" /> {position.salaryRange}
+            <DollarSign className="h-3 w-3" /> {getLocalizedContent(position.salaryRange)}
           </p>
         )}
 
@@ -235,7 +235,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
             </span>
           )}
           {position.employmentType && (
-            <span className="flex items-center gap-1"><Briefcase className="h-3 w-3" /> {position.employmentType}</span>
+            <span className="flex items-center gap-1"><Briefcase className="h-3 w-3" /> {getLocalizedContent(position.employmentType)}</span>
           )}
         </div>
       </CardContent>
@@ -274,7 +274,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
             </DialogTrigger>
             <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>{position.title}</DialogTitle>
+              <DialogTitle>{getLocalizedContent(position.title)}</DialogTitle>
               <DialogDescription>Position Details</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
@@ -290,7 +290,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
                   <h4 className="text-sm font-medium mb-2">Salary Range</h4>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    <span>{position.salaryRange}</span>
+                    <span>{getLocalizedContent(position.salaryRange)}</span>
                   </div>
                 </div>
               )}
@@ -300,7 +300,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
                   <h4 className="text-sm font-medium mb-2">Employment Type</h4>
                   <div className="flex items-center gap-2">
                     <Briefcase className="h-4 w-4" />
-                    <span>{position.employmentType}</span>
+                    <span>{getLocalizedContent(position.employmentType)}</span>
                   </div>
                 </div>
               )}

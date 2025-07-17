@@ -66,17 +66,18 @@ class Environment {
 
   // JWT secret key
   get jwtSecret(): string {
-    const secret = getEnv('VITE_JWT_SECRET');
+    // In server environment, try JWT_SECRET first, then VITE_JWT_SECRET
+    const secret = getEnv('JWT_SECRET') || getEnv('VITE_JWT_SECRET');
     if (!secret) {
-      logger.warn('VITE_JWT_SECRET is not set, using default (unsafe for production)');
-      return 'your-secret-key';
+      logger.error('JWT_SECRET is not set - authentication will not work');
+      throw new Error('Authentication service is not properly configured. Please check your environment variables.');
     }
     return secret;
   }
 
   // JWT expiration time
   get jwtExpiresIn(): string {
-    return getEnv('VITE_JWT_EXPIRES_IN') || '7d';
+    return getEnv('JWT_EXPIRES_IN') || getEnv('VITE_JWT_EXPIRES_IN') || '7d';
   }
 
   // Supabase URL
