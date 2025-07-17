@@ -39,14 +39,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Check if authentication is properly configured
   useEffect(() => {
     const checkAuthConfig = () => {
-      const jwtSecret = env.jwtSecret;
-      const isConfigured = jwtSecret && jwtSecret !== 'your-secret-key';
-      setIsAuthConfigured(isConfigured);
-      
-      if (!isConfigured) {
-        logger.warn('Authentication is not properly configured - missing JWT secret');
-      } else {
-        logger.debug('Authentication is properly configured');
+      try {
+        const jwtSecret = env.jwtSecret;
+        // Consider auth configured if JWT secret exists and is not empty
+        const isConfigured = jwtSecret && jwtSecret.length > 0 && jwtSecret !== 'your-secret-key';
+        setIsAuthConfigured(isConfigured);
+        
+        if (!isConfigured) {
+          logger.warn('Authentication is not properly configured - missing or invalid JWT secret');
+        } else {
+          logger.debug('Authentication is properly configured');
+        }
+      } catch (error) {
+        logger.error('Failed to check auth configuration:', error);
+        setIsAuthConfigured(false);
       }
     };
     
