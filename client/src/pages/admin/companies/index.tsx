@@ -101,6 +101,7 @@ export default function CompaniesPage() {
         // The actual API returns data directly, not nested under companies
         const companiesData = response.data || [];
         logger.info(`Fetched ${companiesData.length} companies`);
+        console.log(`[DEBUG] [companiesPage] Raw companies data:`, companiesData);
         const cleanedData = companiesData.map((company: Company) => {
           if (company.logoUrl && company.logoUrl.startsWith('blob:')) {
             logger.warn(`Found stale blob URL for company ${company.name}, replacing with placeholder`);
@@ -108,6 +109,7 @@ export default function CompaniesPage() {
           }
           return company;
         });
+        console.log(`[DEBUG] [companiesPage] Cleaned companies data:`, cleanedData);
         setCompanies(cleanedData);
         setFilteredCompanies(cleanedData);
       } else {
