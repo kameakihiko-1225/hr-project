@@ -14,10 +14,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded files statically
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   
+  // Health check endpoint for webhook
+  app.get('/webhook', (req, res) => {
+    res.json({ 
+      status: 'Webhook endpoint is active',
+      url: 'https://career.millatumidi.uz/webhook',
+      method: 'POST',
+      timestamp: new Date().toISOString()
+    });
+  });
+  
   // Telegram webhook endpoint - direct implementation
   app.post('/webhook', async (req, res) => {
     try {
       console.log('[TELEGRAM-BOT] Received webhook data:', JSON.stringify(req.body));
+      console.log('[TELEGRAM-BOT] Request URL:', req.url);
+      console.log('[TELEGRAM-BOT] Request headers:', JSON.stringify(req.headers));
       
       // Import the webhook logic
       const axios = require('axios');
@@ -59,7 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       async function findExistingContact(phone) {
         if (!phone) return null;
         try {
-          const searchResp = await axios.get(`${BITRIX_BASE}/crm.contact.list.json?filter[PHONE]=${encodeURIComponent(phone)}`);
+          const searchResp = await axios.get(`${BITRIX_BASE}/crm.contact.list.json?filter[PHONE]=${phone}`);
           const contacts = searchResp.data.result;
           return contacts && contacts.length > 0 ? contacts[0].ID : null;
         } catch {
