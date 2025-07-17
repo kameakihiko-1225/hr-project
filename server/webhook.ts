@@ -1,6 +1,9 @@
-// Note: Using dynamic imports to avoid require() issues
-let axios: any;
-let FormData: any;
+// Import required modules - use exact same approach as working simple-server.js
+import axiosDefault from 'axios';
+import FormDataClass from 'form-data';
+
+const axios = axiosDefault;
+const FormData = FormDataClass;
 
 const BITRIX_BASE = 'https://millatumidi.bitrix24.kz/rest/21/wx0c9lt1mxcwkhz9';
 
@@ -59,15 +62,7 @@ async function findDealIdByContact(contactId: string): Promise<string | null> {
 export async function processWebhookData(data: any): Promise<{ message: string; contactId: string; dealId: string }> {
   console.log('[TELEGRAM-BOT] Processing webhook data...');
   
-  // Dynamically import dependencies to avoid require() issues
-  if (!axios) {
-    const axiosModule = await import('axios');
-    axios = axiosModule.default;
-  }
-  if (!FormData) {
-    const formDataModule = await import('form-data');
-    FormData = formDataModule.default;
-  }
+  // Dependencies are already imported statically above
 
   // Enhanced data sanitization for BOM characters
   const cleanedData: Record<string, any> = {};
@@ -142,15 +137,21 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log('[TELEGRAM-BOT] Contact fields being sent to Bitrix24:');
   console.log(JSON.stringify(contactFields, null, 2));
 
-  // Create FormData for contact
+  // Create FormData for contact - use exact same format as working simple-server.js
   const contactForm = new FormData();
   Object.keys(contactFields).forEach(key => {
-    if (key === 'PHONE' && Array.isArray(contactFields[key])) {
-      contactForm.append(key, JSON.stringify(contactFields[key]));
+    const value = contactFields[key];
+    console.log(`[TELEGRAM-BOT] Appending to FormData: ${key} = ${typeof value === 'object' ? JSON.stringify(value) : value}`);
+    if (key === 'PHONE' && Array.isArray(value)) {
+      contactForm.append(key, JSON.stringify(value));
     } else {
-      contactForm.append(key, contactFields[key]);
+      contactForm.append(key, String(value || ''));
     }
   });
+  
+  // Debug FormData contents
+  console.log('[TELEGRAM-BOT] FormData headers:', contactForm.getHeaders());
+  console.log('[TELEGRAM-BOT] FormData buffer length:', contactForm.getBuffer().length);
 
   // Check for existing contact
   let contactId: string;
