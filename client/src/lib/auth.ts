@@ -1,14 +1,11 @@
 import { createLogger } from './logger';
-import prisma from './prisma';
-import { generateToken, verifyToken } from './jwt';
-import bcrypt from 'bcryptjs';
 
 // Create a logger for authentication
 const logger = createLogger('auth');
 
 /**
  * Authentication service
- * Provides methods for user authentication
+ * Uses the existing backend authentication system
  */
 export class AuthService {
   /**
@@ -18,46 +15,31 @@ export class AuthService {
     try {
       logger.debug(`Attempting sign in for email: ${email}`);
       
-      // Find admin by email
-      const admin = await prisma.admin.findUnique({
-        where: { email }
+      // Use the existing backend authentication endpoint
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
       
-      if (!admin) {
-        logger.warn(`Sign in failed: No admin found with email ${email}`);
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        logger.warn(`Sign in failed for email: ${email} - ${data.error}`);
         return {
           success: false,
-          error: 'Invalid email or password',
+          error: data.error || 'Authentication failed',
         };
       }
       
-      // Check password
-      const passwordValid = await bcrypt.compare(password, admin.passwordHash);
-      
-      if (!passwordValid) {
-        logger.warn(`Sign in failed: Invalid password for ${email}`);
-        return {
-          success: false,
-          error: 'Invalid email or password',
-        };
-      }
-      
-      // Generate JWT token
-      const token = generateToken({
-        adminId: admin.id,
-        email: admin.email,
-        isSuperAdmin: admin.isSuperAdmin,
-      });
-      
-      // Return admin without password hash
-      const { passwordHash, ...adminWithoutPassword } = admin;
-      
-      logger.info(`Sign in successful for admin: ${admin.email} (${admin.id})`);
+      logger.info(`Sign in successful for user: ${email}`);
       
       return {
         success: true,
-        admin: adminWithoutPassword,
-        token,
+        user: data.user,
+        token: data.token,
       };
     } catch (error) {
       logger.error(`Sign in error for email: ${email}`, error);
@@ -69,54 +51,36 @@ export class AuthService {
   }
   
   /**
-   * Register a new admin
+   * Register a new user (simplified version)
    */
-  async register(email: string, password: string, isSuperAdmin: boolean = false) {
+  async register(email: string, password: string) {
     try {
-      logger.debug(`Attempting to register new admin with email: ${email}`);
+      logger.debug(`Attempting to register new user with email: ${email}`);
       
-      // Check if admin already exists
-      const existingAdmin = await prisma.admin.findUnique({
-        where: { email }
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
       
-      if (existingAdmin) {
-        logger.warn(`Registration failed: Admin already exists with email ${email}`);
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        logger.warn(`Registration failed for email: ${email} - ${data.error}`);
         return {
           success: false,
-          error: 'Email already in use',
+          error: data.error || 'Registration failed',
         };
       }
       
-      // Hash password
-      const salt = await bcrypt.genSalt(10);
-      const passwordHash = await bcrypt.hash(password, salt);
-      
-      // Create admin
-      const admin = await prisma.admin.create({
-        data: {
-          email,
-          passwordHash,
-          isSuperAdmin,
-        }
-      });
-      
-      // Generate JWT token
-      const token = generateToken({
-        adminId: admin.id,
-        email: admin.email,
-        isSuperAdmin: admin.isSuperAdmin,
-      });
-      
-      // Return admin without password hash
-      const { passwordHash: _, ...adminWithoutPassword } = admin;
-      
-      logger.info(`Registration successful for admin: ${admin.email} (${admin.id})`);
+      logger.info(`Registration successful for user: ${email}`);
       
       return {
         success: true,
-        admin: adminWithoutPassword,
-        token,
+        user: data.user,
+        token: data.token,
       };
     } catch (error) {
       logger.error(`Registration error for email: ${email}`, error);
@@ -128,68 +92,44 @@ export class AuthService {
   }
   
   /**
-   * Reset password
-   */
-  async resetPassword(email: string) {
-    try {
-      logger.debug(`Attempting to reset password for email: ${email}`);
-      
-      // Check if admin exists
-      const admin = await prisma.admin.findUnique({
-        where: { email }
-      });
-      
-      if (!admin) {
-        logger.warn(`Password reset failed: No admin found with email ${email}`);
-        return {
-          success: false,
-          error: 'Email not found',
-        };
-      }
-      
-      // In a real application, we would send an email with a reset link
-      // For now, we'll just log it
-      logger.info(`Password reset requested for admin: ${admin.email} (${admin.id})`);
-      
-      return {
-        success: true,
-        message: 'Password reset instructions sent to your email',
-      };
-    } catch (error) {
-      logger.error(`Password reset error for email: ${email}`, error);
-      return {
-        success: false,
-        error: 'An error occurred during password reset',
-      };
-    }
-  }
-  
-  /**
-   * Verify token and get admin
+   * Verify token 
    */
   async verifyToken(token: string) {
     try {
       logger.debug('Verifying token');
       
-      // Verify token
-      const payload = verifyToken(token);
+      const response = await fetch('/api/auth/verify', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
       
-      if (!payload || !payload.adminId) {
-        logger.warn('Token verification failed: Invalid payload');
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        logger.warn('Token verification failed');
         return {
           success: false,
           error: 'Invalid token',
         };
       }
       
-      // Find admin by ID
-      const admin = await prisma.admin.findUnique({
-        where: { id: payload.adminId }
-      });
+      logger.info('Token verification successful');
       
-      if (!admin) {
-        logger.warn(`Token verification failed: No admin found with ID ${payload.adminId}`);
-        return {
+      return {
+        success: true,
+        user: data.user,
+      };
+    } catch (error) {
+      logger.error('Token verification error', error);
+      return {
+        success: false,
+        error: 'An error occurred during token verification',
+      };
+    }
+  }
           success: false,
           error: 'Invalid token',
         };

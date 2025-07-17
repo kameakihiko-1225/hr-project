@@ -14,7 +14,7 @@ interface DepartmentInfoModalProps {
 }
 
 export function DepartmentInfoModal({ department, company, isOpen, onClose }: DepartmentInfoModalProps) {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   
   // Helper function to get localized content
   const getLocalizedContent = (content: string | LocalizedContent): string => {
@@ -44,7 +44,7 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
             <div>
               <h2 className="text-xl font-semibold">{getLocalizedContent(department.name)}</h2>
               <p className="text-sm text-muted-foreground">
-                Department at {company ? getLocalizedContent(company.name) : 'Unknown Company'}
+                {t('modals.department_info.department_at')} {company ? getLocalizedContent(company.name) : 'Unknown Company'}
               </p>
             </div>
           </DialogTitle>
@@ -54,7 +54,7 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
           {/* Department Description */}
           {department.description && (
             <div>
-              <h3 className="font-medium mb-2">About This Department</h3>
+              <h3 className="font-medium mb-2">{t('modals.department_info.about_department')}</h3>
               <p className="text-sm text-muted-foreground">{getLocalizedContent(department.description)}</p>
             </div>
           )}
@@ -64,7 +64,7 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
             <div className="border-t pt-4">
               <h3 className="font-medium mb-2 flex items-center gap-2">
                 <Building className="h-4 w-4" />
-                Company Information
+                {t('modals.department_info.company_info')}
               </h3>
               
               {company.description && (
@@ -74,7 +74,7 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
               {/* Industry Tags */}
               {company.industryTags && company.industryTags.length > 0 && (
                 <div className="mb-3">
-                  <h4 className="text-sm font-medium mb-1">Industry</h4>
+                  <h4 className="text-sm font-medium mb-1">{t('modals.department_info.industry')}</h4>
                   <div className="flex flex-wrap gap-2">
                     {company.industryTags.map((tag, index) => (
                       <Badge key={index} variant="outline" className="text-xs">
@@ -121,7 +121,7 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
 
         <div className="flex justify-end pt-4">
           <Button onClick={onClose} variant="outline">
-            Close
+            {t('modals.department_info.close')}
           </Button>
         </div>
       </DialogContent>

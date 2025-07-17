@@ -13,7 +13,7 @@ interface CompanyInfoModalProps {
 }
 
 export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalProps) {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   
   // Helper function to get localized content
   const getLocalizedContent = (content: string | LocalizedContent): string => {
@@ -42,7 +42,7 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
             )}
             <div>
               <h2 className="text-xl font-semibold">{getLocalizedContent(company.name)}</h2>
-              <p className="text-sm text-muted-foreground">Company Information</p>
+              <p className="text-sm text-muted-foreground">{t('modals.company_info.title')}</p>
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -51,7 +51,7 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
           {/* Description */}
           {company.description && (
             <div>
-              <h3 className="font-medium mb-2">About</h3>
+              <h3 className="font-medium mb-2">{t('modals.company_info.about')}</h3>
               <p className="text-sm text-muted-foreground">{getLocalizedContent(company.description)}</p>
             </div>
           )}
@@ -59,7 +59,7 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
           {/* Industry Tags */}
           {company.industries && company.industries.length > 0 && (
             <div>
-              <h3 className="font-medium mb-2">Industry</h3>
+              <h3 className="font-medium mb-2">{t('modals.company_info.industry')}</h3>
               <div className="flex flex-wrap gap-2">
                 {company.industries.map((industry) => (
                   <Badge key={industry.id} variant="outline" className="text-xs">
@@ -104,14 +104,14 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
                 className="w-4 h-4 rounded-full border"
                 style={{ backgroundColor: company.color }}
               />
-              <span>Brand Color</span>
+              <span>{t('modals.company_info.brand_color')}</span>
             </div>
           )}
         </div>
 
         <div className="flex justify-end pt-4">
           <Button onClick={onClose} variant="outline">
-            Close
+            {t('modals.company_info.close')}
           </Button>
         </div>
       </DialogContent>

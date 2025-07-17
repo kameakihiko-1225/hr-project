@@ -130,6 +130,26 @@
     "delete_description": "Это действие нельзя отменить."
   },
 
+  "modals": {
+    "company_info": {
+      "title": "Информация о компании",
+      "about": "О компании",
+      "industry": "Отрасль",
+      "contact_info": "Контактная информация",
+      "brand_color": "Цвет бренда",
+      "close": "Закрыть"
+    },
+    "department_info": {
+      "title": "Информация об отделе",
+      "department_at": "Отдел в",
+      "about_department": "Об этом отделе",
+      "company_info": "Информация о компании",
+      "industry": "Отрасль",
+      "contact_info": "Контактная информация",
+      "close": "Закрыть"
+    }
+  },
+
   "stats_cards": {
     "companies": "Компании",
     "departments": "Отделы",

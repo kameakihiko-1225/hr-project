@@ -392,7 +392,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <h4 className="text-sm font-medium mb-2">Salary Range</h4>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    <span>{position.salaryRange}</span>
+                    <span>{getLocalizedContent(position.salaryRange)}</span>
                   </div>
                 </div>
               )}
@@ -402,7 +402,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <h4 className="text-sm font-medium mb-2">Employment Type</h4>
                   <div className="flex items-center gap-2">
                     <Briefcase className="h-4 w-4" />
-                    <span>{position.employmentType}</span>
+                    <span>{getLocalizedContent(position.employmentType)}</span>
                   </div>
                 </div>
               )}
@@ -426,12 +426,12 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <div className="flex items-center gap-2">
                     <ExternalLink className="h-4 w-4" />
                     <a 
-                      href={position.applyLink} 
+                      href={getLocalizedContent(position.applyLink)} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline truncate max-w-[250px]"
                     >
-                      {position.applyLink}
+                      {getLocalizedContent(position.applyLink)}
                     </a>
                   </div>
                 </div>

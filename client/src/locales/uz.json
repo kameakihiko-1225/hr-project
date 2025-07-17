@@ -130,6 +130,26 @@
     "delete_description": "Bu harakatni bekor qilib bo'lmaydi."
   },
 
+  "modals": {
+    "company_info": {
+      "title": "Kompaniya ma'lumotlari",
+      "about": "Kompaniya haqida",
+      "industry": "Soha",
+      "contact_info": "Aloqa ma'lumotlari",
+      "brand_color": "Brend rangi",
+      "close": "Yopish"
+    },
+    "department_info": {
+      "title": "Bo'lim ma'lumotlari",
+      "department_at": "Bo'lim",
+      "about_department": "Ushbu bo'lim haqida",
+      "company_info": "Kompaniya ma'lumotlari",
+      "industry": "Soha",
+      "contact_info": "Aloqa ma'lumotlari",
+      "close": "Yopish"
+    }
+  },
+
   "stats_cards": {
     "companies": "Kompaniyalar",
     "departments": "Bo'limlar",
