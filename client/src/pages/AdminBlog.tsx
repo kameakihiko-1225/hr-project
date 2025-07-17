@@ -321,8 +321,8 @@ export default function AdminBlog() {
                 Add Blog Item
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
+            <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+              <DialogHeader className="flex-shrink-0">
                 <DialogTitle>
                   {editingItem ? 'Edit Blog Item' : 'Add Blog Item'}
                 </DialogTitle>
@@ -330,9 +330,10 @@ export default function AdminBlog() {
                   {editingItem ? 'Update the blog item details' : 'Create a new blog item to showcase team culture'}
                 </DialogDescription>
               </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                  <div className="space-y-4">
+              <div className="flex-1 overflow-y-auto px-1">
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                    <div className="space-y-4">
                     <MultilingualInput
                       label="Blog Title"
                       value={form.watch('title') as LocalizedContent}
@@ -445,7 +446,8 @@ export default function AdminBlog() {
                     </Button>
                   </div>
                 </form>
-              </Form>
+                </Form>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
