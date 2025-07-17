@@ -143,6 +143,26 @@
     "delete_description": "This action cannot be undone."
   },
 
+  "modals": {
+    "company_info": {
+      "title": "Company Information",
+      "about": "About",
+      "industry": "Industry",
+      "contact_info": "Contact Information",
+      "brand_color": "Brand Color",
+      "close": "Close"
+    },
+    "department_info": {
+      "title": "Department Information",
+      "department_at": "Department at",
+      "about_department": "About This Department",
+      "company_info": "Company Information",
+      "industry": "Industry",
+      "contact_info": "Contact Information",
+      "close": "Close"
+    }
+  },
+
   "stats_cards": {
     "companies": "Companies",
     "departments": "Departments",
