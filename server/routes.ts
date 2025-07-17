@@ -479,9 +479,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Departments endpoints
   app.get("/api/departments", async (req, res) => {
     try {
-      // Set cache headers for better performance
-      res.set('Cache-Control', 'public, max-age=1800, s-maxage=3600'); // 30 min client, 1 hour CDN
-      res.set('ETag', `"departments-${Date.now()}"`);
+      // Disable caching for departments debugging
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
       
       const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
       

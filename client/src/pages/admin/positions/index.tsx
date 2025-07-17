@@ -74,6 +74,8 @@ export default function PositionsPage() {
           getPositions(undefined, undefined, true), // Use raw=true for admin interface
           fetch('/api/all-applied-positions').then(res => res.json())
         ]);
+        
+        console.log('[PositionsPage] departmentsData:', departmentsData);
 
         // Handle departments
         if (departmentsData.status === 'fulfilled' && departmentsData.value && Array.isArray(departmentsData.value)) {

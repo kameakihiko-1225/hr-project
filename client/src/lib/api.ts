@@ -760,13 +760,17 @@ export const getDepartments = async (companyId?: string, includePositions?: bool
   if (raw) params.append('raw', 'true');
   
   const url = `${API_BASE_URL}/departments${params.toString() ? `?${params.toString()}` : ''}`;
-  console.log('[getDepartments] URL:', url, 'includePositions:', includePositions, 'language:', language, 'raw:', raw);
+  console.log('[getDepartments] URL:', url, 'companyId:', companyId, 'includePositions:', includePositions, 'language:', language, 'raw:', raw);
   
   const response = await fetch(url, {
-    headers: getAuthHeaders()
+    headers: {
+      ...getAuthHeaders(),
+      'Cache-Control': 'no-cache'
+    }
   });
   if (!response.ok) throw new Error('Failed to fetch departments');
   const data = await response.json();
+  console.log('[getDepartments] Response data length:', data.data?.length);
   console.log('[getDepartments] Response data:', data.data);
   return data.data || [];
 };
