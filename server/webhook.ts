@@ -137,21 +137,13 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log('[TELEGRAM-BOT] Contact fields being sent to Bitrix24:');
   console.log(JSON.stringify(contactFields, null, 2));
 
-  // Create FormData for contact - use exact same format as working simple-server.js
-  const contactForm = new FormData();
-  Object.keys(contactFields).forEach(key => {
-    const value = contactFields[key];
-    console.log(`[TELEGRAM-BOT] Appending to FormData: ${key} = ${typeof value === 'object' ? JSON.stringify(value) : value}`);
-    if (key === 'PHONE' && Array.isArray(value)) {
-      contactForm.append(key, JSON.stringify(value));
-    } else {
-      contactForm.append(key, String(value || ''));
-    }
-  });
+  // Create JSON payload for contact - Bitrix24 works better with JSON than FormData
+  const contactPayload = {
+    fields: contactFields
+  };
   
-  // Debug FormData contents
-  console.log('[TELEGRAM-BOT] FormData headers:', contactForm.getHeaders());
-  console.log('[TELEGRAM-BOT] FormData buffer length:', contactForm.getBuffer().length);
+  console.log('[TELEGRAM-BOT] Contact JSON payload being sent to Bitrix24:');
+  console.log(JSON.stringify(contactPayload, null, 2));
 
   // Check for existing contact
   let contactId: string;
@@ -159,16 +151,23 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   
   if (existingContactId) {
     console.log(`[TELEGRAM-BOT] Existing contact found: ${existingContactId}, updating...`);
-    contactForm.append('id', existingContactId);
-    const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, contactForm, {
-      headers: contactForm.getHeaders(),
+    const updatePayload = {
+      id: existingContactId,
+      fields: contactFields
+    };
+    const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, updatePayload, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
     });
     console.log('[TELEGRAM-BOT] Contact update response:', updateResp.data);
     contactId = existingContactId;
   } else {
     console.log('[TELEGRAM-BOT] Creating new contact...');
-    const createResp = await axios.post(`${BITRIX_BASE}/crm.contact.add.json`, contactForm, {
-      headers: contactForm.getHeaders(),
+    const createResp = await axios.post(`${BITRIX_BASE}/crm.contact.add.json`, contactPayload, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
     });
     console.log('[TELEGRAM-BOT] Contact create response:', createResp.data);
     contactId = createResp.data.result;

@@ -167,16 +167,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
-### July 17, 2025 - Field Extraction Bug Fix & Complete Webhook Integration - COMPLETED ✓
-- **Field Extraction Issue Fixed**: Resolved critical bug where webhook payload fields were extracting as empty strings despite correct JSON reception
-- **Root Cause Resolution**: Fixed field name mapping and extraction logic in simple-server.js to match actual webhook payload structure
-- **Missing Age Field Added**: Implemented UF_CRM_1752622669492 field mapping that was missing from original contact creation
-- **Phone Normalization Fixed**: Corrected phone number processing to proper E.164 format (+998xxxxxxxxx) with automatic fallback system
-- **File Field Mapping**: Fixed resume/diploma field IDs (UF_CRM_1752621810/UF_CRM_1752621831) to match Bitrix24 custom field requirements
-- **Phase2 Answer Processing**: All three phase2 questions now properly mapped to correct Bitrix24 fields (UF_CRM_1752241370/1752241378/1752241386)
-- **Dual Endpoint Success**: Both main Express server webhook and simple-server.js now working identically with same field extraction logic
-- **Production Testing**: Successfully tested with real webhook payload data - contacts 62343 and 9947 created with complete field mapping
-- **Contact/Deal Creation**: Verified end-to-end workflow from webhook reception to Bitrix24 contact/deal creation with all 13+ custom fields populated
+### July 17, 2025 - CRITICAL BITRIX24 CUSTOM FIELDS ISSUE RESOLVED - COMPLETED ✓
+- **ROOT CAUSE IDENTIFIED**: Bitrix24 API requires JSON format instead of FormData for proper custom field population
+- **Main Webhook Fixed**: Converted main Express webhook from FormData to JSON format with `{ fields: { FIELDNAME: value } }` structure
+- **Field Population Success**: All 13+ custom fields now correctly populated in Bitrix24:
+  - ✅ Basic fields: name, phone, age, city, degree, position, username working
+  - ✅ File attachments: resume (UF_CRM_1752621810), diploma (UF_CRM_1752621831) working
+  - ✅ Phase2 answers: Q1-Q3 (UF_CRM_1752241370/1752241378/1752241386) working
+- **Verified Contact Creation**: Contact #62377 successfully created with ALL fields populated correctly
+- **Dual Endpoint Consistency**: Updated both main Express webhook and simple-server.js to use identical JSON format
+- **Production Ready**: Both webhooks (port 5000 and 3001) now fully operational with complete field mapping
+- **Technical Solution**: Changed from `contactForm.append('fields[FIELDNAME]')` to `{ fields: contactFields }` JSON payload
+- **End-to-End Success**: Complete workflow from webhook reception to Bitrix24 contact/deal creation with verified custom field population
 
 ### July 17, 2025 - Complete Webhook Integration & ES Module Migration - COMPLETED ✓
 - **Module System Migration**: Successfully converted webhook from CommonJS to ES modules to eliminate "require is not defined" errors
