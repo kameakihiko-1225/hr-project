@@ -130,28 +130,6 @@ export class AuthService {
       };
     }
   }
-          success: false,
-          error: 'Invalid token',
-        };
-      }
-      
-      // Return admin without password hash
-      const { passwordHash, ...adminWithoutPassword } = admin;
-      
-      logger.debug(`Token verified for admin: ${admin.email} (${admin.id})`);
-      
-      return {
-        success: true,
-        admin: adminWithoutPassword,
-      };
-    } catch (error) {
-      logger.error('Token verification error', error);
-      return {
-        success: false,
-        error: 'An error occurred during token verification',
-      };
-    }
-  }
 }
 
 // Export a singleton instance
