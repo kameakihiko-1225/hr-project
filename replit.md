@@ -182,6 +182,9 @@ Preferred communication style: Simple, everyday language.
 - **Issue Resolution**: Problem is NOT webhook-related but Bitrix24 field configuration/permissions
 - **Recommended Actions**: Check Bitrix24 custom field settings and API user permissions for data visibility
 - **Service Status**: Webhook service fully operational with comprehensive field verification capabilities
+- **Production Integration**: Moved webhook from separate port 3001 to main Express server for deployment compatibility
+- **URL Fix**: Resolved "Malformed input to a URL function" error by removing problematic encodeURI calls
+- **Direct Implementation**: Webhook now runs at https://career.millatumidi.uz/webhook without port routing issues
 
 ### July 17, 2025 - Database Deletion Investigation & Data Loss Issue - COMPLETED ✓
 - **Database Investigation**: Discovered that all departments and positions have been completely deleted from database
