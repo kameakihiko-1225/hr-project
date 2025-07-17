@@ -230,93 +230,80 @@ app.post('/webhook', async (req, res) => {
       ? await getFileBufferFromTelegram(data.diploma, 'diploma')
       : { buffer: null, url: null };
 
-    // 2. Prepare contact fields (always create new contact)
+    // 2. Prepare contact fields - extract exactly as main webhook does
     const fullName = (data.full_name_uzbek || '').trim();
-    const nameParts = fullName.split(' ').filter(Boolean);
-    const firstName = nameParts[0] || 'Unknown';
-    const lastName = nameParts.slice(1).join(' ');
     const phoneRaw = data.phone_number_uzbek || '';
-    const ageRaw = data.user_age || data.age || data.age_uzbek || data.age_ru;
+    const ageRaw = data.age_uzbek || '';
+    const cityRaw = data.city_uzbek || '';
+    const degreeRaw = data.degree || '';
+    const positionRaw = data.position_uz || '';
+    const usernameRaw = data.username || '';
 
-    const phone = normalizePhone(phoneRaw);
-    console.log(`[TELEGRAM-BOT] Full name: "${fullName}", phone_raw: "${phoneRaw}", normalized_phone: "${phone}", age: "${ageRaw}"`);
+    // Normalize phone number to E.164 format
+    const normalizedPhone = phoneRaw ? (phoneRaw.startsWith('998') ? `+${phoneRaw}` : `+998${phoneRaw}`) : '';
+    
+    console.log(`[TELEGRAM-BOT] Full name: "${fullName}", phone_raw: "${phoneRaw}", normalized_phone: "${normalizedPhone}", age: "${ageRaw}"`);
+    console.log(`[TELEGRAM-BOT] City: "${cityRaw}", degree: "${degreeRaw}", position: "${positionRaw}", username: "${usernameRaw}"`);
     
     const contactFields = {
       NAME: fullName || 'Unknown',
-      PHONE: phone ? [{ VALUE: phone, VALUE_TYPE: 'WORK' }] : [],
-      UF_CRM_1752239621: data.position_uz, // position
-      UF_CRM_1752239635: data.city_uzbek,  // city
-      UF_CRM_1752239653: data.degree,      // degree
-      UF_CRM_CONTACT_1745579971270: extractInnerTextFromHtmlLink(data.username), // telegram username
+      UF_CRM_1752239621: positionRaw, // position
+      UF_CRM_1752239635: cityRaw,     // city
+      UF_CRM_1752239653: degreeRaw,   // degree
+      UF_CRM_CONTACT_1745579971270: extractInnerTextFromHtmlLink(usernameRaw), // telegram username
+      UF_CRM_1752622669492: ageRaw,   // age field (this was missing!)
     };
-    
-    // Resolve resume & diploma links
-    const resumeLink = data.resume ? (resumeResult.url || (isTelegramFileId(data.resume) ? await getTelegramFileUrl(data.resume) : null) || data.resume) : null;
-    const diplomaLink = data.diploma ? (diplomaResult.url || (isTelegramFileId(data.diploma) ? await getTelegramFileUrl(data.diploma) : null) || data.diploma) : null;
 
-    // Add link fields required by Bitrix24
-    if (resumeLink) {
-      contactFields['UF_CRM_1752239677'] = resumeLink; // resume link field
-    }
-    if (diplomaLink) {
-      contactFields['UF_CRM_1752239690'] = diplomaLink; // diploma link field
+    // Add phone if available
+    if (normalizedPhone) {
+      contactFields.PHONE = [{ VALUE: normalizedPhone, VALUE_TYPE: 'MOBILE' }];
     }
 
-    // Build Comments with links and age
+    // Handle file fields using correct field IDs
+    if (data.resume && isTelegramFileId(data.resume)) {
+      contactFields.UF_CRM_1752621810 = data.resume; // Resume file field
+    }
+    if (data.diploma && isTelegramFileId(data.diploma)) {
+      contactFields.UF_CRM_1752621831 = data.diploma; // Diploma file field
+    }
+
+    // Handle phase2 answers using correct field IDs
+    if (data.phase2_q_1) {
+      contactFields.UF_CRM_1752241370 = data.phase2_q_1; // Phase2 Q1 field
+    }
+    if (data.phase2_q_2) {
+      contactFields.UF_CRM_1752241378 = data.phase2_q_2; // Phase2 Q2 field
+    }
+    if (data.phase2_q_3) {
+      contactFields.UF_CRM_1752241386 = data.phase2_q_3; // Phase2 Q3 field
+    }
+
+    // Build comments
     const commentsParts = [];
-    if (resumeLink) commentsParts.push(`Resume: ${resumeLink}`);
-    if (diplomaLink) commentsParts.push(`Diploma: ${diplomaLink}`);
-    if (ageRaw) {
-      commentsParts.push(`The Age is ${ageRaw}`);
-    }
-    if (commentsParts.length) {
-      contactFields.COMMENTS = commentsParts.join('\n');
+    if (data.resume) commentsParts.push(`Resume: ${data.resume}`);
+    if (data.diploma) commentsParts.push(`Diploma: ${data.diploma}`);
+    if (ageRaw) commentsParts.push(`The Age is ${ageRaw}`);
+    if (commentsParts.length > 0) {
+      contactFields.COMMENTS = commentsParts.join('\\n');
     }
 
-    // Handle Phase2 text or voice answers (store as text/link)
-    const phase2 = [
-      { val: data.phase2_q_1, textField: 'UF_CRM_1752241370', fileField: 'UF_CRM_1752245274', filename: 'q1.ogg', label: 'phase2_q_1' },
-      { val: data.phase2_q_2, textField: 'UF_CRM_1752241378', fileField: 'UF_CRM_1752245286', filename: 'q2.ogg', label: 'phase2_q_2' },
-      { val: data.phase2_q_3, textField: 'UF_CRM_1752241386', fileField: 'UF_CRM_1752245298', filename: 'q3.ogg', label: 'phase2_q_3' },
-    ];
-    const phase2Log = [];
-    for (const q of phase2) {
-      if (!q.val) continue;
-      if (isTelegramFileId(q.val)) {
-        const link = await getTelegramFileUrl(q.val);
-        if (link) {
-          contactFields[q.textField] = link;
-          commentsParts.push(`${q.label}: ${link}`);
-          phase2Log.push(`${q.label} (file link): ${link}`);
-        } else {
-          phase2Log.push(`${q.label} file_id unresolved`);
-        }
-      } else {
-        contactFields[q.textField] = q.val;
-        phase2Log.push(`${q.label} (text): ${q.val}`);
-      }
-    }
-    console.log('[TELEGRAM-BOT] Phase2 answers log:', phase2Log.join(' | '));
+    console.log('[TELEGRAM-BOT] Contact fields being sent to Bitrix24:');
+    console.log(JSON.stringify(contactFields, null, 2));
 
-    // Prepare FormData for contact (no file buffers for resume/diploma/phase2)
+    // Prepare FormData for contact - use correct format
     const contactForm = new FormData();
-    Object.entries(contactFields).forEach(([key, value]) => {
-      // Stringify arrays/objects for Bitrix24
-      if (Array.isArray(value) || typeof value === 'object') {
-        contactForm.append(`fields[${key}]`, JSON.stringify(value));
+    Object.keys(contactFields).forEach(key => {
+      if (key === 'PHONE' && Array.isArray(contactFields[key])) {
+        contactForm.append(key, JSON.stringify(contactFields[key]));
       } else {
-        contactForm.append(`fields[${key}]`, value || '');
+        contactForm.append(key, contactFields[key]);
       }
     });
-    contactForm.append('params[REGISTER_SONET_EVENT]', 'Y');
 
-    // Log outgoing FormData fields
-    console.log('[TELEGRAM-BOT] Contact FormData fields:', Object.keys(contactFields));
-
-    // Check duplicate by phone and update if exists
+    // Check for existing contact by phone
     let contactId;
-    if (phone) {
-      const existingId = await findContactIdByPhone(phone);
+    if (normalizedPhone) {
+      const existingId = await findContactIdByPhone(normalizedPhone);
       if (existingId) {
         console.log(`[TELEGRAM-BOT] Existing contact found: ${existingId}, updating...`);
         contactForm.append('id', existingId.toString());
@@ -342,18 +329,18 @@ app.post('/webhook', async (req, res) => {
     }
 
     // PHONE NUMBER FALLBACK: Verify and add phone if missing after contact creation
-    if (phone && contactId) {
-      await ensurePhoneNumberSet(contactId, phone);
+    if (normalizedPhone && contactId) {
+      await ensurePhoneNumberSet(contactId, normalizedPhone);
     }
 
     // 3. Prepare deal fields (always create new deal attached to contact)
     const dealFields = {
-      TITLE: `HR BOT - ${firstName} ${lastName}`.trim(),
+      TITLE: `HR BOT - ${fullName}`.trim(),
       CATEGORY_ID: '55',
       STATUS_ID: 'C55:NEW',
       UTM_SOURCE: 'hr_telegram_bot',
       CONTACT_ID: contactId,
-      UF_CRM_CONTACT_1745579971270: extractInnerTextFromHtmlLink(data.username), // telegram username
+      UF_CRM_CONTACT_1745579971270: extractInnerTextFromHtmlLink(usernameRaw), // telegram username
     };
     console.log('[TELEGRAM-BOT] Deal payload:', dealFields);
 
