@@ -79,6 +79,7 @@ export default function DepartmentsPage() {
         try {
           // Always request position counts for admin/department page
           const companyIdFilter = selectedCompanyId !== 'all' ? selectedCompanyId : undefined;
+          console.log('[DepartmentsPage] companyIdFilter:', companyIdFilter, 'selectedCompanyId:', selectedCompanyId);
           const departmentsData = await getDepartments(companyIdFilter, true, undefined, true); // Use raw=true for admin interface
           console.log('[DepartmentsPage] departmentsData with position counts:', departmentsData);
           setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
