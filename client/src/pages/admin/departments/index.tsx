@@ -32,6 +32,8 @@ export default function DepartmentsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all');
+  
+  console.log('[DepartmentsPage] selectedCompanyId:', selectedCompanyId);
 
   // Dialog states
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -76,7 +78,8 @@ export default function DepartmentsPage() {
         // Then fetch departments, filtered by company if selected
         try {
           // Always request position counts for admin/department page
-          const departmentsData = await getDepartments(selectedCompanyId !== 'all' ? selectedCompanyId : undefined, true, undefined, true); // Use raw=true for admin interface
+          const companyIdFilter = selectedCompanyId !== 'all' ? selectedCompanyId : undefined;
+          const departmentsData = await getDepartments(companyIdFilter, true, undefined, true); // Use raw=true for admin interface
           console.log('[DepartmentsPage] departmentsData with position counts:', departmentsData);
           setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
         } catch (error) {
@@ -290,7 +293,7 @@ export default function DepartmentsPage() {
             <SelectContent>
               <SelectItem value="all">All Companies</SelectItem>
               {Array.isArray(companies) && companies.map((company) => (
-                <SelectItem key={company.id} value={company.id}>
+                <SelectItem key={company.id} value={company.id.toString()}>
                   {typeof company.name === 'string' ? company.name : company.name.en || company.name.ru || company.name.uz || 'Unknown Company'}
                 </SelectItem>
               ))}
@@ -356,7 +359,7 @@ export default function DepartmentsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {Array.isArray(companies) && companies.map((company) => (
-                    <SelectItem key={company.id} value={company.id}>
+                    <SelectItem key={company.id} value={company.id.toString()}>
                       {typeof company.name === 'string' ? company.name : company.name.en || company.name.ru || company.name.uz || 'Unknown Company'}
                     </SelectItem>
                   ))}
