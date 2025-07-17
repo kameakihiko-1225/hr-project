@@ -1004,7 +1004,7 @@ export const getCompany = async (id: string) => {
 
 export const createCompany = async (companyData: FormData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/companies`, {
+    const response = await fetch(`${API_BASE_URL}/companies?raw=true`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: companyData
@@ -1025,7 +1025,7 @@ export const createCompany = async (companyData: FormData) => {
 
 export const updateCompany = async (id: string, companyData: FormData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/companies/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/companies/${id}?raw=true`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: companyData

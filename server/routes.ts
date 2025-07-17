@@ -172,6 +172,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyData = req.body;
       }
 
+      console.log('Company creation data:', JSON.stringify(companyData, null, 2));
+
       // Extract industry tags from companyData
       const { industries, ...companyDataWithoutIndustries } = companyData;
       
@@ -211,9 +213,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Fetch the company with industry tags for response
-      const language = req.query.language as string || 'en';
-      const companyWithIndustries = await storage.getCompanyById(company.id, language);
-      res.json({ success: true, data: companyWithIndustries });
+      const rawData = req.query.raw === 'true'; // For admin interface
+      
+      if (rawData) {
+        // Return raw LocalizedContent objects for admin editing
+        const companyWithIndustries = await storage.getCompanyById(company.id); // No language parameter
+        res.json({ success: true, data: companyWithIndustries });
+      } else {
+        // Return localized content for public use
+        const language = req.query.language as string || 'en';
+        const companyWithIndustries = await storage.getCompanyById(company.id, language);
+        res.json({ success: true, data: companyWithIndustries });
+      }
     } catch (error) {
       console.error('Error creating company:', error);
       res.status(400).json({ success: false, error: error.message || "Failed to create company" });
@@ -284,9 +295,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Fetch the company with industry tags for response
-      const language = req.query.language as string || 'en';
-      const companyWithIndustries = await storage.getCompanyById(id, language);
-      res.json({ success: true, data: companyWithIndustries });
+      const rawData = req.query.raw === 'true'; // For admin interface
+      
+      if (rawData) {
+        // Return raw LocalizedContent objects for admin editing
+        const companyWithIndustries = await storage.getCompanyById(id); // No language parameter
+        res.json({ success: true, data: companyWithIndustries });
+      } else {
+        // Return localized content for public use
+        const language = req.query.language as string || 'en';
+        const companyWithIndustries = await storage.getCompanyById(id, language);
+        res.json({ success: true, data: companyWithIndustries });
+      }
     } catch (error) {
       console.error('Error updating company:', error);
       res.status(400).json({ success: false, error: error.message || "Failed to update company" });
