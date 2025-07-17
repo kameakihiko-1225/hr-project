@@ -167,6 +167,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 17, 2025 - Telegram Webhook Data Processing Fix - COMPLETED ✓
+- **Webhook Issue Resolved**: Fixed critical field parsing bug in Telegram webhook service
+- **Field Mapping Fix**: Corrected field extraction order to prioritize `age_uzbek` over `user_age` and `age`
+- **Data Processing**: Webhook now correctly extracts all fields from JSON payload:
+  - Full name: "Shohabbos Usmonov" ✓
+  - Phone: "+998941701078" (properly normalized to E.164) ✓  
+  - Age: "23" ✓
+  - All other fields (city, degree, position, files) working correctly ✓
+- **Bitrix24 Integration**: End-to-end workflow confirmed working - contact creation and deal processing successful
+- **Service Status**: Telegram webhook service running on port 3001 with complete data flow
+
 ### July 17, 2025 - Database Deletion Investigation & Data Loss Issue - COMPLETED ✓
 - **Database Investigation**: Discovered that all departments and positions have been completely deleted from database
 - **Root Cause Analysis**: Both departments and positions tables are empty (0 records each)

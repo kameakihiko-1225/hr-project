@@ -164,7 +164,7 @@ app.post('/webhook', async (req, res) => {
     const firstName = nameParts[0] || 'Unknown';
     const lastName = nameParts.slice(1).join(' ');
     const phoneRaw = data.phone_number_uzbek || '';
-    const ageRaw = data.user_age || data.age || data.age_uzbek || data.age_ru;
+    const ageRaw = data.age_uzbek || data.user_age || data.age || data.age_ru;
 
     const phone = normalizePhone(phoneRaw);
     console.log(`[TELEGRAM-BOT] Full name: "${fullName}", phone_raw: "${phoneRaw}", normalized_phone: "${phone}", age: "${ageRaw}"`);
