@@ -3,8 +3,7 @@ import { neon } from "@neondatabase/serverless";
 import { eq, and, desc, count } from "drizzle-orm";
 import dotenv from "dotenv";
 import { 
-  users, companies, departments, positions, candidates, galleryItems, industryTags, companyIndustryTags, positionClicks,
-  type User, type InsertUser,
+  companies, departments, positions, candidates, galleryItems, industryTags, companyIndustryTags, positionClicks,
   type Company, type InsertCompany,
   type Department, type InsertDepartment,
   type Position, type InsertPosition,
@@ -36,11 +35,6 @@ export type CompanyWithIndustries = Company & {
 };
 
 export interface IStorage {
-  // User methods
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-
   // Company methods with localization support
   getAllCompanies(language?: SupportedLanguage): Promise<CompanyWithIndustries[]>;
   getCompanyById(id: number, language?: SupportedLanguage): Promise<CompanyWithIndustries | undefined>;
@@ -102,22 +96,6 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  // User methods
-  async getUser(id: number): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.id, id));
-    return result[0];
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.username, username));
-    return result[0];
-  }
-
-  async createUser(user: InsertUser): Promise<User> {
-    const result = await db.insert(users).values(user).returning();
-    return result[0];
-  }
-
   // Company methods
   async getAllCompanies(language?: SupportedLanguage): Promise<CompanyWithIndustries[]> {
     try {

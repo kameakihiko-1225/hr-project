@@ -6,7 +6,7 @@ import { Badge } from './ui/badge';
 import { Pencil, Trash2, Building2, Briefcase, DollarSign, Clock, MapPin, Send, ExternalLink, Crown, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { toast } from '@/components/ui/use-toast';
-import { useAuth } from '@/lib/authContext';
+
 import { getBotByAdminId, createCandidateDeepLink, createPositionDeepLink } from '@/lib/api';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
@@ -34,7 +34,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
-  const { admin } = useAuth();
+  // Authentication removed - no admin check needed
   const [isApplying, setIsApplying] = useState(false);
   const { incrementJobSeekers, incrementApplicants } = useClickCounter();
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);

@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema, insertIndustryTagSchema, fileAttachments, departments, companies } from "@shared/schema";
-import bcrypt from "bcryptjs";
+
 import { initializeGalleryData } from "./init-gallery-data";
 import { uploadSingle } from "./middleware/upload";
 import { db } from "./db";
@@ -40,61 +40,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Authentication endpoints
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      
-      console.log('Login attempt:', { email, password: password ? '[HIDDEN]' : 'undefined' });
-      
-      if (!email || !password) {
-        return res.status(400).json({ 
-          success: false, 
-          error: "Email and password are required" 
-        });
-      }
 
-      // Get user from database
-      const user = await storage.getUserByUsername(email);
-      
-      console.log('User found:', user ? { id: user.id, username: user.username } : 'null');
-      
-      if (!user) {
-        return res.status(401).json({ 
-          success: false, 
-          error: "Invalid email or password" 
-        });
-      }
-
-      // Check password
-      console.log('Comparing password with hash...');
-      const passwordValid = await bcrypt.compare(password, user.password);
-      
-      console.log('Password valid:', passwordValid);
-      
-      if (!passwordValid) {
-        return res.status(401).json({ 
-          success: false, 
-          error: "Invalid email or password" 
-        });
-      }
-
-      // Return user without password
-      const { password: _, ...userWithoutPassword } = user;
-      
-      res.json({
-        success: true,
-        admin: userWithoutPassword,
-        token: "dummy-jwt-token" // Simple token for now
-      });
-    } catch (error) {
-      console.error('Login error:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: "An error occurred during login" 
-      });
-    }
-  });
 
   // Companies endpoints with caching headers
   app.get("/api/companies", async (req, res) => {

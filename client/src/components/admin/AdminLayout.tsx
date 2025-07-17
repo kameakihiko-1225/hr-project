@@ -8,8 +8,6 @@ import {
   Users,
   Menu,
   X,
-  LogOut,
-  User,
   CheckCircle2,
   AlertCircle,
   Image,
@@ -18,17 +16,9 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useAuth } from "@/lib/authContext";
+
 import { createLogger } from "@/lib/logger";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 import { Label } from "@/components/ui/label";
 import { LanguageSelector } from '../ui/LanguageSelector';
 
@@ -41,7 +31,7 @@ interface AdminLayoutProps {
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [location, navigate] = useLocation();
   const isMobile = useIsMobile();
-  const { admin, logout } = useAuth();
+  // Authentication removed - no user management needed
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
@@ -72,25 +62,9 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     );
   };
 
-  const handleLogout = async () => {
-    try {
-      logger.info('Logging out user');
-      await logout();
-      navigate("/admin/login");
-    } catch (error) {
-      logger.error('Error during logout', error);
-    }
-  };
+  // Authentication removed - no logout needed
 
-  // Get admin initials for avatar
-  const getInitials = (email: string): string => {
-    if (!email) return 'AD';
-    
-    return email
-      .split('@')[0]
-      .substring(0, 2)
-      .toUpperCase();
-  };
+  // Authentication removed - no user avatar needed
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -178,16 +152,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
               )}
             </div>
           ))}
-          <div className="mt-auto pt-4 border-t">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              Logout
-            </Button>
-          </div>
+
         </nav>
       </div>
 
@@ -204,36 +169,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
             <div className="flex-1 flex justify-end items-center gap-4">
               {/* Language Selector */}
               <LanguageSelector className="mr-2" />
-              <div className="ml-4 flex items-center md:ml-6">
-                {admin && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="rounded-full">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-blue-100 text-blue-600">
-                            {getInitials(admin.username || admin.email)}
-                          </AvatarFallback>
-                        </Avatar>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>
-                        <div className="flex flex-col">
-                          <span>{admin.username || admin.email}</span>
-                          <span className="text-xs text-gray-500">
-                            {admin.isSuperAdmin ? 'Super Admin' : 'Admin'}
-                          </span>
-                        </div>
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span>Logout</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
+
             </div>
           </div>
         </header>

@@ -1,5 +1,4 @@
 import { createLogger } from './logger';
-import { env } from './env';
 
 // Create a logger for Prisma
 const logger = createLogger('prisma');

@@ -1,5 +1,4 @@
 import { createLogger } from './logger';
-import { env } from './env';
 
 // Create a logger for the API client
 const logger = createLogger('apiClient');
@@ -8,12 +7,11 @@ const logger = createLogger('apiClient');
 const isBrowser = typeof window !== 'undefined';
 
 // API base URL
-export const API_BASE_URL = env.apiUrl || 'http://localhost:3000/api';
+export const API_BASE_URL = '/api';
 
-// Get auth headers
+// Get auth headers - simplified without authentication
 export const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return token ? { 'Authorization': `Bearer ${token}` } : {};
+  return {};
 };
 
 // API response interface

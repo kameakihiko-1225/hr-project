@@ -29,11 +29,7 @@ export function getLocalizedContent(content: LocalizedContent | string | null, l
   return '';
 }
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-});
+
 
 export const companies = pgTable("companies", {
   id: serial("id").primaryKey(),
@@ -179,10 +175,6 @@ const optionalLocalizedContentSchema = z.object({
 );
 
 // Insert schemas with localization support
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
 
 export const insertCompanySchema = z.object({
   name: localizedContentSchema,
@@ -255,8 +247,6 @@ export const insertPositionClickSchema = createInsertSchema(positionClicks).omit
 });
 
 // Types
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
 
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type Company = typeof companies.$inferSelect;

@@ -1,5 +1,4 @@
 import { createLogger } from './logger';
-import { env } from './env';
 import initializeEnvironment from './setupEnv';
 // import { setupMockApi } from './mockApi';
 
@@ -21,7 +20,7 @@ export async function initializeApp(): Promise<void> {
     initializeEnvironment();
     
     // Log environment
-    logger.info(`Environment: ${env.nodeEnv}`);
+    logger.info(`Environment: ${import.meta.env.NODE_ENV || 'development'}`);
     
     // Skip database initialization in browser environment
     if (isBrowser) {
