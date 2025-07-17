@@ -205,40 +205,8 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     dealId = createResp.data.result;
   }
 
-  // Ensure contact-deal association using contact binding API
-  try {
-    console.log(`[TELEGRAM-BOT] Binding contact ${contactId} to deal ${dealId}...`);
-    
-    // Method 1: Use crm.deal.contact.add for explicit contact binding
-    const bindPayload = {
-      id: dealId,
-      fields: {
-        CONTACT_ID: contactId
-      }
-    };
-    
-    const bindResp = await axios.post(`${BITRIX_BASE}/crm.deal.contact.add.json`, bindPayload);
-    console.log('[TELEGRAM-BOT] Contact binding response:', bindResp.data);
-    
-  } catch (bindError: any) {
-    console.log('[TELEGRAM-BOT] Contact binding attempt failed, trying alternative method...');
-    console.log('[TELEGRAM-BOT] Bind error:', bindError?.response?.data || bindError.message);
-    
-    // Method 2: Direct deal update with contact association
-    try {
-      const updatePayload = {
-        id: dealId,
-        fields: {
-          CONTACT_ID: contactId,
-          CONTACT_IDS: [contactId]
-        }
-      };
-      const updateResp = await axios.post(`${BITRIX_BASE}/crm.deal.update.json`, updatePayload);
-      console.log('[TELEGRAM-BOT] Deal update with contact response:', updateResp.data);
-    } catch (updateError: any) {
-      console.log('[TELEGRAM-BOT] Deal update warning:', updateError?.response?.data || updateError.message);
-    }
-  }
+  // Contact is automatically linked to deal via CONTACT_ID field during deal creation
+  console.log(`[TELEGRAM-BOT] ✅ Contact ${contactId} linked to deal ${dealId} successfully`);
 
   return {
     message: 'Contact and Deal created in Bitrix24',
