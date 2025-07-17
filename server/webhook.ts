@@ -60,31 +60,59 @@ async function findDealIdByContact(contactId: string): Promise<string | null> {
 }
 
 export async function processWebhookData(data: any): Promise<{ message: string; contactId: string; dealId: string }> {
-  console.log('='.repeat(60));
-  console.log('[WEBHOOK-PROCESSING] PUZZLEBOT CLEAN JSON FORMAT');
-  console.log('[WEBHOOK-PROCESSING] Data type:', typeof data);
-  console.log('[WEBHOOK-PROCESSING] Data keys:', data ? Object.keys(data) : 'No keys');
-  console.log('[WEBHOOK-PROCESSING] Raw data structure:', JSON.stringify(data, null, 2));
-  console.log('='.repeat(60));
+  console.log('🔄 [WEBHOOK-PROCESSING] STARTING DATA PROCESSING');
+  console.log('='.repeat(80));
+  console.log('📊 [WEBHOOK-PROCESSING] INPUT DATA ANALYSIS:');
+  console.log('- Data type:', typeof data);
+  console.log('- Data constructor:', data?.constructor?.name || 'Unknown');
+  console.log('- Is null/undefined:', data === null || data === undefined);
+  console.log('- Is array:', Array.isArray(data));
+  console.log('- Has keys:', data ? Object.keys(data).length : 0);
+  console.log('- Available keys:', data ? Object.keys(data) : 'No keys');
+  console.log('');
+  console.log('📝 [WEBHOOK-PROCESSING] RAW DATA STRUCTURE:');
+  console.log(JSON.stringify(data, null, 2));
+  console.log('');
   
   // Handle the new clean JSON format from Puzzlebot
-  // Data now comes as a clean JSON object with all fields directly accessible
   let cleanedData = data;
   
-  console.log('[WEBHOOK-PROCESSING] Processing clean JSON data...');
-  console.log('[WEBHOOK-PROCESSING] Available fields:', Object.keys(cleanedData || {}));
+  console.log('🧹 [WEBHOOK-PROCESSING] FIELD VALIDATION:');
   
   // Validate that we have the essential fields
   const requiredFields = ['full_name_uzbek', 'phone_number_uzbek', 'position_uz'];
-  const missingFields = requiredFields.filter(field => !cleanedData[field]);
-  if (missingFields.length > 0) {
-    console.log('[WEBHOOK-PROCESSING] Warning: Missing required fields:', missingFields);
-  }
-
-  console.log('[WEBHOOK-PROCESSING] Final cleaned data structure:');
-  Object.keys(cleanedData).forEach(key => {
-    console.log(`- ${key}: ${JSON.stringify(cleanedData[key])} (type: ${typeof cleanedData[key]})`);
+  const optionalFields = ['age_uzbek', 'city_uzbek', 'degree', 'username', 'resume', 'diploma', 'phase2_q_1', 'phase2_q_2', 'phase2_q_3'];
+  
+  console.log('');
+  console.log('🔍 [WEBHOOK-PROCESSING] REQUIRED FIELDS CHECK:');
+  requiredFields.forEach(field => {
+    const value = cleanedData[field];
+    const exists = value !== undefined && value !== null && value !== '';
+    console.log(`  ${exists ? '✅' : '❌'} ${field}: ${JSON.stringify(value)} (${typeof value})`);
   });
+  
+  console.log('');
+  console.log('📋 [WEBHOOK-PROCESSING] OPTIONAL FIELDS CHECK:');
+  optionalFields.forEach(field => {
+    const value = cleanedData[field];
+    const exists = value !== undefined && value !== null && value !== '';
+    console.log(`  ${exists ? '✅' : '⚪'} ${field}: ${JSON.stringify(value)} (${typeof value})`);
+  });
+  
+  const missingRequired = requiredFields.filter(field => !cleanedData[field]);
+  if (missingRequired.length > 0) {
+    console.log('');
+    console.log('⚠️  [WEBHOOK-PROCESSING] WARNING: Missing required fields:', missingRequired);
+  }
+  
+  console.log('');
+  console.log('📊 [WEBHOOK-PROCESSING] COMPLETE FIELD SUMMARY:');
+  Object.keys(cleanedData || {}).forEach(key => {
+    const value = cleanedData[key];
+    const isEmpty = !value || value === '';
+    console.log(`  - ${key}: ${JSON.stringify(value)} (${typeof value}) ${isEmpty ? '[EMPTY]' : '[HAS VALUE]'}`);
+  });
+  console.log('='.repeat(80));
 
   // Extract fields
   const firstName = cleanedData.full_name_uzbek || '';
@@ -95,7 +123,16 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   const position = cleanedData.position_uz || '';
   const username = cleanedData.username || '';
 
-  console.log(`[TELEGRAM-BOT] Full name: ${JSON.stringify(firstName)}, phone_raw: ${JSON.stringify(cleanedData.phone_number_uzbek)}, normalized_phone: ${JSON.stringify(phone)}, age: ${JSON.stringify(age)}`);
+  console.log('');
+  console.log('🎯 [WEBHOOK-PROCESSING] FIELD EXTRACTION:');
+  console.log(`  - Full name: ${JSON.stringify(firstName)} (from: ${JSON.stringify(cleanedData.full_name_uzbek)})`);
+  console.log(`  - Phone raw: ${JSON.stringify(cleanedData.phone_number_uzbek)}`);
+  console.log(`  - Phone normalized: ${JSON.stringify(phone)}`);
+  console.log(`  - Age: ${JSON.stringify(age)} (from: ${JSON.stringify(cleanedData.age_uzbek)})`);
+  console.log(`  - City: ${JSON.stringify(city)} (from: ${JSON.stringify(cleanedData.city_uzbek)})`);
+  console.log(`  - Degree: ${JSON.stringify(degree)} (from: ${JSON.stringify(cleanedData.degree)})`);
+  console.log(`  - Position: ${JSON.stringify(position)} (from: ${JSON.stringify(cleanedData.position_uz)})`);
+  console.log(`  - Username: ${JSON.stringify(username)} (from: ${JSON.stringify(cleanedData.username)})`);
 
   // Prepare contact fields
   const contactFields: Record<string, any> = {
@@ -106,48 +143,73 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     UF_CRM_CONTACT_1745579971270: extractInnerTextFromHtmlLink(username), // Username
     UF_CRM_1752622669492: age, // Age
   };
+  
+  console.log('');
+  console.log('🏗️ [WEBHOOK-PROCESSING] BASIC CONTACT FIELDS PREPARED:');
+  Object.keys(contactFields).forEach(key => {
+    console.log(`  - ${key}: ${JSON.stringify(contactFields[key])}`);
+  });
 
   // Add phone fields
+  console.log('');
+  console.log('📞 [WEBHOOK-PROCESSING] PHONE FIELD PROCESSING:');
   if (phone) {
-    console.log(`[TELEGRAM-BOT] Adding phone field (E.164 format): ${phone}`);
+    console.log(`  ✅ Phone normalized successfully: ${phone}`);
     contactFields.PHONE = [{ VALUE: phone, VALUE_TYPE: 'MOBILE' }];
     contactFields.UF_CRM_1747689959 = phone; // Phone backup
+    console.log(`  - Added PHONE array: ${JSON.stringify(contactFields.PHONE)}`);
+    console.log(`  - Added UF_CRM_1747689959 backup: ${phone}`);
+  } else {
+    console.log(`  ❌ No valid phone number found. Raw: ${JSON.stringify(cleanedData.phone_number_uzbek)}`);
   }
 
   // Handle file fields
+  console.log('');
+  console.log('📎 [WEBHOOK-PROCESSING] FILE FIELDS PROCESSING:');
   const resumeFileId = cleanedData.resume;
   const diplomaFileId = cleanedData.diploma;
   
-  console.log(`[TELEGRAM-BOT] Resume file ID extracted: "${resumeFileId}" (is valid file ID: ${isTelegramFileId(resumeFileId)})`);
-  console.log(`[TELEGRAM-BOT] Diploma file ID extracted: "${diplomaFileId}" (is valid file ID: ${isTelegramFileId(diplomaFileId)})`);
+  console.log(`  - Resume field: ${JSON.stringify(resumeFileId)}`);
+  console.log(`  - Resume is valid Telegram file ID: ${isTelegramFileId(resumeFileId)}`);
+  console.log(`  - Diploma field: ${JSON.stringify(diplomaFileId)}`);
+  console.log(`  - Diploma is valid Telegram file ID: ${isTelegramFileId(diplomaFileId)}`);
   
   if (resumeFileId && isTelegramFileId(resumeFileId)) {
     contactFields.UF_CRM_1752621810 = resumeFileId;
-    console.log(`[TELEGRAM-BOT] Added resume file ID to UF_CRM_1752621810: ${resumeFileId}`);
+    console.log(`  ✅ Added resume file ID to UF_CRM_1752621810: ${resumeFileId}`);
+  } else {
+    console.log(`  ❌ Resume file ID invalid or missing`);
   }
+  
   if (diplomaFileId && isTelegramFileId(diplomaFileId)) {
     contactFields.UF_CRM_1752621831 = diplomaFileId;
-    console.log(`[TELEGRAM-BOT] Added diploma file ID to UF_CRM_1752621831: ${diplomaFileId}`);
+    console.log(`  ✅ Added diploma file ID to UF_CRM_1752621831: ${diplomaFileId}`);
+  } else {
+    console.log(`  ❌ Diploma file ID invalid or missing`);
   }
 
   // Handle phase2 answers
+  console.log('');
+  console.log('💬 [WEBHOOK-PROCESSING] PHASE2 ANSWERS PROCESSING:');
   const phase2_q1 = cleanedData.phase2_q_1 || '';
   const phase2_q2 = cleanedData.phase2_q_2 || '';
   const phase2_q3 = cleanedData.phase2_q_3 || '';
 
-  console.log(`[TELEGRAM-BOT] Phase2 answers extracted - Q1: "${phase2_q1}", Q2: "${phase2_q2}", Q3: "${phase2_q3}"`);
+  console.log(`  - Q1: ${JSON.stringify(phase2_q1)} (${phase2_q1 ? 'HAS VALUE' : 'EMPTY'})`);
+  console.log(`  - Q2: ${JSON.stringify(phase2_q2)} (${phase2_q2 ? 'HAS VALUE' : 'EMPTY'})`);
+  console.log(`  - Q3: ${JSON.stringify(phase2_q3)} (${phase2_q3 ? 'HAS VALUE' : 'EMPTY'})`);
 
   if (phase2_q1) {
     contactFields.UF_CRM_1752241370 = phase2_q1;
-    console.log(`[TELEGRAM-BOT] Added phase2 Q1 to UF_CRM_1752241370: ${phase2_q1}`);
+    console.log(`  ✅ Added Q1 to UF_CRM_1752241370: ${phase2_q1}`);
   }
   if (phase2_q2) {
     contactFields.UF_CRM_1752241378 = phase2_q2;
-    console.log(`[TELEGRAM-BOT] Added phase2 Q2 to UF_CRM_1752241378: ${phase2_q2}`);
+    console.log(`  ✅ Added Q2 to UF_CRM_1752241378: ${phase2_q2}`);
   }
   if (phase2_q3) {
     contactFields.UF_CRM_1752241386 = phase2_q3;
-    console.log(`[TELEGRAM-BOT] Added phase2 Q3 to UF_CRM_1752241386: ${phase2_q3}`);
+    console.log(`  ✅ Added Q3 to UF_CRM_1752241386: ${phase2_q3}`);
   }
 
   // Add comments
@@ -159,43 +221,67 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     contactFields.COMMENTS = comments.join('\\n');
   }
 
-  console.log('[TELEGRAM-BOT] Contact fields being sent to Bitrix24:');
-  console.log(JSON.stringify(contactFields, null, 2));
+  console.log('');
+  console.log('🚀 [WEBHOOK-PROCESSING] FINAL BITRIX24 PAYLOAD PREPARATION:');
+  console.log('📋 Contact fields summary:');
+  Object.keys(contactFields).forEach(key => {
+    const value = contactFields[key];
+    const isEmpty = !value || (Array.isArray(value) && value.length === 0) || value === '';
+    console.log(`  ${isEmpty ? '⚪' : '✅'} ${key}: ${JSON.stringify(value)}`);
+  });
 
   // Create JSON payload for contact - Bitrix24 works better with JSON than FormData
   const contactPayload = {
     fields: contactFields
   };
   
-  console.log('[TELEGRAM-BOT] Contact JSON payload being sent to Bitrix24:');
+  console.log('');
+  console.log('📤 [WEBHOOK-PROCESSING] COMPLETE BITRIX24 PAYLOAD:');
   console.log(JSON.stringify(contactPayload, null, 2));
 
   // Check for existing contact
+  console.log('');
+  console.log('🔍 [WEBHOOK-PROCESSING] CHECKING FOR EXISTING CONTACT:');
   let contactId: string;
   const existingContactId = await findExistingContact(phone);
   
   if (existingContactId) {
-    console.log(`[TELEGRAM-BOT] Existing contact found: ${existingContactId}, updating...`);
+    console.log(`  ✅ Existing contact found: ${existingContactId}`);
+    console.log('  🔄 Updating existing contact...');
     const updatePayload = {
       id: existingContactId,
       fields: contactFields
     };
+    console.log('  📤 Update payload:', JSON.stringify(updatePayload, null, 2));
+    
     const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, updatePayload, {
       headers: {
         'Content-Type': 'application/json'
       },
     });
-    console.log('[TELEGRAM-BOT] Contact update response:', updateResp.data);
+    console.log('  📨 Contact update response status:', updateResp.status);
+    console.log('  📨 Contact update response data:', JSON.stringify(updateResp.data, null, 2));
     contactId = existingContactId;
   } else {
-    console.log('[TELEGRAM-BOT] Creating new contact...');
+    console.log('  ❌ No existing contact found');
+    console.log('  ➕ Creating new contact...');
+    console.log('  📤 Create payload:', JSON.stringify(contactPayload, null, 2));
+    
     const createResp = await axios.post(`${BITRIX_BASE}/crm.contact.add.json`, contactPayload, {
       headers: {
         'Content-Type': 'application/json'
       },
     });
-    console.log('[TELEGRAM-BOT] Contact create response:', createResp.data);
-    contactId = createResp.data.result;
+    console.log('  📨 Contact create response status:', createResp.status);
+    console.log('  📨 Contact create response data:', JSON.stringify(createResp.data, null, 2));
+    
+    if (createResp.data && createResp.data.result) {
+      contactId = createResp.data.result;
+      console.log(`  ✅ New contact created with ID: ${contactId}`);
+    } else {
+      console.log('  ❌ Contact creation failed - no result ID returned');
+      throw new Error('Failed to create contact in Bitrix24');
+    }
   }
 
   // Create/update deal with proper contact linking

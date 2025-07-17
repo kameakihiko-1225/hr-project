@@ -28,36 +28,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Telegram webhook endpoint - direct implementation
   app.post('/webhook', async (req, res) => {
     try {
-      console.log('='.repeat(80));
-      console.log('[WEBHOOK-DEBUG] INCOMING PUZZLEBOT REQUEST');
-      console.log('='.repeat(80));
+      console.log('='.repeat(100));
+      console.log('[WEBHOOK-DEBUG] 🚀 INCOMING PUZZLEBOT REQUEST - FULL DEBUG MODE');
+      console.log('='.repeat(100));
+      console.log('[WEBHOOK-DEBUG] Timestamp:', new Date().toISOString());
       console.log('[WEBHOOK-DEBUG] Request URL:', req.url);
       console.log('[WEBHOOK-DEBUG] Request method:', req.method);
       console.log('[WEBHOOK-DEBUG] Content-Type:', req.headers['content-type']);
       console.log('[WEBHOOK-DEBUG] User-Agent:', req.headers['user-agent']);
-      console.log('[WEBHOOK-DEBUG] Request headers:', JSON.stringify(req.headers, null, 2));
-      console.log('[WEBHOOK-DEBUG] Raw request body type:', typeof req.body);
-      console.log('[WEBHOOK-DEBUG] Raw request body:', JSON.stringify(req.body, null, 2));
+      console.log('[WEBHOOK-DEBUG] Content-Length:', req.headers['content-length']);
+      console.log('[WEBHOOK-DEBUG] Origin:', req.headers['origin'] || 'Not set');
+      console.log('[WEBHOOK-DEBUG] Referer:', req.headers['referer'] || 'Not set');
+      console.log('');
+      console.log('[WEBHOOK-DEBUG] 📋 FULL REQUEST HEADERS:');
+      console.log(JSON.stringify(req.headers, null, 2));
+      console.log('');
+      console.log('[WEBHOOK-DEBUG] 📦 RAW REQUEST BODY:');
+      console.log('- Body type:', typeof req.body);
+      console.log('- Body constructor:', req.body?.constructor?.name || 'Unknown');
+      console.log('- Body length:', req.body ? Object.keys(req.body).length : 'No keys');
+      console.log('- Full body:', JSON.stringify(req.body, null, 2));
       
       // Log each field individually if it's an object
       if (req.body && typeof req.body === 'object') {
-        console.log('[WEBHOOK-DEBUG] Individual fields:');
+        console.log('');
+        console.log('[WEBHOOK-DEBUG] 🔍 INDIVIDUAL FIELD ANALYSIS:');
         Object.keys(req.body).forEach(key => {
           const value = req.body[key];
-          console.log(`  - ${key}: ${JSON.stringify(value)} (type: ${typeof value})`);
+          console.log(`  ✓ ${key}:`);
+          console.log(`    - Value: ${JSON.stringify(value)}`);
+          console.log(`    - Type: ${typeof value}`);
+          console.log(`    - Length: ${value?.length || 'N/A'}`);
+          console.log(`    - Is Empty: ${!value || value === ''}`);
         });
       }
       
-      console.log('='.repeat(80));
+      console.log('');
+      console.log('[WEBHOOK-DEBUG] 🔄 STARTING WEBHOOK PROCESSING...');
+      console.log('='.repeat(100));
       
       const result = await processWebhookData(req.body);
+      
+      console.log('');
+      console.log('[WEBHOOK-DEBUG] ✅ WEBHOOK PROCESSING COMPLETED');
+      console.log('[WEBHOOK-DEBUG] Result:', JSON.stringify(result, null, 2));
+      console.log('='.repeat(100));
+      
       res.status(200).json(result);
 
     } catch (error: any) {
-      console.error('[TELEGRAM-BOT] Error processing webhook:', error?.response?.data || error.message);
+      console.log('');
+      console.log('[WEBHOOK-DEBUG] ❌ WEBHOOK ERROR OCCURRED');
+      console.log('[WEBHOOK-DEBUG] Error type:', error?.constructor?.name);
+      console.log('[WEBHOOK-DEBUG] Error message:', error?.message);
+      console.log('[WEBHOOK-DEBUG] Error response data:', error?.response?.data);
+      console.log('[WEBHOOK-DEBUG] Full error:', error);
+      console.log('='.repeat(100));
+      
       res.status(500).json({
         message: 'Error processing webhook',
         error: error?.response?.data || error.message,
+        requestBody: req.body, // Include request body for debugging
       });
     }
   });
