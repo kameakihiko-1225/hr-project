@@ -28,9 +28,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Telegram webhook endpoint - direct implementation
   app.post('/webhook', async (req, res) => {
     try {
-      console.log('[TELEGRAM-BOT] Received webhook data:', JSON.stringify(req.body));
-      console.log('[TELEGRAM-BOT] Request URL:', req.url);
-      console.log('[TELEGRAM-BOT] Request headers:', JSON.stringify(req.headers));
+      console.log('='.repeat(80));
+      console.log('[WEBHOOK-DEBUG] INCOMING PUZZLEBOT REQUEST');
+      console.log('='.repeat(80));
+      console.log('[WEBHOOK-DEBUG] Request URL:', req.url);
+      console.log('[WEBHOOK-DEBUG] Request method:', req.method);
+      console.log('[WEBHOOK-DEBUG] Content-Type:', req.headers['content-type']);
+      console.log('[WEBHOOK-DEBUG] User-Agent:', req.headers['user-agent']);
+      console.log('[WEBHOOK-DEBUG] Request headers:', JSON.stringify(req.headers, null, 2));
+      console.log('[WEBHOOK-DEBUG] Raw request body type:', typeof req.body);
+      console.log('[WEBHOOK-DEBUG] Raw request body:', JSON.stringify(req.body, null, 2));
+      
+      // Log each field individually if it's an object
+      if (req.body && typeof req.body === 'object') {
+        console.log('[WEBHOOK-DEBUG] Individual fields:');
+        Object.keys(req.body).forEach(key => {
+          const value = req.body[key];
+          console.log(`  - ${key}: ${JSON.stringify(value)} (type: ${typeof value})`);
+        });
+      }
+      
+      console.log('='.repeat(80));
       
       const result = await processWebhookData(req.body);
       res.status(200).json(result);
