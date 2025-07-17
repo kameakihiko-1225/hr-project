@@ -173,7 +173,7 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     contactId = createResp.data.result;
   }
 
-  // Create/update deal
+  // Create/update deal with proper contact linking
   const dealFields = {
     TITLE: `HR BOT - ${firstName}`.trim(),
     CATEGORY_ID: '55',
@@ -203,6 +203,41 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     const createResp = await axios.post(`${BITRIX_BASE}/crm.deal.add.json`, createPayload);
     console.log('[TELEGRAM-BOT] Deal create response:', createResp.data);
     dealId = createResp.data.result;
+  }
+
+  // Ensure contact-deal association using contact binding API
+  try {
+    console.log(`[TELEGRAM-BOT] Binding contact ${contactId} to deal ${dealId}...`);
+    
+    // Method 1: Use crm.deal.contact.add for explicit contact binding
+    const bindPayload = {
+      id: dealId,
+      fields: {
+        CONTACT_ID: contactId
+      }
+    };
+    
+    const bindResp = await axios.post(`${BITRIX_BASE}/crm.deal.contact.add.json`, bindPayload);
+    console.log('[TELEGRAM-BOT] Contact binding response:', bindResp.data);
+    
+  } catch (bindError: any) {
+    console.log('[TELEGRAM-BOT] Contact binding attempt failed, trying alternative method...');
+    console.log('[TELEGRAM-BOT] Bind error:', bindError?.response?.data || bindError.message);
+    
+    // Method 2: Direct deal update with contact association
+    try {
+      const updatePayload = {
+        id: dealId,
+        fields: {
+          CONTACT_ID: contactId,
+          CONTACT_IDS: [contactId]
+        }
+      };
+      const updateResp = await axios.post(`${BITRIX_BASE}/crm.deal.update.json`, updatePayload);
+      console.log('[TELEGRAM-BOT] Deal update with contact response:', updateResp.data);
+    } catch (updateError: any) {
+      console.log('[TELEGRAM-BOT] Deal update warning:', updateError?.response?.data || updateError.message);
+    }
   }
 
   return {
