@@ -34,7 +34,8 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
   const { i18n } = useTranslation();
   
   // Helper function to get localized content
-  const getLocalizedContent = (content: string | LocalizedContent): string => {
+  const getLocalizedContent = (content: string | LocalizedContent | undefined): string => {
+    if (!content) return '';
     if (typeof content === 'string') return content;
     return content[i18n.language as keyof LocalizedContent] || content.en || '';
   };

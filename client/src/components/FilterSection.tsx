@@ -70,7 +70,7 @@ export const FilterSection = ({
       try {
         const allDeps: DepartmentOption[] = [];
         for (const companyName of selectedCompanies) {
-          const company = companyOptions.find(c => getLocalizedContent(c.name, i18n.language) === companyName);
+          const company = companyOptions.find(c => getLocalizedContent(c.name, i18n.language as "en" | "ru" | "uz") === companyName);
           if (!company) continue;
           const deps = await getDepartments(company.id, false, i18n.language);
           if (Array.isArray(deps)) {
@@ -102,7 +102,7 @@ export const FilterSection = ({
       try {
         const allPositions: PositionOption[] = [];
         for (const deptName of selectedDepartments) {
-          const dept = departmentOptions.find(d => getLocalizedContent(d.name, i18n.language) === deptName);
+          const dept = departmentOptions.find(d => getLocalizedContent(d.name, i18n.language as "en" | "ru" | "uz") === deptName);
           if (!dept) continue;
           const positions = await getPositions(dept.id, i18n.language);
           if (Array.isArray(positions)) {
@@ -122,9 +122,9 @@ export const FilterSection = ({
   }, [selectedDepartments, i18n.language]);
 
   // Ensure unique values to avoid duplicate keys in lists
-  const availableCompanies = Array.from(new Set(companyOptions.map(c => getLocalizedContent(c.name, i18n.language))));
-  const availableDepartments = Array.from(new Set(departmentOptions.map(d => getLocalizedContent(d.name, i18n.language))));
-  const availablePositions = Array.from(new Set(positionOptions.map(p => getLocalizedContent(p.title, i18n.language))));
+  const availableCompanies = Array.from(new Set(companyOptions.map(c => getLocalizedContent(c.name, i18n.language as "en" | "ru" | "uz"))));
+  const availableDepartments = Array.from(new Set(departmentOptions.map(d => getLocalizedContent(d.name, i18n.language as "en" | "ru" | "uz"))));
+  const availablePositions = Array.from(new Set(positionOptions.map(p => getLocalizedContent(p.title, i18n.language as "en" | "ru" | "uz"))));
 
   const handleSearch = () => {
     onFilterComplete();

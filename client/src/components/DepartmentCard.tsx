@@ -212,7 +212,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
               <div key="created-info">
                 <h4 className="text-sm font-medium mb-2">Created</h4>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(department.createdAt).toLocaleDateString()}
+                  {department.createdAt ? new Date(department.createdAt).toLocaleDateString() : 'Not specified'}
                 </p>
               </div>
             </div>

@@ -251,6 +251,11 @@ export const insertPositionClickSchema = createInsertSchema(positionClicks).omit
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type Company = typeof companies.$inferSelect;
 
+// Extended Company type with industries for API responses
+export type CompanyWithIndustries = Company & {
+  industries?: IndustryTag[];
+};
+
 export type InsertDepartment = z.infer<typeof insertDepartmentSchema>;
 export type Department = typeof departments.$inferSelect;
 

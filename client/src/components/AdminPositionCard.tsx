@@ -90,12 +90,12 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
     const company = companyFromAPI;
 
     return {
-      // Logo: use position logo -> company logo -> fallback
-      logoUrl: basePosition.logoUrl || company?.logoUrl || null,
+      // Logo: use company logo -> fallback (positions don't have logos)
+      logoUrl: company?.logoUrl || null,
       
-      // Location: use position location -> department location -> company location
-      city: getLocalizedContent(basePosition.city) || getLocalizedContent(department?.city) || getLocalizedContent(company?.city) || null,
-      country: getLocalizedContent(basePosition.country) || getLocalizedContent(department?.country) || getLocalizedContent(company?.country) || null,
+      // Location: use position location -> company location
+      city: getLocalizedContent(basePosition.city || company?.city || null) || null,
+      country: getLocalizedContent(basePosition.country || company?.country || null) || null,
       
       // Company info
       companyName: company ? getLocalizedContent(company.name) : 'Company',
@@ -338,7 +338,7 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
               <div>
                 <h4 className="text-sm font-medium mb-2">Created</h4>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(position.createdAt).toLocaleDateString()}
+                  {position.createdAt ? new Date(position.createdAt).toLocaleDateString() : 'Not specified'}
                 </p>
               </div>
             </div>
@@ -380,15 +380,15 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
       
       {/* Company Info Modal */}
       <CompanyInfoModal 
-        company={companyFromAPI}
+        company={companyFromAPI ? {...companyFromAPI, industries: companyFromAPI.industries || []} : null}
         isOpen={isCompanyModalOpen}
         onClose={() => setIsCompanyModalOpen(false)}
       />
       
       {/* Department Info Modal */}
       <DepartmentInfoModal 
-        department={departmentFromAPI}
-        company={companyFromAPI}
+        department={departmentFromAPI ? {...departmentFromAPI, name: departmentFromAPI.name || '', description: departmentFromAPI.description || null, createdAt: departmentFromAPI.createdAt || null} : null}
+        company={companyFromAPI ? {...companyFromAPI, industries: companyFromAPI.industries || []} : null}
         isOpen={isDepartmentModalOpen}
         onClose={() => setIsDepartmentModalOpen(false)}
       />

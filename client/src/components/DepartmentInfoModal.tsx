@@ -2,13 +2,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Mail, Building, Users, Globe } from "lucide-react";
-import { Department, Company } from "@shared/schema";
+import { Department, Company, CompanyWithIndustries } from "@shared/schema";
 import { useTranslation } from 'react-i18next';
 import { LocalizedContent } from "@shared/schema";
 
 interface DepartmentInfoModalProps {
   department: Department | null;
-  company: Company | null;
+  company: CompanyWithIndustries | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -17,7 +17,8 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
   const { i18n, t } = useTranslation();
   
   // Helper function to get localized content
-  const getLocalizedContent = (content: string | LocalizedContent): string => {
+  const getLocalizedContent = (content: string | LocalizedContent | null): string => {
+    if (!content) return '';
     if (typeof content === 'string') return content;
     return content[i18n.language as keyof LocalizedContent] || content.en || '';
   };
@@ -72,13 +73,13 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
               )}
 
               {/* Industry Tags */}
-              {company.industryTags && company.industryTags.length > 0 && (
+              {company.industries && company.industries.length > 0 && (
                 <div className="mb-3">
                   <h4 className="text-sm font-medium mb-1">{t('modals.department_info.industry')}</h4>
                   <div className="flex flex-wrap gap-2">
-                    {company.industryTags.map((tag, index) => (
+                    {company.industries.map((industry, index) => (
                       <Badge key={index} variant="outline" className="text-xs">
-                        {tag}
+                        {typeof industry.name === 'string' ? industry.name : getLocalizedContent(industry.name)}
                       </Badge>
                     ))}
                   </div>

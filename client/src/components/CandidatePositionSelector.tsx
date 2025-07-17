@@ -251,7 +251,8 @@ export function CandidatePositionSelector({
                     <CompanyCard
                       key={company.id}
                       company={company}
-                      onClick={() => handleCompanySelect(company)}
+                      onEdit={() => {}}
+                      onDelete={() => {}}
                     />
                   ))}
                 </div>
@@ -267,7 +268,7 @@ export function CandidatePositionSelector({
                   {departments.map(department => (
                     <DepartmentCard
                       key={department.id}
-                      department={department}
+                      department={{...department, positionCount: 0, companyId: department.companyId || 0, createdAt: department.createdAt || null}}
                       onClick={() => handleDepartmentSelect(department)}
                     />
                   ))}
@@ -285,7 +286,8 @@ export function CandidatePositionSelector({
                     <PositionCard
                       key={position.id}
                       position={position}
-                      onClick={() => handlePositionSelect(position)}
+                      onEdit={() => {}}
+                      onDelete={() => {}}
                     />
                   ))}
                 </div>

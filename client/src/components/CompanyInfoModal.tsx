@@ -2,12 +2,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Mail, Building, Globe } from "lucide-react";
-import { Company } from "@shared/schema";
+import { Company, CompanyWithIndustries } from "@shared/schema";
 import { useTranslation } from 'react-i18next';
 import { LocalizedContent } from "@shared/schema";
 
 interface CompanyInfoModalProps {
-  company: Company | null;
+  company: CompanyWithIndustries | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -16,7 +16,8 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
   const { i18n, t } = useTranslation();
   
   // Helper function to get localized content
-  const getLocalizedContent = (content: string | LocalizedContent): string => {
+  const getLocalizedContent = (content: string | LocalizedContent | null): string => {
+    if (!content) return '';
     if (typeof content === 'string') return content;
     return content[i18n.language as keyof LocalizedContent] || content.en || '';
   };
@@ -61,7 +62,7 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
             <div>
               <h3 className="font-medium mb-2">{t('modals.company_info.industry')}</h3>
               <div className="flex flex-wrap gap-2">
-                {company.industries.map((industry) => (
+                {company.industries.map((industry: any) => (
                   <Badge key={industry.id} variant="outline" className="text-xs">
                     {industry.name}
                   </Badge>
