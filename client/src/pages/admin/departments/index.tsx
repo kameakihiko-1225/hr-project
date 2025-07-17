@@ -291,7 +291,7 @@ export default function DepartmentsPage() {
               <SelectItem value="all">All Companies</SelectItem>
               {Array.isArray(companies) && companies.map((company) => (
                 <SelectItem key={company.id} value={company.id}>
-                  {company.name}
+                  {typeof company.name === 'string' ? company.name : company.name.en || company.name.ru || company.name.uz || 'Unknown Company'}
                 </SelectItem>
               ))}
             </SelectContent>

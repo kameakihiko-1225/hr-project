@@ -52,7 +52,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
   };
 
   const handleLogoError = () => {
-    logger.warn(`Failed to load logo for company: ${department.company?.name}`);
+    logger.warn(`Failed to load logo for company: ${department.company?.name ? getLocalizedContent(department.company.name) : 'Unknown'}`);
     setCompanyLogoError(true);
   };
 
@@ -66,7 +66,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
       .substring(0, 2);
   };
 
-  const companyInitials = department.company?.name ? getInitials(department.company.name) : '';
+  const companyInitials = department.company?.name ? getInitials(getLocalizedContent(department.company.name)) : '';
 
   // Use positionCount from backend if available, otherwise fallback to existing positions array
   const positionCount = department.positionCount !== undefined 
@@ -126,7 +126,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
                 <Avatar className="h-6 w-6 mr-1">
                   <AvatarImage 
                     src={department.company.logoUrl} 
-                    alt={department.company.name}
+                    alt={getLocalizedContent(department.company.name)}
                     onError={handleLogoError}
                   />
                   <AvatarFallback className="bg-blue-100 text-blue-800 text-xs">
@@ -175,7 +175,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
                       <Avatar className="h-8 w-8">
                         <AvatarImage 
                           src={department.company.logoUrl} 
-                          alt={department.company.name}
+                          alt={getLocalizedContent(department.company.name)}
                           onError={handleLogoError}
                         />
                         <AvatarFallback className="bg-blue-100 text-blue-800">
@@ -185,7 +185,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
                     ) : (
                       <Building2 className="h-4 w-4" />
                     )}
-                    <span>{department.company.name}</span>
+                    <span>{getLocalizedContent(department.company.name)}</span>
                   </div>
                 </div>
               )}
@@ -196,7 +196,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
                     {positions.slice(0, 3).map((position) => (
                       <div key={position.id} className="flex items-center gap-2">
                         <BriefcaseBusiness className="h-4 w-4 text-muted-foreground" />
-                        <span>{position.title}</span>
+                        <span>{typeof position.title === 'string' ? position.title : getLocalizedContent(position.title)}</span>
                       </div>
                     ))}
                     {positions.length > 3 && (
