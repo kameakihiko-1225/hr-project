@@ -119,27 +119,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Company methods
-  async getAllCompanies(language: SupportedLanguage = 'en'): Promise<CompanyWithIndustries[]> {
+  async getAllCompanies(language?: SupportedLanguage): Promise<CompanyWithIndustries[]> {
     try {
       const companiesData = await db.select().from(companies);
       
-      // Fetch industry tags and localize each company
+      // Fetch industry tags and conditionally localize each company
       const companiesWithTags = await Promise.all(
         companiesData.map(async (company) => {
           const industries = await this.getCompanyIndustryTags(company.id, language);
           
-          // Localize company fields while preserving original structure
-          const localizedCompany = {
-            ...company,
-            name: getLocalizedContent(company.name, language),
-            description: getLocalizedContent(company.description, language),
-            address: getLocalizedContent(company.address, language),
-            city: getLocalizedContent(company.city, language),
-            country: getLocalizedContent(company.country, language),
-            industries,
-          };
-          
-          return localizedCompany as CompanyWithIndustries;
+          if (language) {
+            // Localize company fields for public API
+            const localizedCompany = {
+              ...company,
+              name: getLocalizedContent(company.name, language),
+              description: getLocalizedContent(company.description, language),
+              address: getLocalizedContent(company.address, language),
+              city: getLocalizedContent(company.city, language),
+              country: getLocalizedContent(company.country, language),
+              industries,
+            };
+            return localizedCompany as CompanyWithIndustries;
+          } else {
+            // Return raw data for admin interface
+            return {
+              ...company,
+              industries,
+            } as CompanyWithIndustries;
+          }
         })
       );
       

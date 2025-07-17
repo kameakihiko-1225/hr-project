@@ -93,7 +93,9 @@ export default function CompaniesPage() {
       setIsLoading(true);
       logger.debug('Fetching companies from API');
       
-      const response = await api.get('/companies');
+      // For admin interface, we want to get the raw data without language filtering
+      // so we can edit all language versions
+      const response = await api.get('/companies?raw=true');
       
       if (response.success) {
         // The actual API returns data directly, not nested under companies
@@ -137,11 +139,15 @@ export default function CompaniesPage() {
       setFilteredCompanies(companies);
     } else {
       const query = searchQuery.toLowerCase();
-      const filtered = companies.filter(company => 
-        company.name.toLowerCase().includes(query) || 
-        company.industry?.toLowerCase().includes(query) ||
-        company.location?.toLowerCase().includes(query)
-      );
+      const filtered = companies.filter(company => {
+        const companyName = getLocalizedContent(company.name).toLowerCase();
+        const companyIndustry = company.industry ? company.industry.toLowerCase() : '';
+        const companyLocation = company.location ? company.location.toLowerCase() : '';
+        
+        return companyName.includes(query) || 
+               companyIndustry.includes(query) ||
+               companyLocation.includes(query);
+      });
       setFilteredCompanies(filtered);
     }
   }, [searchQuery, companies]);

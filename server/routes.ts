@@ -103,8 +103,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.set('ETag', `"companies-${Date.now()}"`);
       
       const language = req.query.language as string || 'en';
-      const companies = await storage.getAllCompanies(language);
-      res.json({ success: true, data: companies });
+      const rawData = req.query.raw === 'true'; // For admin interface
+      
+      if (rawData) {
+        // Return raw LocalizedContent objects for admin editing
+        const companies = await storage.getAllCompanies(); // No language parameter
+        res.json({ success: true, data: companies });
+      } else {
+        // Return localized content for public use
+        const companies = await storage.getAllCompanies(language);
+        res.json({ success: true, data: companies });
+      }
     } catch (error) {
       console.error('Error fetching companies:', error);
       res.status(500).json({ success: false, error: "Failed to fetch companies" });
