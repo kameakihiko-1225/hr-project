@@ -5,6 +5,7 @@ import { Search, Filter, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCompanies, getDepartments, getPositions } from "@/lib/api";
 import { useTranslation } from 'react-i18next';
+import { getLocalizedContent } from "@shared/schema";
 
 interface FilterSectionProps {
   selectedCompanies: string[];
@@ -69,7 +70,7 @@ export const FilterSection = ({
       try {
         const allDeps: DepartmentOption[] = [];
         for (const companyName of selectedCompanies) {
-          const company = companyOptions.find(c => c.name === companyName);
+          const company = companyOptions.find(c => getLocalizedContent(c.name, i18n.language) === companyName);
           if (!company) continue;
           const deps = await getDepartments(company.id, false, i18n.language);
           if (Array.isArray(deps)) {
@@ -101,7 +102,7 @@ export const FilterSection = ({
       try {
         const allPositions: PositionOption[] = [];
         for (const deptName of selectedDepartments) {
-          const dept = departmentOptions.find(d => d.name === deptName);
+          const dept = departmentOptions.find(d => getLocalizedContent(d.name, i18n.language) === deptName);
           if (!dept) continue;
           const positions = await getPositions(dept.id, i18n.language);
           if (Array.isArray(positions)) {
@@ -121,9 +122,9 @@ export const FilterSection = ({
   }, [selectedDepartments, i18n.language]);
 
   // Ensure unique values to avoid duplicate keys in lists
-  const availableCompanies = Array.from(new Set(companyOptions.map(c => c.name)));
-  const availableDepartments = Array.from(new Set(departmentOptions.map(d => d.name)));
-  const availablePositions = Array.from(new Set(positionOptions.map(p => p.title)));
+  const availableCompanies = Array.from(new Set(companyOptions.map(c => getLocalizedContent(c.name, i18n.language))));
+  const availableDepartments = Array.from(new Set(departmentOptions.map(d => getLocalizedContent(d.name, i18n.language))));
+  const availablePositions = Array.from(new Set(positionOptions.map(p => getLocalizedContent(p.title, i18n.language))));
 
   const handleSearch = () => {
     onFilterComplete();
