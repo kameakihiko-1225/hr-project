@@ -1,0 +1,60 @@
+DepartmentInfoModal rendered: 
+Object {department: {…}, company: {…}, isOpen: false}
+CompanyInfoModal rendered: 
+Object {company: {…}, isOpen: false}
+DepartmentInfoModal rendered: 
+Object {department: {…}, company: {…}, isOpen: false}
+CompanyInfoModal rendered: 
+Object {company: {…}, isOpen: false}
+DepartmentInfoModal rendered: 
+Object {department: {…}, company: {…}, isOpen: false}
+CompanyInfoModal rendered: 
+Object {company: {…}, isOpen: false}
+DepartmentInfoModal rendered: 
+Object {department: {…}, company: {…}, isOpen: false}
+CompanyInfoModal rendered: 
+Object {company: {…}, isOpen: false}
+DepartmentInfoModal rendered: 
+Object {department: {…}, company: {…}, isOpen: false}
+CompanyInfoModal rendered: 
+Object {company: {…}, isOpen: false}
+DepartmentInfoModal rendered: 
+Object {department: {…}, company: {…}, isOpen: false}
+CompanyInfoModal rendered: 
+Object {company: {…}, isOpen: false}
+DepartmentInfoModal rendered: 
+Object {department: {…}, company: {…}, isOpen: false}
+Error creating position: 
+Error {}
+message: "[↵ {↵ "code": "custom",↵ "message": "At least one language must be provided",↵ "path": [↵ "applyLink"↵ ]↵ }↵]"
+stack: "Error: [↵ {↵ "code": "custom",↵ "message": "At least one language must be provided",↵ "path": [↵ "applyLink"↵ ]↵ }↵]↵ at createPosition (https://9c851740-b761-4ff0-8625-d5610f45d742-00-2ltxug5vol3ml.worf.replit.dev/src/lib/api.ts:715:13)↵ at async handleCreatePosition (https://9c851740-b761-4ff0-8625-d5610f45d742-00-2ltxug5vol3ml.worf.replit.dev/src/pages/admin/positions/index.tsx:167:27)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+
+Error creating position: 
+Error {}
+
+[PositionsPage] positions: 
+(9) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+[PositionsPage] selectedDepartmentId: all
+[Filter] position: 
+Object {id: 9, title: {…}, description: {…}, location: null, city: {…}, …}
+[Filter] position: 
+Object {id: 10, title: {…}, description: {…}, location: null, city: {…}, …}
+[Filter] position: 
+Object {id: 11, title: {…}, description: {…}, location: null, city: {…}, …}
+[Filter] position: 
+Object {id: 12, title: {…}, description: {…}, location: null, city: {…}, …}
+[Filter] position: 
+Object {id: 7, title: {…}, description: {…}, location: null, city: {…}, …}
+[Filter] position: 
+Object {id: 8, title: {…}, description: {…}, location: null, city: {…}, …}
+[Filter] position: 
+Object {id: 13, title: {…}, description: {…}, location: null, city: {…}, …}
+[Filter] position: 
+Object {id: 14, title: {…}, description: {…}, location: null, city: {…}, …}
+[Filter] position: 
+Object {id: 15, title: {…}, description: {…}, location: null, city: {…}, …}
+[Render] filteredPositions: 
+(9) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]

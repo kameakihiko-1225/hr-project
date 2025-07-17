@@ -155,6 +155,29 @@ const localizedContentSchema = z.object({
   { message: "At least one language must be provided" }
 );
 
+// Optional localized content schema that allows completely empty objects
+const optionalLocalizedContentSchema = z.object({
+  en: z.string().optional(),
+  ru: z.string().optional(),
+  uz: z.string().optional(),
+}).optional().refine(
+  (data) => {
+    // Allow undefined or null
+    if (!data) return true;
+    
+    // Allow empty object
+    if (Object.keys(data).length === 0) return true;
+    
+    // Check if all values are empty strings or undefined
+    const hasEmptyValues = Object.values(data).every(val => !val || val.trim() === '');
+    if (hasEmptyValues) return true;
+    
+    // If there are actual values, at least one language must be provided
+    return data.en || data.ru || data.uz;
+  },
+  { message: "At least one language must be provided when apply link is specified" }
+);
+
 // Insert schemas with localization support
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -193,7 +216,7 @@ export const insertPositionSchema = z.object({
   qualifications: localizedContentSchema.optional(),
   responsibilities: localizedContentSchema.optional(),
   departmentId: z.number(),
-  applyLink: localizedContentSchema.optional(), // LocalizedContent to match database
+  applyLink: optionalLocalizedContentSchema, // Allow completely empty apply links
 });
 
 export const insertCandidateSchema = createInsertSchema(candidates).omit({

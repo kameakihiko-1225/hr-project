@@ -201,14 +201,24 @@ export default function PositionsPage() {
         return;
       }
 
-      const newPosition = await createPosition({
+      // Check if apply link has any content, if not, omit it completely
+      const hasApplyLinkContent = formData.applyLink && 
+        (formData.applyLink.en?.trim() || formData.applyLink.ru?.trim() || formData.applyLink.uz?.trim());
+
+      const positionData: any = {
         title: formData.title,
         description: formData.description,
         salaryRange: formData.salaryRange,
         employmentType: formData.employmentType,
-        departmentId: formData.departmentId,
-        applyLink: formData.applyLink
-      });
+        departmentId: formData.departmentId
+      };
+
+      // Only include applyLink if it has content
+      if (hasApplyLinkContent) {
+        positionData.applyLink = formData.applyLink;
+      }
+
+      const newPosition = await createPosition(positionData);
 
       setPositions(prev => [...prev, newPosition]);
       setIsCreateDialogOpen(false);
@@ -256,13 +266,23 @@ export default function PositionsPage() {
         return;
       }
 
-      const updatedPosition = await updatePosition(currentPosition.id, {
+      // Check if apply link has any content, if not, omit it completely
+      const hasApplyLinkContent = formData.applyLink && 
+        (formData.applyLink.en?.trim() || formData.applyLink.ru?.trim() || formData.applyLink.uz?.trim());
+
+      const positionData: any = {
         title: formData.title,
         description: formData.description,
         salaryRange: formData.salaryRange,
-        employmentType: formData.employmentType,
-        applyLink: formData.applyLink
-      });
+        employmentType: formData.employmentType
+      };
+
+      // Only include applyLink if it has content
+      if (hasApplyLinkContent) {
+        positionData.applyLink = formData.applyLink;
+      }
+
+      const updatedPosition = await updatePosition(currentPosition.id, positionData);
 
       setPositions(prev => 
         prev.map(pos => pos.id === currentPosition.id ? updatedPosition : pos)

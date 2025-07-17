@@ -749,7 +749,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
 
+      console.log('[Position Creation] Incoming data:', JSON.stringify(positionData, null, 2));
+      console.log('[Position Creation] applyLink field:', positionData.applyLink);
+      
       const validatedData = insertPositionSchema.parse(positionData);
+      console.log('[Position Creation] Validated data:', JSON.stringify(validatedData, null, 2));
+      
       const position = await storage.createPosition(validatedData);
       res.json({ success: true, data: position });
     } catch (error) {
