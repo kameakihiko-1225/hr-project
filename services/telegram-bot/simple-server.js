@@ -42,7 +42,7 @@ async function getTelegramFileUrl(fileId) {
     const TELEGRAM_BOT_TOKEN = getBotToken();
     const fileInfoResp = await axios.get(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getFile?file_id=${fileId}`);
     if (!fileInfoResp.data.ok || !fileInfoResp.data.result?.file_path) return null;
-    return `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${encodeURI(fileInfoResp.data.result.file_path)}`;
+    return `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfoResp.data.result.file_path}`;
   } catch {
     return null;
   }
@@ -62,7 +62,7 @@ async function getFileBufferFromTelegram(fileId, fieldName) {
       return { buffer: null, url: null };
     }
     const filePath = fileInfoResp.data.result.file_path;
-    const fileUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${encodeURI(filePath)}`;
+    const fileUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${filePath}`;
     console.log(`[TELEGRAM-BOT] Fetching file from: ${fileUrl}`);
 
     // Use fetch for file downloads
