@@ -808,8 +808,9 @@ export const getDepartment = async (id: string) => {
   }
 };
 
-export const createDepartment = async (departmentData: { name: string; description?: string; companyId: string }) => {
+export const createDepartment = async (departmentData: { name: any; description?: any; companyId: string }) => {
   try {
+    console.log('Creating department with data:', departmentData);
     const response = await fetch(`${API_BASE_URL}/departments`, {
       method: 'POST',
       headers: {
@@ -821,10 +822,12 @@ export const createDepartment = async (departmentData: { name: string; descripti
     
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Department creation failed:', errorData);
       throw new Error(errorData.error || 'Failed to create department');
     }
     
     const data = await response.json();
+    console.log('Department created successfully:', data);
     return data.data;
   } catch (error) {
     console.error('Error creating department:', error);
@@ -832,8 +835,9 @@ export const createDepartment = async (departmentData: { name: string; descripti
   }
 };
 
-export const updateDepartment = async (id: string, departmentData: { name?: string; description?: string }) => {
+export const updateDepartment = async (id: string, departmentData: { name?: any; description?: any }) => {
   try {
+    console.log('Updating department with data:', departmentData);
     const response = await fetch(`${API_BASE_URL}/departments/${id}`, {
       method: 'PUT',
       headers: {
@@ -845,10 +849,12 @@ export const updateDepartment = async (id: string, departmentData: { name?: stri
     
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Department update failed:', errorData);
       throw new Error(errorData.error || 'Failed to update department');
     }
     
     const data = await response.json();
+    console.log('Department updated successfully:', data);
     return data.data;
   } catch (error) {
     console.error('Error updating department:', error);
