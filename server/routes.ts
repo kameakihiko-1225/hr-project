@@ -915,6 +915,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Parse LocalizedContent objects from FormData
+      ['title', 'description'].forEach(field => {
+        if (galleryData[field] && typeof galleryData[field] === 'string') {
+          try {
+            galleryData[field] = JSON.parse(galleryData[field]);
+          } catch (e) {
+            console.warn(`Failed to parse ${field} as JSON:`, galleryData[field]);
+          }
+        }
+      });
+      
       // Convert string booleans and numbers from FormData
       if (galleryData.isActive !== undefined) {
         galleryData.isActive = galleryData.isActive === 'true' || galleryData.isActive === true;
@@ -982,6 +993,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updateData.tags = [];
         }
       }
+      
+      // Parse LocalizedContent objects from FormData
+      ['title', 'description'].forEach(field => {
+        if (updateData[field] && typeof updateData[field] === 'string') {
+          try {
+            updateData[field] = JSON.parse(updateData[field]);
+          } catch (e) {
+            console.warn(`Failed to parse ${field} as JSON:`, updateData[field]);
+          }
+        }
+      });
       
       // Convert string booleans and numbers from FormData
       if (updateData.isActive !== undefined) {

@@ -83,7 +83,12 @@ export default function AdminBlog() {
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
         } else if (value !== undefined && value !== null) {
-          formData.append(key, value.toString());
+          // Handle LocalizedContent objects by JSON stringifying them
+          if (typeof value === 'object' && value !== null) {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, value.toString());
+          }
         }
       });
 
@@ -131,7 +136,12 @@ export default function AdminBlog() {
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
         } else if (value !== undefined && value !== null) {
-          formData.append(key, value.toString());
+          // Handle LocalizedContent objects by JSON stringifying them
+          if (typeof value === 'object' && value !== null) {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, value.toString());
+          }
         }
       });
 
