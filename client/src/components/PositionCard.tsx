@@ -132,8 +132,9 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
 
     // If position has a direct apply link, use it
     if (position.applyLink) {
-      console.log('Redirecting to custom apply link:', position.applyLink);
-      window.open(position.applyLink, '_blank', 'noopener,noreferrer');
+      const applyLinkUrl = getLocalizedContent(position.applyLink);
+      console.log('Redirecting to custom apply link:', applyLinkUrl);
+      window.open(applyLinkUrl, '_blank', 'noopener,noreferrer');
       toast({ 
         title: 'Redirected to Application', 
         description: 'You\'ve been redirected to the application form.' 
@@ -149,11 +150,11 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       // For now, since we don't have bot functionality set up, show a simple message
       toast({ 
         title: 'Application Initiated', 
-        description: `Thank you for your interest in the ${position.title} position! You will be contacted soon.` 
+        description: `Thank you for your interest in the ${getLocalizedContent(position.title)} position! You will be contacted soon.` 
       });
       
       // In a real implementation, this would integrate with Telegram bot or other application system
-      console.log(`Application submitted for position: ${position.title} (ID: ${position.id})`);
+      console.log(`Application submitted for position: ${getLocalizedContent(position.title)} (ID: ${position.id})`);
     } catch (error: any) {
       console.error('Apply via AI error:', error);
       toast({ title: 'Error', description: error?.message || 'Something went wrong' });
@@ -173,8 +174,8 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       logoUrl: basePosition.logoUrl || company?.logoUrl || null,
       
       // Location: use position location -> department location -> company location
-      city: basePosition.city || department?.city || company?.city || null,
-      country: basePosition.country || department?.country || company?.country || null,
+      city: getLocalizedContent(basePosition.city) || getLocalizedContent(department?.city) || getLocalizedContent(company?.city) || null,
+      country: getLocalizedContent(basePosition.country) || getLocalizedContent(department?.country) || getLocalizedContent(company?.country) || null,
       
       // Company info
       companyName: company ? getLocalizedContent(company.name) : 'Company',

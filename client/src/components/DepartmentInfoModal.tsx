@@ -90,14 +90,14 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
                 {company.address && (
                   <div className="flex items-center gap-2 text-sm">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span>{company.address}</span>
+                    <span>{getLocalizedContent(company.address)}</span>
                   </div>
                 )}
                 
                 {company.city && company.country && (
                   <div className="flex items-center gap-2 text-sm">
                     <Globe className="h-4 w-4 text-muted-foreground" />
-                    <span>{company.city}, {company.country}</span>
+                    <span>{getLocalizedContent(company.city)}, {getLocalizedContent(company.country)}</span>
                   </div>
                 )}
 

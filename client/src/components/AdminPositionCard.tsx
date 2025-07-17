@@ -94,8 +94,8 @@ export const AdminPositionCard = React.memo(function AdminPositionCard({ positio
       logoUrl: basePosition.logoUrl || company?.logoUrl || null,
       
       // Location: use position location -> department location -> company location
-      city: basePosition.city || department?.city || company?.city || null,
-      country: basePosition.country || department?.country || company?.country || null,
+      city: getLocalizedContent(basePosition.city) || getLocalizedContent(department?.city) || getLocalizedContent(company?.city) || null,
+      country: getLocalizedContent(basePosition.country) || getLocalizedContent(department?.country) || getLocalizedContent(company?.country) || null,
       
       // Company info
       companyName: company ? getLocalizedContent(company.name) : 'Company',
