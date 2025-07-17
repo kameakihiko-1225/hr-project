@@ -160,6 +160,17 @@
       "industry": "Industry",
       "contact_info": "Contact Information",
       "close": "Close"
+    },
+    "position_details": {
+      "title": "Position Details",
+      "description": "Description",
+      "salary_range": "Salary Range",
+      "employment_type": "Employment Type",
+      "department": "Department",
+      "apply_link": "Apply Link",
+      "created": "Created",
+      "close": "Close",
+      "no_description": "No description provided"
     }
   },
 

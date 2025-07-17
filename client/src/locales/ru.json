@@ -147,6 +147,17 @@
       "industry": "Отрасль",
       "contact_info": "Контактная информация",
       "close": "Закрыть"
+    },
+    "position_details": {
+      "title": "Детали позиции",
+      "description": "Описание",
+      "salary_range": "Зарплатный диапазон",
+      "employment_type": "Тип занятости",
+      "department": "Отдел",
+      "apply_link": "Ссылка для подачи заявки",
+      "created": "Создано",
+      "close": "Закрыть",
+      "no_description": "Описание не предоставлено"
     }
   },
 

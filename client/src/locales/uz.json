@@ -147,6 +147,17 @@
       "industry": "Soha",
       "contact_info": "Aloqa ma'lumotlari",
       "close": "Yopish"
+    },
+    "position_details": {
+      "title": "Lavozim tafsilotlari",
+      "description": "Tavsif",
+      "salary_range": "Maosh oralig'i",
+      "employment_type": "Ish turi",
+      "department": "Bo'lim",
+      "apply_link": "Ariza berish havolasi",
+      "created": "Yaratilgan",
+      "close": "Yopish",
+      "no_description": "Tavsif berilmagan"
     }
   },
 

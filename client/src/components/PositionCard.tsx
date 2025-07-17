@@ -377,19 +377,19 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>{getLocalizedContent(position.title)}</DialogTitle>
-              <DialogDescription>Position Details</DialogDescription>
+              <DialogDescription>{t('modals.position_details.title')}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div>
-                <h4 className="text-sm font-medium mb-2">Description</h4>
+                <h4 className="text-sm font-medium mb-2">{t('modals.position_details.description')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  {inheritedData.description || 'No description provided'}
+                  {inheritedData.description || t('modals.position_details.no_description')}
                 </p>
               </div>
               
               {position.salaryRange && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Salary Range</h4>
+                  <h4 className="text-sm font-medium mb-2">{t('modals.position_details.salary_range')}</h4>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
                     <span>{getLocalizedContent(position.salaryRange)}</span>
@@ -399,7 +399,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
               
               {position.employmentType && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Employment Type</h4>
+                  <h4 className="text-sm font-medium mb-2">{t('modals.position_details.employment_type')}</h4>
                   <div className="flex items-center gap-2">
                     <Briefcase className="h-4 w-4" />
                     <span>{getLocalizedContent(position.employmentType)}</span>
@@ -408,7 +408,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
               )}
               
               <div>
-                <h4 className="text-sm font-medium mb-2">Department</h4>
+                <h4 className="text-sm font-medium mb-2">{t('modals.position_details.department')}</h4>
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
                   <span>{inheritedData.departmentName}</span>
@@ -422,7 +422,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
               
               {position.applyLink && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Apply Link</h4>
+                  <h4 className="text-sm font-medium mb-2">{t('modals.position_details.apply_link')}</h4>
                   <div className="flex items-center gap-2">
                     <ExternalLink className="h-4 w-4" />
                     <a 
@@ -438,14 +438,16 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
               )}
               
               <div>
-                <h4 className="text-sm font-medium mb-2">Created</h4>
+                <h4 className="text-sm font-medium mb-2">{t('modals.position_details.created')}</h4>
                 <p className="text-sm text-muted-foreground">
                   {new Date(position.createdAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>Close</Button>
+              <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
+                {t('modals.position_details.close')}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
