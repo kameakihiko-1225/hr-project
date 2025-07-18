@@ -1,14 +1,29 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+
+# Sitemap
+Sitemap: https://career.millatumidi.uz/sitemap.xml
+
+# Central Asia SEO - Allow indexing of multilingual content
+Allow: /en/
+Allow: /ru/
+Allow: /uz/
+
+# Specific search engine directives for Central Asia
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 1
+
+# Block admin areas from search engines
+Disallow: /admin/
+Disallow: /api/
+Disallow: /uploads/private/
+
+# Performance optimization
+Disallow: *.json$
+Disallow: *.js$
+Disallow: *.css$

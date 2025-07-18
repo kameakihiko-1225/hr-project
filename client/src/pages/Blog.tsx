@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Heart, Award, Coffee, Lightbulb, Target, Images, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { type GalleryItem } from "@shared/schema";
+import SEOHead from "@/components/SEOHead";
+import { getPageSEO } from "@/utils/seoUtils";
 
 const categoryIcons = {
   teamwork: Users,
@@ -25,11 +27,13 @@ const categoryColors = {
 };
 
 export default function Blog() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+  
+  const seoData = getPageSEO('blog', i18n.language);
 
   // Fetch blog items from API
   const { data: blogResponse, isLoading, error } = useQuery({
@@ -80,6 +84,13 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead 
+        title={seoData.title}
+        description={seoData.description}
+        keywords={seoData.keywords}
+        canonical={seoData.canonical}
+        type="website"
+      />
       <Header />
       
       {/* Hero Section */}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
@@ -6,17 +7,20 @@ import { FounderSection } from "@/components/FounderSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { StatsSection } from "@/components/StatsSection";
 import { CompanyCarousel } from "@/components/CompanyCarousel";
-
-
 import { CTASection } from "@/components/CTASection";
 import { FilterSection } from "@/components/FilterSection";
 import { OpenPositions } from "@/components/OpenPositions";
+import SEOHead from "@/components/SEOHead";
+import { getPageSEO } from "@/utils/seoUtils";
 
 const Index = () => {
+  const { i18n } = useTranslation();
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [selectedPositions, setSelectedPositions] = useState<string[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  
+  const seoData = getPageSEO('home', i18n.language);
   
   // Handle company selection changes
   const handleCompanyChange = (companies: string[]) => {
@@ -51,6 +55,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead 
+        title={seoData.title}
+        description={seoData.description}
+        keywords={seoData.keywords}
+        canonical={seoData.canonical}
+        type="website"
+      />
       <Header />
       <HeroSection />
       <FounderSection />
