@@ -10,8 +10,11 @@ const FormData = FormDataClass;
 const BITRIX_BASE = 'https://millatumidi.bitrix24.kz/rest/21/wx0c9lt1mxcwkhz9';
 const TELEGRAM_API_BASE = 'https://api.telegram.org';
 
+// Hardcoded Telegram Bot Token - directly set like Bitrix24  
+const TELEGRAM_BOT_TOKEN = '7191717059:AAHIlA-fAxxzlwYEnse3vSBlQLH_4ozhPTY';
+
 function getBotToken() {
-  return process.env.TELEGRAM_BOT_TOKEN;
+  return TELEGRAM_BOT_TOKEN;
 }
 
 function normalizePhone(phone: string): string {
@@ -287,49 +290,40 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  ❌ No valid phone number found. Raw: ${JSON.stringify(cleanedData.phone_number_uzbek)}`);
   }
 
-  // Handle file fields with Telegram download
+  // Handle file fields with Telegram download - INLINE PROCESSING
   console.log('');
   console.log('📎 [WEBHOOK-PROCESSING] FILE FIELDS PROCESSING WITH TELEGRAM DOWNLOAD:');
   const resumeFileId = cleanedData.resume;
   const diplomaFileId = cleanedData.diploma;
   
   console.log(`  - Resume field: ${JSON.stringify(resumeFileId)}`);
-  console.log(`  - Resume is valid Telegram file ID: ${isTelegramFileId(resumeFileId)}`);
   console.log(`  - Diploma field: ${JSON.stringify(diplomaFileId)}`);
-  console.log(`  - Diploma is valid Telegram file ID: ${isTelegramFileId(diplomaFileId)}`);
   
-  // Convert Telegram file IDs to downloadable URLs
+  // Process resume file directly
   if (resumeFileId && isTelegramFileId(resumeFileId)) {
-    console.log(`  🔄 Converting resume file ID to downloadable URL...`);
-    try {
-      const resumeUrl = await convertTelegramFileIdToUrl(resumeFileId, 'resume');
-      contactFields.UF_CRM_1752621810 = resumeUrl;
-      console.log(`  ✅ Added resume URL to UF_CRM_1752621810: ${resumeUrl}`);
-    } catch (error: any) {
-      console.log(`  ❌ Error converting resume file ID: ${error.message}`);
-      contactFields.UF_CRM_1752621810 = resumeFileId; // Fallback to original ID
-    }
+    console.log(`  🔄 Converting resume file ID...`);
+    const resumeUrl = await convertTelegramFileIdToUrl(resumeFileId, 'resume');
+    contactFields.UF_CRM_1752621810 = resumeUrl;
+    console.log(`  ✅ Resume URL set: ${resumeUrl}`);
   } else {
-    console.log(`  ❌ Resume file ID invalid or missing`);
+    contactFields.UF_CRM_1752621810 = resumeFileId || '';
+    console.log(`  ⚪ Resume kept as-is: ${resumeFileId}`);
   }
   
+  // Process diploma file directly  
   if (diplomaFileId && isTelegramFileId(diplomaFileId)) {
-    console.log(`  🔄 Converting diploma file ID to downloadable URL...`);
-    try {
-      const diplomaUrl = await convertTelegramFileIdToUrl(diplomaFileId, 'diploma');
-      contactFields.UF_CRM_1752621831 = diplomaUrl;
-      console.log(`  ✅ Added diploma URL to UF_CRM_1752621831: ${diplomaUrl}`);
-    } catch (error: any) {
-      console.log(`  ❌ Error converting diploma file ID: ${error.message}`);
-      contactFields.UF_CRM_1752621831 = diplomaFileId; // Fallback to original ID
-    }
+    console.log(`  🔄 Converting diploma file ID...`);
+    const diplomaUrl = await convertTelegramFileIdToUrl(diplomaFileId, 'diploma');
+    contactFields.UF_CRM_1752621831 = diplomaUrl;
+    console.log(`  ✅ Diploma URL set: ${diplomaUrl}`);
   } else {
-    console.log(`  ❌ Diploma file ID invalid or missing`);
+    contactFields.UF_CRM_1752621831 = diplomaFileId || '';
+    console.log(`  ⚪ Diploma kept as-is: ${diplomaFileId}`);
   }
 
-  // Handle phase2 answers
+  // Handle phase2 answers with file download support
   console.log('');
-  console.log('💬 [WEBHOOK-PROCESSING] PHASE2 ANSWERS PROCESSING:');
+  console.log('💬 [WEBHOOK-PROCESSING] PHASE2 ANSWERS PROCESSING WITH FILE SUPPORT:');
   const phase2_q1 = cleanedData.phase2_q_1 || '';
   const phase2_q2 = cleanedData.phase2_q_2 || '';
   const phase2_q3 = cleanedData.phase2_q_3 || '';
@@ -338,17 +332,46 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log(`  - Q2: ${JSON.stringify(phase2_q2)} (${phase2_q2 ? 'HAS VALUE' : 'EMPTY'})`);
   console.log(`  - Q3: ${JSON.stringify(phase2_q3)} (${phase2_q3 ? 'HAS VALUE' : 'EMPTY'})`);
 
+  // Process Q1 - check if it's a file ID or text
   if (phase2_q1) {
-    contactFields.UF_CRM_1752241370 = phase2_q1;
-    console.log(`  ✅ Added Q1 to UF_CRM_1752241370: ${phase2_q1}`);
+    if (isTelegramFileId(phase2_q1)) {
+      console.log(`  🎧 Q1 is file ID, converting to URL...`);
+      const q1Url = await convertTelegramFileIdToUrl(phase2_q1, 'phase2_q1');
+      contactFields.UF_CRM_1752621857 = q1Url; // Voice field
+      contactFields.UF_CRM_1752241370 = `Voice answer: ${q1Url}`; // Text field with URL
+      console.log(`  ✅ Q1 voice URL: ${q1Url}`);
+    } else {
+      contactFields.UF_CRM_1752241370 = phase2_q1; // Text field
+      console.log(`  ✅ Q1 text: ${phase2_q1}`);
+    }
   }
+
+  // Process Q2 - check if it's a file ID or text
   if (phase2_q2) {
-    contactFields.UF_CRM_1752241378 = phase2_q2;
-    console.log(`  ✅ Added Q2 to UF_CRM_1752241378: ${phase2_q2}`);
+    if (isTelegramFileId(phase2_q2)) {
+      console.log(`  🎧 Q2 is file ID, converting to URL...`);
+      const q2Url = await convertTelegramFileIdToUrl(phase2_q2, 'phase2_q2');
+      contactFields.UF_CRM_1752621874 = q2Url; // Voice field
+      contactFields.UF_CRM_1752241378 = `Voice answer: ${q2Url}`; // Text field with URL
+      console.log(`  ✅ Q2 voice URL: ${q2Url}`);
+    } else {
+      contactFields.UF_CRM_1752241378 = phase2_q2; // Text field
+      console.log(`  ✅ Q2 text: ${phase2_q2}`);
+    }
   }
+
+  // Process Q3 - check if it's a file ID or text
   if (phase2_q3) {
-    contactFields.UF_CRM_1752241386 = phase2_q3;
-    console.log(`  ✅ Added Q3 to UF_CRM_1752241386: ${phase2_q3}`);
+    if (isTelegramFileId(phase2_q3)) {
+      console.log(`  🎧 Q3 is file ID, converting to URL...`);
+      const q3Url = await convertTelegramFileIdToUrl(phase2_q3, 'phase2_q3');
+      contactFields.UF_CRM_1752621887 = q3Url; // Voice field
+      contactFields.UF_CRM_1752241386 = `Voice answer: ${q3Url}`; // Text field with URL
+      console.log(`  ✅ Q3 voice URL: ${q3Url}`);
+    } else {
+      contactFields.UF_CRM_1752241386 = phase2_q3; // Text field
+      console.log(`  ✅ Q3 text: ${phase2_q3}`);
+    }
   }
 
   // Add comments with file URLs
