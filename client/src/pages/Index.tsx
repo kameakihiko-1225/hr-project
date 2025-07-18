@@ -12,6 +12,8 @@ import { FilterSection } from "@/components/FilterSection";
 import { OpenPositions } from "@/components/OpenPositions";
 import SEOHead from "@/components/SEOHead";
 import { getPageSEO } from "@/utils/seoUtils";
+import VoiceSearchOptimization from "@/components/VoiceSearchOptimization";
+import { SEOResourcePrefetch, useWebVitals } from "@/components/PerformanceOptimizations";
 
 const Index = () => {
   const { i18n } = useTranslation();
@@ -21,6 +23,9 @@ const Index = () => {
   const [hasSearched, setHasSearched] = useState(false);
   
   const seoData = getPageSEO('home', i18n.language);
+  
+  // Initialize performance optimizations
+  useWebVitals();
   
   // Handle company selection changes
   const handleCompanyChange = (companies: string[]) => {
@@ -86,6 +91,10 @@ const Index = () => {
 
       <CTASection />
       <Footer />
+      
+      {/* SEO and Performance Components */}
+      <VoiceSearchOptimization />
+      <SEOResourcePrefetch />
     </div>
   );
 };

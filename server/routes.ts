@@ -1425,6 +1425,188 @@ ${hreflangs}
     }
   });
 
+  // Individual position endpoint for SEO pages
+  app.get('/api/positions/:id', async (req, res) => {
+    try {
+      const positionId = parseInt(req.params.id);
+      if (isNaN(positionId)) {
+        return res.status(400).json({ success: false, error: 'Invalid position ID' });
+      }
+
+      const position = await storage.getPositionById(positionId);
+      if (!position) {
+        return res.status(404).json({ success: false, error: 'Position not found' });
+      }
+
+      res.json({ success: true, data: position });
+    } catch (error) {
+      console.error('Error getting position by ID:', error);
+      res.status(500).json({ success: false, error: 'Failed to get position' });
+    }
+  });
+
+  // Individual company endpoint
+  app.get('/api/companies/:id', async (req, res) => {
+    try {
+      const companyId = parseInt(req.params.id);
+      if (isNaN(companyId)) {
+        return res.status(400).json({ success: false, error: 'Invalid company ID' });
+      }
+
+      const company = await storage.getCompanyById(companyId);
+      if (!company) {
+        return res.status(404).json({ success: false, error: 'Company not found' });
+      }
+
+      res.json({ success: true, data: company });
+    } catch (error) {
+      console.error('Error getting company by ID:', error);
+      res.status(500).json({ success: false, error: 'Failed to get company' });
+    }
+  });
+
+  // Individual department endpoint
+  app.get('/api/departments/:id', async (req, res) => {
+    try {
+      const departmentId = parseInt(req.params.id);
+      if (isNaN(departmentId)) {
+        return res.status(400).json({ success: false, error: 'Invalid department ID' });
+      }
+
+      const department = await storage.getDepartmentById(departmentId);
+      if (!department) {
+        return res.status(404).json({ success: false, error: 'Department not found' });
+      }
+
+      res.json({ success: true, data: department });
+    } catch (error) {
+      console.error('Error getting department by ID:', error);
+      res.status(500).json({ success: false, error: 'Failed to get department' });
+    }
+  });
+
+  // Dynamic sitemap generation for SEO
+  app.get('/sitemap.xml', async (req, res) => {
+    try {
+      console.log('[SEO] Generating dynamic sitemap');
+      
+      const baseUrl = 'https://career.millatumidi.uz';
+      const languages = ['en', 'ru', 'uz'];
+      
+      // Get all positions for individual pages
+      const positions = await storage.getAllPositions();
+      
+      // Static pages
+      const staticPages = [
+        { url: '', priority: '1.0', changefreq: 'daily' },
+        { url: '/blog', priority: '0.8', changefreq: 'weekly' }
+      ];
+      
+      let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">`;
+
+      // Add static pages with language alternates
+      staticPages.forEach(page => {
+        languages.forEach(lang => {
+          const url = lang === 'en' ? `${baseUrl}${page.url}` : `${baseUrl}/${lang}${page.url}`;
+          
+          sitemap += `
+  <url>
+    <loc>${url}</loc>
+    <priority>${page.priority}</priority>
+    <changefreq>${page.changefreq}</changefreq>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>`;
+
+          // Add hreflang alternates
+          languages.forEach(alternateLang => {
+            const alternateUrl = alternateLang === 'en' ? 
+              `${baseUrl}${page.url}` : 
+              `${baseUrl}/${alternateLang}${page.url}`;
+            
+            sitemap += `
+    <xhtml:link rel="alternate" hreflang="${alternateLang}" href="${alternateUrl}" />`;
+          });
+
+          sitemap += `
+  </url>`;
+        });
+      });
+
+      // Add individual position pages
+      positions.forEach(position => {
+        languages.forEach(lang => {
+          const url = `${baseUrl}/positions/${position.id}`;
+          
+          sitemap += `
+  <url>
+    <loc>${url}</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+    <lastmod>${position.createdAt ? new Date(position.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>`;
+
+          // Add hreflang alternates for position pages
+          languages.forEach(alternateLang => {
+            sitemap += `
+    <xhtml:link rel="alternate" hreflang="${alternateLang}" href="${url}?lang=${alternateLang}" />`;
+          });
+
+          sitemap += `
+  </url>`;
+        });
+      });
+
+      sitemap += `
+</urlset>`;
+
+      res.set('Content-Type', 'text/xml');
+      res.send(sitemap);
+      
+      console.log(`[SEO] Sitemap generated with ${staticPages.length * languages.length + positions.length * languages.length} URLs`);
+    } catch (error) {
+      console.error('[SEO] Error generating sitemap:', error);
+      res.status(500).send('Error generating sitemap');
+    }
+  });
+
+  // Robots.txt for Central Asia SEO optimization
+  app.get('/robots.txt', (req, res) => {
+    const robotsTxt = `User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /uploads/private/
+
+# Sitemap location
+Sitemap: https://career.millatumidi.uz/sitemap.xml
+
+# Google bot optimization for Central Asia
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Yandex bot optimization for Russian-speaking users
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 1
+
+# Bing bot for international reach
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Block unwanted bots
+User-agent: BadBot
+Disallow: /
+
+# Cache optimization
+User-agent: *
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term`;
+
+    res.set('Content-Type', 'text/plain');
+    res.send(robotsTxt);
+  });
+
   const httpServer = createServer(app);
 
   // Initialize gallery data on startup

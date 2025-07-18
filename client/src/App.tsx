@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { Router, Route, Switch } from "wouter";
 import { ClickCounterProvider } from "@/contexts/ClickCounterContext";
 import Index from "./pages/Index";
 import Blog from "./pages/Blog";
+import JobPositionPage from "./pages/JobPositionPage";
 import NotFound from "./pages/NotFound";
 
 // Import admin pages
@@ -67,6 +69,7 @@ const App = () => (
         <Switch>
           <Route path="/" component={Index} />
           <Route path="/blog" component={Blog} />
+          <Route path="/positions/:id" component={JobPositionPage} />
           
           {/* Admin Routes - No authentication required */}
           <Route path="/admin/dashboard" component={AdminDashboard} />
