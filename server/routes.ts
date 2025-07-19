@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema, insertIndustryTagSchema, fileAttachments, departments, companies } from "@shared/schema";
+import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema, insertIndustryTagSchema, fileAttachments, departments, companies, adminLoginSchema } from "@shared/schema";
+import { z } from 'zod';
 
 import { initializeGalleryData } from "./init-gallery-data";
 import { uploadSingle } from "./middleware/upload";
@@ -10,6 +11,7 @@ import { eq } from "drizzle-orm";
 import path from "path";
 import express from "express";
 import { processWebhookData } from "./webhook";
+import { AuthService, authenticateAdmin, requireRole, requireSuperAdmin, AuthRequest } from './auth';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded files statically
@@ -1630,6 +1632,48 @@ Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term`;
 
     res.set('Content-Type', 'text/plain');
     res.send(robotsTxt);
+  });
+
+  // Authentication routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const loginData = adminLoginSchema.parse(req.body);
+      const result = await AuthService.login(loginData);
+      
+      if (!result) {
+        return res.status(401).json({ success: false, error: "Invalid username or password" });
+      }
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ success: false, error: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/logout", authenticateAdmin, async (req: AuthRequest, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : '';
+      
+      if (token) {
+        await AuthService.logout(token);
+      }
+
+      res.json({ success: true, message: "Logged out successfully" });
+    } catch (error) {
+      console.error('Logout error:', error);
+      res.status(500).json({ success: false, error: "Logout failed" });
+    }
+  });
+
+  app.get("/api/auth/me", authenticateAdmin, async (req: AuthRequest, res) => {
+    try {
+      res.json({ success: true, data: req.admin });
+    } catch (error) {
+      console.error('Get current admin error:', error);
+      res.status(500).json({ success: false, error: "Failed to get admin info" });
+    }
   });
 
   const httpServer = createServer(app);

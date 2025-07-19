@@ -11,11 +11,16 @@ import {
   CheckCircle2,
   AlertCircle,
   Image,
-  TrendingUp
+  TrendingUp,
+  LogOut,
+  User
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/AuthContext";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import { createLogger } from "@/lib/logger";
 
@@ -31,9 +36,18 @@ interface AdminLayoutProps {
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [location, navigate] = useLocation();
   const isMobile = useIsMobile();
-  // Authentication removed - no user management needed
+  const { admin, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/admin/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -169,6 +183,47 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
             <div className="flex-1 flex justify-end items-center gap-4">
               {/* Language Selector */}
               <LanguageSelector className="mr-2" />
+              
+              {/* Admin User Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-blue-100 text-blue-600">
+                        {admin?.firstName?.[0] || admin?.username?.[0] || 'A'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden sm:block text-sm font-medium text-gray-700">
+                      {admin?.firstName || admin?.username || 'Admin'}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex items-center gap-2 p-2">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-blue-100 text-blue-600">
+                        {admin?.firstName?.[0] || admin?.username?.[0] || 'A'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">
+                        {admin?.firstName && admin?.lastName ? `${admin.firstName} ${admin.lastName}` : admin?.username}
+                      </span>
+                      <span className="text-xs text-gray-500">{admin?.email}</span>
+                      <span className="text-xs text-blue-600 capitalize">{admin?.role}</span>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
             </div>
           </div>

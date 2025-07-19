@@ -72,6 +72,30 @@ export const positions = pgTable("positions", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Admin users table for authentication
+export const adminUsers = pgTable("admin_users", {
+  id: serial("id").primaryKey(),
+  username: varchar("username", { length: 50 }).notNull().unique(),
+  email: varchar("email", { length: 100 }).notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  role: varchar("role", { length: 20 }).notNull().default("admin"), // admin, super_admin
+  isActive: boolean("is_active").notNull().default(true),
+  lastLoginAt: timestamp("last_login_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Admin sessions table for JWT token management
+export const adminSessions = pgTable("admin_sessions", {
+  id: serial("id").primaryKey(),
+  adminUserId: integer("admin_user_id").notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const candidates = pgTable("candidates", {
   id: text("id").primaryKey(),
   fullName: text("full_name"),
@@ -279,3 +303,34 @@ export type CompanyIndustryTag = typeof companyIndustryTags.$inferSelect;
 
 export type InsertPositionClick = z.infer<typeof insertPositionClickSchema>;
 export type PositionClick = typeof positionClicks.$inferSelect;
+
+// Admin user types and schemas
+export const insertAdminUserSchema = createInsertSchema(adminUsers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastLoginAt: true,
+});
+
+export const adminLoginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export const updateAdminUserSchema = insertAdminUserSchema.partial().omit({
+  passwordHash: true,
+});
+
+export type AdminUser = typeof adminUsers.$inferSelect;
+export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
+export type AdminLogin = z.infer<typeof adminLoginSchema>;
+export type UpdateAdminUser = z.infer<typeof updateAdminUserSchema>;
+
+// Admin session types and schemas
+export const insertAdminSessionSchema = createInsertSchema(adminSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type AdminSession = typeof adminSessions.$inferSelect;
+export type InsertAdminSession = z.infer<typeof insertAdminSessionSchema>;

@@ -11,11 +11,16 @@ import JobPositionPage from "./pages/JobPositionPage";
 import NotFound from "./pages/NotFound";
 
 // Import admin pages
+import AdminLogin from "./pages/admin/login/index";
 import AdminDashboard from "./pages/admin/dashboard/index";
 import AdminCompanies from "./pages/admin/companies/index";
 import AdminDepartments from "./pages/admin/departments/index";
 import AdminPositions from "./pages/admin/positions/index";
 import AdminBlog from "./pages/AdminBlog";
+
+// Import authentication
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 
 
@@ -62,28 +67,53 @@ const queryClient = new QueryClient({
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <ClickCounterProvider>
-        <Toaster />
-        <Sonner />
-        <Router>
-        <Switch>
-          <Route path="/" component={Index} />
-          <Route path="/blog" component={Blog} />
-          <Route path="/positions/:id" component={JobPositionPage} />
-          
-          {/* Admin Routes - No authentication required */}
-          <Route path="/admin/dashboard" component={AdminDashboard} />
-          <Route path="/admin/companies" component={AdminCompanies} />
-          <Route path="/admin/departments" component={AdminDepartments} />
-          <Route path="/admin/positions" component={AdminPositions} />
-          <Route path="/admin/blog" component={AdminBlog} />
+      <AuthProvider>
+        <ClickCounterProvider>
+          <Toaster />
+          <Sonner />
+          <Router>
+          <Switch>
+            <Route path="/" component={Index} />
+            <Route path="/blog" component={Blog} />
+            <Route path="/positions/:id" component={JobPositionPage} />
+            
+            {/* Admin Login Route - Public */}
+            <Route path="/admin/login" component={AdminLogin} />
+            
+            {/* Protected Admin Routes */}
+            <Route path="/admin/dashboard">
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin/companies">
+              <ProtectedRoute>
+                <AdminCompanies />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin/departments">
+              <ProtectedRoute>
+                <AdminDepartments />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin/positions">
+              <ProtectedRoute>
+                <AdminPositions />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin/blog">
+              <ProtectedRoute>
+                <AdminBlog />
+              </ProtectedRoute>
+            </Route>
 
-          
-          {/* Catch-all route for 404 */}
-          <Route component={NotFound} />
-        </Switch>
-        </Router>
-      </ClickCounterProvider>
+            
+            {/* Catch-all route for 404 */}
+            <Route component={NotFound} />
+          </Switch>
+          </Router>
+        </ClickCounterProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

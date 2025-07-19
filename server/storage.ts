@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 import { eq, and, desc, count } from "drizzle-orm";
 import dotenv from "dotenv";
 import { 
-  companies, departments, positions, candidates, galleryItems, industryTags, companyIndustryTags, positionClicks,
+  companies, departments, positions, candidates, galleryItems, industryTags, companyIndustryTags, positionClicks, adminUsers, adminSessions,
   type Company, type InsertCompany,
   type Department, type InsertDepartment,
   type Position, type InsertPosition,
@@ -12,6 +12,8 @@ import {
   type IndustryTag, type InsertIndustryTag,
   type CompanyIndustryTag, type InsertCompanyIndustryTag,
   type PositionClick, type InsertPositionClick,
+  type AdminUser, type InsertAdminUser, type AdminLogin,
+  type AdminSession, type InsertAdminSession,
   type LocalizedContent, type SupportedLanguage, getLocalizedContent
 } from "@shared/schema";
 import { localizeEntity } from "@shared/localization";
@@ -93,6 +95,21 @@ export interface IStorage {
   // New methods for dynamic position counters
   getTopAppliedPositions(): Promise<{ positionId: number; positionTitle: string; appliedCount: number; }[]>;
   getAllAppliedPositions(): Promise<{ positionId: number; positionTitle: string; appliedCount: number; }[]>;
+
+  // Admin authentication methods
+  createAdminUser(adminUser: InsertAdminUser): Promise<AdminUser>;
+  getAdminByUsername(username: string): Promise<AdminUser | undefined>;
+  getAdminByEmail(email: string): Promise<AdminUser | undefined>;
+  getAdminById(id: number): Promise<AdminUser | undefined>;
+  updateAdminUser(id: number, adminUser: Partial<InsertAdminUser>): Promise<AdminUser | undefined>;
+  updateAdminLastLogin(id: number): Promise<void>;
+  deleteAdminUser(id: number): Promise<boolean>;
+
+  // Admin session methods
+  createAdminSession(session: InsertAdminSession): Promise<AdminSession>;
+  getAdminSessionByToken(token: string): Promise<(AdminSession & { adminUser: AdminUser }) | undefined>;
+  deleteAdminSession(token: string): Promise<boolean>;
+  cleanExpiredSessions(): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -791,6 +808,150 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting all applied positions:', error);
       return [];
+    }
+  }
+
+  // Admin authentication methods
+  async createAdminUser(adminUser: InsertAdminUser): Promise<AdminUser> {
+    try {
+      const result = await db.insert(adminUsers).values(adminUser).returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating admin user:', error);
+      throw error;
+    }
+  }
+
+  async getAdminByUsername(username: string): Promise<AdminUser | undefined> {
+    try {
+      const result = await db
+        .select()
+        .from(adminUsers)
+        .where(eq(adminUsers.username, username))
+        .limit(1);
+      return result[0];
+    } catch (error) {
+      console.error('Error getting admin by username:', error);
+      return undefined;
+    }
+  }
+
+  async getAdminByEmail(email: string): Promise<AdminUser | undefined> {
+    try {
+      const result = await db
+        .select()
+        .from(adminUsers)
+        .where(eq(adminUsers.email, email))
+        .limit(1);
+      return result[0];
+    } catch (error) {
+      console.error('Error getting admin by email:', error);
+      return undefined;
+    }
+  }
+
+  async getAdminById(id: number): Promise<AdminUser | undefined> {
+    try {
+      const result = await db
+        .select()
+        .from(adminUsers)
+        .where(eq(adminUsers.id, id))
+        .limit(1);
+      return result[0];
+    } catch (error) {
+      console.error('Error getting admin by id:', error);
+      return undefined;
+    }
+  }
+
+  async updateAdminUser(id: number, adminUser: Partial<InsertAdminUser>): Promise<AdminUser | undefined> {
+    try {
+      const result = await db
+        .update(adminUsers)
+        .set({ ...adminUser, updatedAt: new Date() })
+        .where(eq(adminUsers.id, id))
+        .returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error updating admin user:', error);
+      throw error;
+    }
+  }
+
+  async updateAdminLastLogin(id: number): Promise<void> {
+    try {
+      await db
+        .update(adminUsers)
+        .set({ lastLoginAt: new Date() })
+        .where(eq(adminUsers.id, id));
+    } catch (error) {
+      console.error('Error updating admin last login:', error);
+      throw error;
+    }
+  }
+
+  async deleteAdminUser(id: number): Promise<boolean> {
+    try {
+      await db.delete(adminUsers).where(eq(adminUsers.id, id));
+      return true;
+    } catch (error) {
+      console.error('Error deleting admin user:', error);
+      return false;
+    }
+  }
+
+  // Admin session methods
+  async createAdminSession(session: InsertAdminSession): Promise<AdminSession> {
+    try {
+      const result = await db.insert(adminSessions).values(session).returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating admin session:', error);
+      throw error;
+    }
+  }
+
+  async getAdminSessionByToken(token: string): Promise<(AdminSession & { adminUser: AdminUser }) | undefined> {
+    try {
+      const result = await db
+        .select({
+          session: adminSessions,
+          adminUser: adminUsers,
+        })
+        .from(adminSessions)
+        .leftJoin(adminUsers, eq(adminSessions.adminUserId, adminUsers.id))
+        .where(eq(adminSessions.token, token))
+        .limit(1);
+
+      if (!result[0] || !result[0].adminUser) {
+        return undefined;
+      }
+
+      return {
+        ...result[0].session,
+        adminUser: result[0].adminUser,
+      };
+    } catch (error) {
+      console.error('Error getting admin session by token:', error);
+      return undefined;
+    }
+  }
+
+  async deleteAdminSession(token: string): Promise<boolean> {
+    try {
+      await db.delete(adminSessions).where(eq(adminSessions.token, token));
+      return true;
+    } catch (error) {
+      console.error('Error deleting admin session:', error);
+      return false;
+    }
+  }
+
+  async cleanExpiredSessions(): Promise<void> {
+    try {
+      await db.delete(adminSessions).where(new Date() > adminSessions.expiresAt);
+    } catch (error) {
+      console.error('Error cleaning expired sessions:', error);
     }
   }
 }
