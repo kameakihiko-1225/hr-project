@@ -60,13 +60,17 @@ export const CompanyCarousel = () => {
         <div className="relative">
           <div
             ref={scrollRef}
-            className="flex space-x-12 overflow-hidden"
-            
+            className="flex space-x-12 overflow-x-auto scrollbar-hide"
+            style={{ 
+              scrollBehavior: 'smooth',
+              WebkitOverflowScrolling: 'touch'
+            }}
           >
             {logos.map((file, idx) => (
               <div
                 key={`${file}-${idx}`}
                 className="flex-shrink-0 w-56 h-44 bg-white rounded-2xl shadow-md ring-1 ring-gray-200 flex items-center justify-center px-4 transition-transform hover:shadow-xl hover:-translate-y-1"
+                style={{ minWidth: '224px', minHeight: '176px' }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -85,8 +89,15 @@ export const CompanyCarousel = () => {
           </div>
         </div>
       </div>
-      {/* tailwind keyframes */}
+      {/* Custom styles for carousel */}
       <style>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
         @keyframes scroll {
           0% {
             transform: translateX(0);
