@@ -41,8 +41,15 @@ export const getPositions = async (): Promise<{ data?: Position[] }> => {
   return response.json();
 };
 
-export const getDepartments = async (): Promise<Department[]> => {
-  const response = await fetch('/api/departments');
+export const getDepartments = async (companyId?: string, includePositions?: boolean, language?: string, raw?: boolean): Promise<Department[]> => {
+  const params = new URLSearchParams();
+  if (companyId && companyId !== 'all') params.append('companyId', companyId);
+  if (includePositions) params.append('includePositions', 'true');
+  if (language) params.append('language', language);
+  if (raw) params.append('raw', 'true');
+  
+  const url = `/api/departments${params.toString() ? '?' + params.toString() : ''}`;
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
@@ -164,8 +171,31 @@ export const deletePosition = async (id: number): Promise<void> => {
   }
 };
 
+// Generic API client methods
+const get = async (endpoint: string) => {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};
+
+const post = async (endpoint: string, data: any) => {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};
+
 // Default export for backward compatibility
 const api = {
+  get,
+  post,
   getPositions,
   getDepartments, 
   getCompanies,

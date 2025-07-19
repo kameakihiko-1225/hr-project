@@ -889,13 +889,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const companies = await storage.getAllCompanies();
       const departments = await storage.getAllDepartments();
       const positions = await storage.getAllPositions();
-      
       const candidatesData = await storage.getAllCandidates();
+      
+      // Get position click analytics for additional stats
+      const clickStats = await storage.getDashboardClickStats();
+      
       const stats = {
         companies: companies.length,
         departments: departments.length,
         positions: positions.length,
-        candidates: candidatesData.length
+        bots: 1, // Telegram bot
+        candidates: candidatesData.length,
+        interviews: 0, // Not implemented yet
+        conversionRate: clickStats.totalApplies > 0 ? ((clickStats.totalApplies / clickStats.totalViews) * 100).toFixed(1) : 0,
+        activeDeals: 0, // Not implemented yet
+        admins: 1, // Mock data for now
+        jobs: positions.length, // Same as positions
+        applications: clickStats.totalApplies,
+        recentActivity: [] // Not implemented yet
       };
       
       res.json({ success: true, data: stats });
