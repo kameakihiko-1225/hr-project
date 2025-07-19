@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Department } from '../types/department';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { createLogger } from '@/lib/logger';
 import { useTranslation } from 'react-i18next';
 import { LocalizedContent } from '@shared/schema';
+import { getCompanies } from '@/lib/api';
 
 const logger = createLogger('departmentCard');
 
@@ -27,6 +28,22 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [companyLogoError, setCompanyLogoError] = useState(false);
+  const [companies, setCompanies] = useState<any[]>([]);
+  
+  // Fetch companies data to get company names
+  useEffect(() => {
+    if (showCompany && department.companyId) {
+      getCompanies()
+        .then(response => {
+          if (response.success) {
+            setCompanies(response.data);
+          }
+        })
+        .catch(error => {
+          logger.error('Failed to fetch companies:', error);
+        });
+    }
+  }, [showCompany, department.companyId]);
   
   // Helper function to get localized content
   const getLocalizedContent = (content: string | LocalizedContent): string => {
@@ -52,7 +69,8 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
   };
 
   const handleLogoError = () => {
-    logger.warn(`Failed to load logo for company: ${department.company?.name ? getLocalizedContent(department.company.name) : 'Unknown'}`);
+    const company = companies.find(c => c.id === department.companyId);
+    logger.warn(`Failed to load logo for company: ${company?.name ? getLocalizedContent(company.name) : 'Unknown'}`);
     setCompanyLogoError(true);
   };
 
@@ -66,7 +84,10 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
       .substring(0, 2);
   };
 
-  const companyInitials = department.company?.name ? getInitials(getLocalizedContent(department.company.name)) : '';
+  // Get company information from fetched companies
+  const company = companies.find(c => c.id === department.companyId);
+  const companyName = company ? getLocalizedContent(company.name) : '';
+  const companyInitials = company?.name ? getInitials(getLocalizedContent(company.name)) : '';
 
   // Use positionCount from backend if available, otherwise fallback to existing positions array
   const positionCount = department.positionCount !== undefined 
@@ -74,6 +95,11 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
     : Array.isArray(department.positions) 
       ? department.positions.map((dp: any) => dp.position).filter(Boolean).length
       : 0;
+  
+  // Create display name with company name if showCompany is true
+  const displayName = showCompany && companyName 
+    ? `${getLocalizedContent(department.name)} (${companyName})`
+    : getLocalizedContent(department.name);
 
   // For modal details, still use the actual positions array if available
   const positions = Array.isArray(department.positions)
@@ -84,7 +110,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
     <Card className="overflow-hidden transition-all hover:shadow-md border-l-4 border-l-blue-500">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-xl font-bold truncate">{getLocalizedContent(department.name)}</CardTitle>
+          <CardTitle className="text-xl font-bold truncate">{displayName}</CardTitle>
           <div className="flex gap-2">
             {onEdit && (
               <Button variant="ghost" size="icon" onClick={handleEdit} className="h-8 w-8">
@@ -120,13 +146,13 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
       </CardHeader>
       <CardContent className="pb-2">
         <div className="flex flex-col gap-2">
-          {showCompany && department.company && (
+          {showCompany && company && (
             <div className="flex items-center gap-2 text-sm">
-              {department.company.logoUrl && !companyLogoError ? (
+              {company.logoUrl && !companyLogoError ? (
                 <Avatar className="h-6 w-6 mr-1">
                   <AvatarImage 
-                    src={department.company.logoUrl} 
-                    alt={getLocalizedContent(department.company.name)}
+                    src={company.logoUrl} 
+                    alt={getLocalizedContent(company.name)}
                     onError={handleLogoError}
                   />
                   <AvatarFallback className="bg-blue-100 text-blue-800 text-xs">
@@ -137,7 +163,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
                 <Building2 className="h-4 w-4 text-muted-foreground" />
               )}
               <span className="text-muted-foreground">Company:</span>
-              <span className="font-medium">{getLocalizedContent(department.company.name)}</span>
+              <span className="font-medium">{getLocalizedContent(company.name)}</span>
             </div>
           )}
           <div className="flex items-center gap-2 text-sm">
@@ -167,15 +193,15 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
                   {department.description ? getLocalizedContent(department.description) : 'No description provided'}
                 </p>
               </div>
-              {showCompany && department.company && (
+              {showCompany && company && (
                 <div key="company-info">
                   <h4 className="text-sm font-medium mb-2">Company</h4>
                   <div className="flex items-center gap-2">
-                    {department.company.logoUrl && !companyLogoError ? (
+                    {company.logoUrl && !companyLogoError ? (
                       <Avatar className="h-8 w-8">
                         <AvatarImage 
-                          src={department.company.logoUrl} 
-                          alt={getLocalizedContent(department.company.name)}
+                          src={company.logoUrl} 
+                          alt={getLocalizedContent(company.name)}
                           onError={handleLogoError}
                         />
                         <AvatarFallback className="bg-blue-100 text-blue-800">
@@ -185,7 +211,7 @@ export function DepartmentCard({ department, onEdit, onDelete, showCompany = fal
                     ) : (
                       <Building2 className="h-4 w-4" />
                     )}
-                    <span>{getLocalizedContent(department.company.name)}</span>
+                    <span>{getLocalizedContent(company.name)}</span>
                   </div>
                 </div>
               )}
