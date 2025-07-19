@@ -71,7 +71,7 @@ export default function PositionsPage() {
         // Fetch departments, positions, and applicant counts in parallel for better performance
         const [departmentsData, positionsData, applicantCountsData] = await Promise.allSettled([
           getDepartments(undefined, true, undefined, true), // Use raw=true for admin interface
-          getPositions(undefined, undefined, true), // Use raw=true for admin interface
+          fetch('/api/positions?raw=true').then(res => res.json()), // Use direct fetch for raw admin data
           fetch('/api/all-applied-positions').then(res => res.json())
         ]);
         
@@ -94,8 +94,8 @@ export default function PositionsPage() {
         }
 
         // Handle positions
-        if (positionsData.status === 'fulfilled' && positionsData.value && Array.isArray(positionsData.value)) {
-          setPositions(positionsData.value);
+        if (positionsData.status === 'fulfilled' && positionsData.value?.success && Array.isArray(positionsData.value.data)) {
+          setPositions(positionsData.value.data);
         } else {
           console.error('Failed to load positions:', positionsData.status === 'rejected' ? positionsData.reason : 'Invalid data');
           setPositions([]);
