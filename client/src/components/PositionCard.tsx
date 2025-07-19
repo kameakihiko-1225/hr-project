@@ -68,25 +68,31 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     }
   }, [position.id, hasTrackedView]);
 
-  // Fetch company and department data with optimized caching
-  const { data: companiesResponse, isLoading: companiesLoading } = useQuery({
-    queryKey: ['/api/companies'],
-    staleTime: 30 * 60 * 1000, // 30 minutes - companies don't change often
-    gcTime: 60 * 60 * 1000, // 1 hour cache retention
+  // Simplified data fetching with fresh company data
+  const { data: companyData } = useQuery({
+    queryKey: ['company', position.departmentId],
+    queryFn: async () => {
+      // First get department to find company ID
+      const deptResponse = await fetch(`/api/departments/${position.departmentId}`);
+      if (!deptResponse.ok) return null;
+      const deptResult = await deptResponse.json();
+      
+      // Then get company data
+      const companyResponse = await fetch(`/api/companies/${deptResult.data.companyId}`);
+      if (!companyResponse.ok) return null;
+      const companyResult = await companyResponse.json();
+      
+      return {
+        department: deptResult.data,
+        company: companyResult.data
+      };
+    },
+    staleTime: 0, // Always fetch fresh data
+    enabled: !!position.departmentId
   });
   
-  const { data: departmentsResponse, isLoading: departmentsLoading } = useQuery({
-    queryKey: ['/api/departments'],
-    staleTime: 30 * 60 * 1000, // 30 minutes - departments don't change often
-    gcTime: 60 * 60 * 1000, // 1 hour cache retention
-  });
-  
-  // Extract data properly - both companies and departments return API wrapper format
-  const companies = companiesResponse?.data || [];
-  const departments = departmentsResponse?.data || [];
-  
-  const departmentFromAPI = departments?.find(d => d.id === position.departmentId);
-  const companyFromAPI = companies?.find(c => c.id === departmentFromAPI?.companyId);
+  const departmentFromAPI = companyData?.department;
+  const companyFromAPI = companyData?.company;
   
   // Data loading is working correctly
 
@@ -163,67 +169,32 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     }
   };
 
-  // Data inheritance logic: position -> department -> company (same as AdminPositionCard)
-  const getInheritedData = () => {
-    const basePosition = position;
-    const department = departmentFromAPI;
-    const company = companyFromAPI;
-
-    return {
-      // Logo: use position logo -> company logo -> fallback
-      logoUrl: basePosition.logoUrl || company?.logoUrl || null,
-      
-      // Location: use position location -> department location -> company location
-      city: getLocalizedContent(basePosition.city) || getLocalizedContent(department?.city) || getLocalizedContent(company?.city) || null,
-      country: getLocalizedContent(basePosition.country) || getLocalizedContent(department?.country) || getLocalizedContent(company?.country) || null,
-      
-      // Company info
-      companyName: company ? getLocalizedContent(company.name) : 'Company',
-      companyColor: company?.color || '#b69b83',
-      
-      // Department info
-      departmentName: department ? getLocalizedContent(department.name) : 'Department',
-      
-      // Description inheritance
-      description: basePosition.description ? getLocalizedContent(basePosition.description) : 
-                   department?.description ? getLocalizedContent(department.description) : 
-                   company?.description ? getLocalizedContent(company.description) : null,
-    };
-  };
-
-  const inheritedData = getInheritedData();
-  const companyName = inheritedData.companyName;
-  const companyLogoUrl = inheritedData.logoUrl;
+  // Simplified data extraction
+  const companyName = companyFromAPI?.name || 'Company';
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
-  
-  // Debug logging for logo URL
-  console.log('PositionCard Debug:', {
-    positionId: position.id,
-    companyName,
-    companyLogoUrl,
-    logoError,
-    logoExists: companyLogoUrl ? true : false
-  });
 
-  const CompanyAvatar = () => (
-    <Avatar className="w-full h-full border-2 border-white/30 shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
-      {companyLogoUrl && !logoError ? (
-        <AvatarImage 
-          src={companyLogoUrl} 
-          alt={companyName} 
-          className="object-contain object-center w-full h-full p-1 sm:p-2"
-          loading="lazy"
-          decoding="async"
-          onError={handleLogoError}
-          onLoad={() => console.log('✅ Logo loaded successfully:', companyLogoUrl)}
-        />
-      ) : (
-        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-sm sm:text-lg shadow-inner">
-          {companyName.charAt(0)}
-        </AvatarFallback>
-      )}
-    </Avatar>
-  );
+  // Simplified logo rendering
+  const renderLogo = () => {
+    const logoUrl = companyFromAPI?.logoUrl;
+    const fallbackLetter = companyFromAPI?.name?.charAt(0) || 'C';
+    
+    return (
+      <Avatar className="w-full h-full border-2 border-white/30 shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
+        {logoUrl && !logoError ? (
+          <AvatarImage 
+            src={logoUrl} 
+            alt={companyFromAPI?.name || 'Company'} 
+            className="object-contain object-center w-full h-full p-1 sm:p-2"
+            onError={() => setLogoError(true)}
+          />
+        ) : (
+          <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-sm sm:text-lg shadow-inner">
+            {fallbackLetter}
+          </AvatarFallback>
+        )}
+      </Avatar>
+    );
+  };
 
   return (
     <Card
@@ -301,7 +272,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
 
       <CardHeader className="flex items-start gap-3 pb-2 pt-3 sm:pt-4 px-3 sm:px-6 relative z-10">
         <div className="w-12 h-12 sm:w-16 sm:h-16">
-          <CompanyAvatar />
+          {renderLogo()}
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-sm sm:text-base leading-tight text-foreground truncate">
@@ -388,14 +359,17 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
             </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>{getLocalizedContent(position.title)}</DialogTitle>
+              <DialogTitle>{(position.title && getLocalizedContent(position.title)) || 'Position'}</DialogTitle>
               <DialogDescription>{t('modals.position_details.title')}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div>
                 <h4 className="text-sm font-medium mb-2">{t('modals.position_details.description')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  {inheritedData.description || t('modals.position_details.no_description')}
+                  {(position.description && getLocalizedContent(position.description)) || 
+                   (departmentFromAPI?.description && getLocalizedContent(departmentFromAPI.description)) || 
+                   (companyFromAPI?.description && getLocalizedContent(companyFromAPI.description)) || 
+                   t('modals.position_details.no_description')}
                 </p>
               </div>
               
@@ -404,7 +378,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <h4 className="text-sm font-medium mb-2">{t('modals.position_details.salary_range')}</h4>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    <span>{getLocalizedContent(position.salaryRange)}</span>
+                    <span>{(position.salaryRange && getLocalizedContent(position.salaryRange)) || 'Not specified'}</span>
                   </div>
                 </div>
               )}
@@ -414,7 +388,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <h4 className="text-sm font-medium mb-2">{t('modals.position_details.employment_type')}</h4>
                   <div className="flex items-center gap-2">
                     <Briefcase className="h-4 w-4" />
-                    <span>{getLocalizedContent(position.employmentType)}</span>
+                    <span>{(position.employmentType && getLocalizedContent(position.employmentType)) || 'Not specified'}</span>
                   </div>
                 </div>
               )}
@@ -423,11 +397,11 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                 <h4 className="text-sm font-medium mb-2">{t('modals.position_details.department')}</h4>
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  <span>{inheritedData.departmentName}</span>
+                  <span>{(departmentFromAPI?.name && getLocalizedContent(departmentFromAPI.name)) || 'Department'}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-1 ml-6">
                   <span className="text-sm text-muted-foreground">
-                    {inheritedData.companyName}
+                    {companyName}
                   </span>
                 </div>
               </div>
@@ -438,12 +412,12 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <div className="flex items-center gap-2">
                     <ExternalLink className="h-4 w-4" />
                     <a 
-                      href={getLocalizedContent(position.applyLink)} 
+                      href={(position.applyLink && getLocalizedContent(position.applyLink)) || '#'} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline truncate max-w-[250px]"
                     >
-                      {getLocalizedContent(position.applyLink)}
+                      {(position.applyLink && getLocalizedContent(position.applyLink)) || 'No link available'}
                     </a>
                   </div>
                 </div>
