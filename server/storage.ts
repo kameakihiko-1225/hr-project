@@ -114,49 +114,89 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   // Company methods
+  // Add caching for frequently accessed data
+  private companiesCache: { data: CompanyWithIndustries[]; timestamp: number; language?: string } | null = null;
+  private departmentsCache: { data: Department[]; timestamp: number; language?: string; companyId?: string } | null = null;
+  private positionsCache: { data: Position[]; timestamp: number; language?: string; departmentId?: string } | null = null;
+  private cacheTimeout = 300000; // 5 minutes cache
+  
   async getAllCompanies(language?: SupportedLanguage): Promise<CompanyWithIndustries[]> {
+    console.log('[Storage] getAllCompanies: Starting request');
+    
+    // Check cache first
+    if (this.companiesCache && 
+        this.companiesCache.language === language &&
+        Date.now() - this.companiesCache.timestamp < this.cacheTimeout) {
+      console.log('[Storage] getAllCompanies: Returning cached data');
+      return this.companiesCache.data;
+    }
+    
     try {
       const companiesData = await db.select().from(companies);
       console.log(`[Storage] getAllCompanies: Found ${companiesData.length} companies in database`);
       console.log(`[Storage] getAllCompanies: Company IDs: ${companiesData.map(c => c.id).join(', ')}`);
       
-      // Fetch industry tags and conditionally localize each company
-      const companiesWithTags = await Promise.all(
-        companiesData.map(async (company) => {
-          try {
-            const industries = await this.getCompanyIndustryTags(company.id, language);
-            
-            if (language) {
-              // Localize company fields for public API
-              const localizedCompany = {
-                ...company,
-                name: getLocalizedContent(company.name, language),
-                description: getLocalizedContent(company.description, language),
-                address: getLocalizedContent(company.address, language),
-                city: getLocalizedContent(company.city, language),
-                country: getLocalizedContent(company.country, language),
-                industries,
-              };
-              return localizedCompany as CompanyWithIndustries;
-            } else {
-              // Return raw data for admin interface
-              return {
-                ...company,
-                industries,
-              } as CompanyWithIndustries;
-            }
-          } catch (error) {
-            console.error(`[Storage] Error processing company ${company.id}:`, error);
-            // Return company without industries if there's an error
-            return {
-              ...company,
-              industries: [],
-            } as CompanyWithIndustries;
-          }
+      // PERFORMANCE OPTIMIZATION: Fetch all industry tags in one query instead of individual queries
+      const allIndustryTags = await db
+        .select({
+          companyId: companyIndustryTags.companyId,
+          industryId: industryTags.id,
+          industryName: industryTags.name,
+          industryDescription: industryTags.description,
+          industryCreatedAt: industryTags.createdAt
         })
-      );
+        .from(companyIndustryTags)
+        .leftJoin(industryTags, eq(companyIndustryTags.industryTagId, industryTags.id));
       
-      console.log(`[Storage] getAllCompanies: Returning ${companiesWithTags.length} companies with tags`);
+      // Group industry tags by company ID for O(1) lookup
+      const industryTagsByCompany = allIndustryTags.reduce((acc, tag) => {
+        if (!acc[tag.companyId]) {
+          acc[tag.companyId] = [];
+        }
+        if (tag.industryId) {
+          const industryTag = {
+            id: tag.industryId,
+            name: language ? getLocalizedContent(tag.industryName as LocalizedContent, language) : tag.industryName,
+            description: language ? getLocalizedContent(tag.industryDescription as LocalizedContent, language) : tag.industryDescription,
+            createdAt: tag.industryCreatedAt
+          };
+          acc[tag.companyId].push(industryTag);
+        }
+        return acc;
+      }, {} as Record<number, any[]>);
+      
+      // Process companies without individual database calls
+      const companiesWithTags = companiesData.map((company) => {
+        const industries = industryTagsByCompany[company.id] || [];
+        
+        if (language) {
+          // Localize company fields for public API
+          return {
+            ...company,
+            name: getLocalizedContent(company.name, language),
+            description: getLocalizedContent(company.description, language),
+            address: getLocalizedContent(company.address, language),
+            city: getLocalizedContent(company.city, language),
+            country: getLocalizedContent(company.country, language),
+            industries,
+          } as CompanyWithIndustries;
+        } else {
+          // Return raw data for admin interface
+          return {
+            ...company,
+            industries,
+          } as CompanyWithIndustries;
+        }
+      });
+      
+      // Cache the result
+      this.companiesCache = {
+        data: companiesWithTags,
+        timestamp: Date.now(),
+        language
+      };
+      
+      console.log(`[Storage] getAllCompanies: Returning ${companiesWithTags.length} companies with optimized queries`);
       return companiesWithTags;
     } catch (error) {
       console.error('Error fetching companies:', error);

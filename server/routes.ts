@@ -97,20 +97,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // Companies endpoints with caching headers
+  // Companies endpoints with optimized caching headers
   app.get("/api/companies", async (req, res) => {
     try {
-      // Disable cache headers to prevent caching issues
-      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.set('Pragma', 'no-cache');
-      res.set('Expires', '0');
+      // Optimized caching: Cache for 5 minutes for public data, no cache for admin
+      const companyIsRawData = req.query.raw === 'true';
+      if (companyIsRawData) {
+        // No cache for admin interface
+        res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+      } else {
+        // Cache public data for 5 minutes
+        res.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+        res.set('ETag', `companies-${Date.now()}`);
+      }
       
       const language = req.query.language as string || 'en';
-      const rawData = req.query.raw === 'true'; // For admin interface
+      const requestRawData = req.query.raw === 'true'; // For admin interface
       
-      console.log(`[Companies API] Raw data requested: ${rawData}, language: ${language}`);
+      console.log(`[Companies API] Raw data requested: ${requestRawData}, language: ${language}`);
       
-      if (rawData) {
+      if (requestRawData) {
         // Return raw LocalizedContent objects for admin editing
         const companies = await storage.getAllCompanies(); // No language parameter
         console.log(`[Companies API] Raw companies count: ${companies.length}`);
@@ -664,21 +672,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Positions endpoints with caching headers
+  // Positions endpoints with optimized caching headers
   app.get("/api/positions", async (req, res) => {
     try {
-      // Disable caching for positions to ensure fresh apply links
-      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.set('Pragma', 'no-cache');
-      res.set('Expires', '0');
+      // Optimized caching: Cache for 2 minutes for public data, no cache for admin
+      const positionIsRawData = req.query.raw === 'true';
+      if (positionIsRawData) {
+        // No cache for admin interface
+        res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+      } else {
+        // Cache public data for 2 minutes to ensure fresh apply links
+        res.set('Cache-Control', 'public, max-age=120, s-maxage=120');
+        res.set('ETag', `positions-${Date.now()}`);
+      }
       
       const departmentId = req.query.departmentId ? parseInt(req.query.departmentId as string) : undefined;
       const language = req.query.language as string || 'en';
-      const rawData = req.query.raw === 'true'; // For admin interface
+      const requestRawData = req.query.raw === 'true'; // For admin interface
       
-      console.log('[Positions API] Request params:', { departmentId, language, raw: rawData, query: req.query });
+      console.log('[Positions API] Request params:', { departmentId, language, raw: requestRawData, query: req.query });
       
-      if (rawData) {
+      if (isRawData) {
         // Return raw LocalizedContent objects for admin editing
         const positions = await storage.getAllPositions(departmentId); // No language parameter for raw data
         console.log('[Positions API] Returning raw positions:', positions);

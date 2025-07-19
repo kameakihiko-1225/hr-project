@@ -4,32 +4,52 @@ import { Position, Company, Department } from '@shared/schema';
 // Export API base URL for other components  
 export const API_BASE_URL = '/api';
 
-
-
-// Individual entity fetchers for job position pages
-export const getPositionById = async (id: number): Promise<Position> => {
-  const response = await fetch(`/api/positions/${id}`);
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+// Optimized fetch function with better performance
+const optimizedFetch = async (url: string, options: RequestInit = {}) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'Accept': 'application/json',
+        'Accept-Encoding': 'gzip, deflate, br',
+        ...options.headers,
+      },
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
   }
+};
+
+
+
+// Individual entity fetchers for job position pages with optimized performance
+export const getPositionById = async (id: number): Promise<Position> => {
+  const response = await optimizedFetch(`/api/positions/${id}`);
   const result = await response.json();
   return result.data;
 };
 
 export const getCompanyById = async (id: number): Promise<Company> => {
-  const response = await fetch(`/api/companies/${id}`);
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
+  const response = await optimizedFetch(`/api/companies/${id}`);
   const result = await response.json();
   return result.data;
 };
 
 export const getDepartmentById = async (id: number): Promise<Department> => {
-  const response = await fetch(`/api/departments/${id}`);
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
+  const response = await optimizedFetch(`/api/departments/${id}`);
   const result = await response.json();
   return result.data;
 };

@@ -31,18 +31,17 @@ export const OpenPositions = ({
   const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // Use React Query with language parameter for localization
+  // Use React Query with optimized caching and language parameter for localization
   const [refreshKey, setRefreshKey] = useState(0);
   const { data: positionsResponse, isLoading } = useQuery({
-    queryKey: ['/api/positions', refreshKey, i18n.language], // Include current language
+    queryKey: ['positions', 'all', i18n.language, 'public'], // Optimized query key structure
     queryFn: async () => {
-      const response = await fetch(`/api/positions?language=${i18n.language}&_t=${Date.now()}`, {
+      const response = await fetch(`/api/positions?language=${i18n.language}`, {
         method: 'GET',
         headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
+          'Accept': 'application/json',
+          'Accept-Encoding': 'gzip, deflate, br', // Enable compression
         },
-        cache: 'no-cache', // Disable browser cache
       });
       if (!response.ok) throw new Error('Failed to fetch positions');
       return response.json();

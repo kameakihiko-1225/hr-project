@@ -3,6 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeIndustryTags } from "./init-industry-tags";
+import { compressionMiddleware } from "./middleware/compression.js";
 import { spawn } from "child_process";
 
 // Load environment variables
@@ -11,6 +12,10 @@ dotenv.config();
 // Telegram bot service disabled - webhook now integrated directly into main server
 
 const app = express();
+
+// Add compression middleware for better performance
+app.use(compressionMiddleware);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
