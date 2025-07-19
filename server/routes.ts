@@ -1197,7 +1197,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/positions/stats", async (req, res) => {
     try {
-      const positionId = req.query.positionId ? parseInt(req.query.positionId as string) : undefined;
+      let positionId: number | undefined = undefined;
+      
+      // Robust query parameter validation
+      if (req.query.positionId) {
+        const parsed = parseInt(req.query.positionId as string);
+        if (isNaN(parsed)) {
+          return res.status(400).json({ 
+            success: false, 
+            error: "Invalid positionId parameter. Must be a valid number." 
+          });
+        }
+        positionId = parsed;
+      }
+      
       const stats = await storage.getPositionClickStats(positionId);
       
       res.json({ 

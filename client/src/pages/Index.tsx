@@ -14,6 +14,8 @@ import SEOHead from "@/components/SEOHead";
 import { getPageSEO } from "@/utils/seoUtils";
 import VoiceSearchOptimization from "@/components/VoiceSearchOptimization";
 import { SEOResourcePrefetch, useWebVitals } from "@/components/PerformanceOptimizations";
+import { AdvancedSEO, getHomepageStructuredData } from "@/components/AdvancedSEO";
+import { TopSearchRankingOptimization } from "@/components/TopSearchRankingOptimization";
 
 const Index = () => {
   const { i18n } = useTranslation();
@@ -60,6 +62,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <AdvancedSEO 
+        title="Millat Umidi HR - Top Jobs in Central Asia | Kazakhstan Uzbekistan Kyrgyzstan"
+        description="Find premium career opportunities at Millat Umidi Group. Leading educational and corporate positions in Central Asia. Join our growing team in Kazakhstan, Uzbekistan, and Kyrgyzstan."
+        keywords="millat umidi jobs, central asia careers, uzbekistan jobs, kazakhstan employment, kyrgyzstan vacancies, hr positions, educational jobs, corporate careers, tashkent jobs, almaty careers"
+        canonicalUrl="https://career.millatumidi.uz"
+        structuredData={getHomepageStructuredData()}
+      />
+      <TopSearchRankingOptimization />
       <SEOHead 
         title={seoData.title}
         description={seoData.description}
