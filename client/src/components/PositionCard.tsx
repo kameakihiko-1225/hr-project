@@ -197,18 +197,18 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
 
   const CompanyAvatar = () => (
-    <Avatar className="h-16 w-16 border-2 border-white/30 shadow-2xl group-hover:shadow-3xl group-hover:scale-105 transition-all duration-300">
+    <Avatar className="w-full h-full border-2 border-white/30 shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
       {companyLogoUrl && !logoError ? (
         <AvatarImage 
           src={companyLogoUrl} 
           alt={companyName} 
-          className="object-contain object-center w-full h-full p-2"
+          className="object-contain object-center w-full h-full p-1 sm:p-2"
           loading="lazy"
           decoding="async"
           onError={handleLogoError} 
         />
       ) : (
-        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-lg shadow-inner">
+        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-sm sm:text-lg shadow-inner">
           {companyName.charAt(0)}
         </AvatarFallback>
       )}
@@ -222,7 +222,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[440px] w-full max-w-[460px] flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[400px] sm:h-[440px] w-full flex flex-col"
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -289,15 +289,17 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       )}
 
-      <CardHeader className="flex items-start gap-3 pb-2 pt-4 relative z-10">
-        <CompanyAvatar />
-        <div className="flex-1">
-          <h3 className="font-semibold text-base leading-tight text-foreground">
+      <CardHeader className="flex items-start gap-3 pb-2 pt-3 sm:pt-4 px-3 sm:px-6 relative z-10">
+        <div className="w-12 h-12 sm:w-16 sm:h-16">
+          <CompanyAvatar />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-sm sm:text-base leading-tight text-foreground truncate">
             {companyName}
           </h3>
           {showDepartment && Array.isArray(position.departments) && position.departments.length > 0 && (
-            <p className="text-sm text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
-              <Building2 className="h-4 w-4" />
+            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
+              <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
               {position.departments.map((dp, idx) => (
                 <span key={dp.department.id} className="flex items-center">
                   {getLocalizedContent(dp.department.name)}
@@ -309,20 +311,20 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-2 pb-2 relative z-10 flex-1 flex flex-col">
-        <CardTitle className="text-lg font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title">
+      <CardContent className="space-y-2 pb-2 px-3 sm:px-6 relative z-10 flex-1 flex flex-col">
+        <CardTitle className="text-base sm:text-lg font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title line-clamp-2">
           {getLocalizedContent(position.title)}
         </CardTitle>
 
         {position.description && (
-          <p className="text-sm text-muted-foreground job-card-description line-clamp-2">
+          <p className="text-xs sm:text-sm text-muted-foreground job-card-description line-clamp-2">
             {getLocalizedContent(position.description)}
           </p>
         )}
 
         {/* Salary after description */}
         {position.salaryRange && (
-          <p className="text-sm font-medium text-foreground flex items-center gap-1">
+          <p className="text-xs sm:text-sm font-medium text-foreground flex items-center gap-1">
             <DollarSign className="h-4 w-4" /> {getLocalizedContent(position.salaryRange)}
           </p>
         )}
@@ -337,7 +339,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-center gap-3 border-t border-border pt-3 pb-4 relative z-10 mt-auto shrink-0">
+      <CardFooter className="flex flex-col items-center gap-2 sm:gap-3 border-t border-border pt-2 sm:pt-3 pb-3 sm:pb-4 px-3 sm:px-6 relative z-10 mt-auto shrink-0">
         {postedAgo && (
           <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
         )}
@@ -346,32 +348,32 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0"
+            className="flex items-center justify-center gap-1 flex-1 h-7 sm:h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 min-w-0"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
             }}
           >
             <Building2 className="h-3 w-3 flex-shrink-0" />
-            <span className="hidden lg:inline truncate">{t('position_card.company_info')}</span>
+            <span className="hidden sm:inline truncate">{t('position_card.company_info')}</span>
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0"
+            className="flex items-center justify-center gap-1 flex-1 h-7 sm:h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 min-w-0"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
             }}
           >
             <Briefcase className="h-3 w-3 flex-shrink-0" />
-            <span className="hidden lg:inline truncate">{t('position_card.department_info')}</span>
+            <span className="hidden sm:inline truncate">{t('position_card.department_info')}</span>
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0">
+              <Button variant="outline" size="sm" className="flex items-center justify-center gap-1 flex-1 h-7 sm:h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 min-w-0">
                 <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                <span className="hidden lg:inline truncate">{t('position_card.view_details')}</span>
+                <span className="hidden sm:inline truncate">{t('position_card.view_details')}</span>
               </Button>
             </DialogTrigger>
           <DialogContent className="max-w-md">
@@ -456,24 +458,24 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         {position.applyLink ? (
           <button
             onClick={handleApply}
-            className="px-4 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 w-full justify-center"
+            className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 w-full justify-center h-8 sm:h-10"
           >
             <span className="hidden sm:inline">{t('position_card.apply')}</span>
             <span className="sm:hidden">{t('position_card.apply')}</span>
-            <ExternalLink className="h-4 w-4" />
+            <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
           </button>
         ) : (
           <Button
             onClick={handleApply}
             disabled={isApplying}
-            className="px-4 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 w-full justify-center"
+            className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 w-full justify-center h-8 sm:h-10"
           >
             {isApplying ? 'Generating…' : (
               <>
                 <span className="hidden sm:inline">{t('position_card.apply')}</span>
                 <span className="sm:hidden">{t('position_card.apply')}</span>
               </>
-            )} <Send className="h-4 w-4" />
+            )} <Send className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         )}
       </CardFooter>

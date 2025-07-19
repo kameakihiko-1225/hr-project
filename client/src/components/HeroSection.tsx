@@ -70,7 +70,7 @@ export const HeroSection = () => {
   };
 
   return (
-    <section id="hero-section" className="relative bg-white dark:bg-gray-950 py-20 md:py-24 overflow-hidden">
+    <section id="hero-section" className="relative bg-white dark:bg-gray-950 py-16 sm:py-20 md:py-24 overflow-hidden">
       {/* Subtle background decoration */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       
@@ -102,54 +102,54 @@ export const HeroSection = () => {
               </button>
             </div>
 
-            {/* Statistics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="text-center">
+            {/* Statistics - Optimized for Mobile/Tablet */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-4xl mx-auto">
+              <div className="bg-white/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-sm border border-gray-100 text-center hover:shadow-md transition-all duration-300">
                 <div className="flex items-center justify-center mb-2">
-                  <Building className="h-5 w-5 text-blue-600 mr-1" />
+                  <Building className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                 </div>
                 {isLoading ? (
-                  <Skeleton className="h-8 w-16 mx-auto mb-1" />
+                  <Skeleton className="h-6 sm:h-8 w-12 sm:w-16 mx-auto mb-1" />
                 ) : (
-                  <div className="text-2xl font-bold text-gray-900">{stats.companies}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.companies}</div>
                 )}
-                <div className="text-sm text-gray-600">{t('stats_cards.companies')}</div>
+                <div className="text-xs sm:text-sm text-gray-600 leading-tight">{t('stats_cards.companies')}</div>
               </div>
               
-              <div className="text-center">
+              <div className="bg-white/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-sm border border-gray-100 text-center hover:shadow-md transition-all duration-300">
                 <div className="flex items-center justify-center mb-2">
-                  <Users className="h-5 w-5 text-green-600 mr-1" />
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                 </div>
                 {isLoading ? (
-                  <Skeleton className="h-8 w-16 mx-auto mb-1" />
+                  <Skeleton className="h-6 sm:h-8 w-12 sm:w-16 mx-auto mb-1" />
                 ) : (
-                  <div className="text-2xl font-bold text-gray-900">{stats.departments}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.departments}</div>
                 )}
-                <div className="text-sm text-gray-600">{t('stats_cards.departments')}</div>
+                <div className="text-xs sm:text-sm text-gray-600 leading-tight">{t('stats_cards.departments')}</div>
               </div>
               
-              <div className="text-center">
+              <div className="bg-white/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-sm border border-gray-100 text-center hover:shadow-md transition-all duration-300">
                 <div className="flex items-center justify-center mb-2">
-                  <Briefcase className="h-5 w-5 text-purple-600 mr-1" />
+                  <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                 </div>
                 {isLoading ? (
-                  <Skeleton className="h-8 w-16 mx-auto mb-1" />
+                  <Skeleton className="h-6 sm:h-8 w-12 sm:w-16 mx-auto mb-1" />
                 ) : (
-                  <div className="text-2xl font-bold text-gray-900">{stats.positions}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.positions}</div>
                 )}
-                <div className="text-sm text-gray-600">{t('stats_cards.positions')}</div>
+                <div className="text-xs sm:text-sm text-gray-600 leading-tight">{t('stats_cards.positions')}</div>
               </div>
               
-              <div className="text-center">
+              <div className="bg-white/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-sm border border-gray-100 text-center hover:shadow-md transition-all duration-300">
                 <div className="flex items-center justify-center mb-2">
-                  <Users className="h-5 w-5 text-orange-600 mr-1" />
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
                 </div>
                 {isLoading ? (
-                  <Skeleton className="h-8 w-16 mx-auto mb-1" />
+                  <Skeleton className="h-6 sm:h-8 w-12 sm:w-16 mx-auto mb-1" />
                 ) : (
-                  <div className="text-2xl font-bold text-gray-900">{stats.applicants}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.applicants}</div>
                 )}
-                <div className="text-sm text-gray-600">{t('stats_cards.applicants')}</div>
+                <div className="text-xs sm:text-sm text-gray-600 leading-tight">{t('stats_cards.applicants')}</div>
               </div>
             </div>
 

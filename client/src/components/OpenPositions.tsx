@@ -237,15 +237,15 @@ export const OpenPositions = ({
   };
 
   return (
-    <section id="open-positions" className="relative py-16 px-6 bg-white dark:bg-gray-950 overflow-hidden">
+    <section id="open-positions" className="relative py-12 sm:py-16 px-4 sm:px-6 bg-white dark:bg-gray-950 overflow-hidden">
       {/* Subtle background decoration - same as hero */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       <div className="max-w-7xl mx-auto relative">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
             {t('positions.available_positions')}
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-4">
             {t('positions.apply_instantly')}
           </p>
           
@@ -281,11 +281,11 @@ export const OpenPositions = ({
           {filteredPositions.length > 0 ? (
             <>
               {viewMode === "grid" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 justify-items-center">
                   {currentPositions.map((pos, index) => {
                     const applicantData = applicantCountMap.get(pos.id);
                     return (
-                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[460px]">
+                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[400px] sm:max-w-[460px]">
                         <PositionCard 
                           position={pos} 
                           applicantCount={applicantData?.count}

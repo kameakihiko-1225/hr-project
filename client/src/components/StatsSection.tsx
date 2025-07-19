@@ -69,47 +69,47 @@ export const StatsSection = () => {
     setIsCompact(isMobile);
   }, [isMobile]);
 
-  // Render a compact horizontal stat card
+  // Render a compact horizontal stat card - Improved for mobile/tablet
   const renderCompactStat = (stat: any, index: number) => (
     <div 
       key={stat.label}
-      className="bg-white p-3 rounded-lg shadow border border-gray-100 flex items-center gap-3 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
+      className="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
       style={{ animationDelay: `${index * 100}ms` }}
     >
-      <div className={`flex-shrink-0 w-10 h-10 bg-gradient-to-r ${stat.color} rounded-lg flex items-center justify-center`}>
-        <stat.icon className="h-5 w-5 text-white" />
+      <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center`}>
+        <stat.icon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
       </div>
       
       <div className="flex-grow min-w-0">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold text-gray-900">{stat.number}</h3>
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900">{stat.number}</h3>
         </div>
         <div className="flex flex-col">
           <h4 className="text-sm font-semibold text-gray-800 truncate">{stat.label}</h4>
-          <p className="text-xs text-gray-600 truncate">{stat.description}</p>
+          <p className="text-xs text-gray-600 line-clamp-1">{stat.description}</p>
         </div>
       </div>
     </div>
   );
 
-  // Render a standard stat card
+  // Render a standard stat card - Improved for mobile/tablet
   const renderStatCard = (stat: any, index: number) => (
     <div 
       key={stat.label}
-      className="text-center bg-white p-6 rounded-xl shadow border border-gray-100 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
+      className="text-center bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
       style={{ animationDelay: `${index * 150}ms` }}
     >
-      <div className={`w-14 h-14 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mx-auto mb-4`}>
-        <stat.icon className="h-6 w-6 text-white" />
+      <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4`}>
+        <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
       </div>
-      <h3 className="text-3xl font-bold text-gray-900 mb-1">{stat.number}</h3>
-      <h4 className="text-base font-semibold text-gray-800 mb-1">{stat.label}</h4>
-      <p className="text-gray-600 text-sm">{stat.description}</p>
+      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stat.number}</h3>
+      <h4 className="text-sm sm:text-base font-semibold text-gray-800 mb-1 leading-tight">{stat.label}</h4>
+      <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">{stat.description}</p>
     </div>
   );
 
   return (
-    <section className="relative py-20 md:py-24 bg-white dark:bg-gray-950 overflow-hidden">
+    <section className="relative py-16 sm:py-20 md:py-24 bg-white dark:bg-gray-950 overflow-hidden">
       {/* Subtle background decoration - same as hero */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -131,15 +131,16 @@ export const StatsSection = () => {
           )}
         </div>
 
-        {isCompact ? (
-          <div className="flex flex-col space-y-3">
-            {stats.map((stat, index) => renderCompactStat(stat, index))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, index) => renderStatCard(stat, index))}
-          </div>
-        )}
+        {/* Render stats grid - Improved responsive layout */}
+        <div className={`animate-fade-in ${
+          isCompact 
+            ? "grid grid-cols-1 gap-3 max-w-md mx-auto" 
+            : "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6"
+        }`}>
+          {stats.map((stat, index) => 
+            isCompact ? renderCompactStat(stat, index) : renderStatCard(stat, index)
+          )}
+        </div>
       </div>
     </section>
   );
