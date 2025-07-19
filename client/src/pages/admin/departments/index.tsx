@@ -314,7 +314,7 @@ export default function DepartmentsPage() {
                 department={department}
                 onEdit={() => handleEditDepartment(department)}
                 onDelete={() => handleDeleteDepartment(department)}
-                showCompany={selectedCompanyId === 'all'}
+                showCompany={true}
               />
             ))}
           </div>

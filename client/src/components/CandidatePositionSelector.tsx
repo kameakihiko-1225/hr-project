@@ -270,6 +270,7 @@ export function CandidatePositionSelector({
                       key={department.id}
                       department={{...department, positionCount: 0, companyId: department.companyId || 0, createdAt: department.createdAt || null}}
                       onClick={() => handleDepartmentSelect(department)}
+                      showCompany={true}
                     />
                   ))}
                 </div>
