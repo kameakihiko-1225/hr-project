@@ -38,7 +38,7 @@ import { CompanyCard } from "@/components/CompanyCard";
 import { toast } from "@/components/ui/use-toast";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { generateRandomColor } from "@/lib/utils";
-import api from "@/lib/api";
+import { getCompanies } from "@/lib/api";
 import { Company, IndustryTag } from "@/types/company";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -95,11 +95,21 @@ export default function CompaniesPage() {
       
       // For admin interface, we want to get the raw data without language filtering
       // so we can edit all language versions
-      const response = await api.get('/companies?raw=true');
+      const response = await fetch('/api/companies?raw=true', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       
-      if (response.success) {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
         // The actual API returns data directly, not nested under companies
-        const companiesData = response.data || [];
+        const companiesData = result.data || [];
         logger.info(`Fetched ${companiesData.length} companies`);
         console.log(`[DEBUG] [companiesPage] Raw companies data:`, companiesData);
         const cleanedData = companiesData.map((company: Company) => {
@@ -113,7 +123,7 @@ export default function CompaniesPage() {
         setCompanies(cleanedData);
         setFilteredCompanies(cleanedData);
       } else {
-        logger.error('Failed to fetch companies', response.error);
+        logger.error('Failed to fetch companies', result.error);
         toast({
           title: "Error",
           description: "Failed to load companies. Please try again later.",

@@ -1,0 +1,54 @@
+logger.js:2 [ERROR] [companiesPage] Error fetching companies TypeError: api.get is not a function
+    at fetchCompanies (index.tsx:98:34)
+    at index.tsx:136:5
+    at commitHookEffectListMount (chunk-RPCDYKBN.js?v=f6b91ddf:16915:34)
+    at commitPassiveMountOnFiber (chunk-RPCDYKBN.js?v=f6b91ddf:18156:19)
+    at commitPassiveMountEffects_complete (chunk-RPCDYKBN.js?v=f6b91ddf:18129:17)
+    at commitPassiveMountEffects_begin (chunk-RPCDYKBN.js?v=f6b91ddf:18119:15)
+    at commitPassiveMountEffects (chunk-RPCDYKBN.js?v=f6b91ddf:18109:11)
+    at flushPassiveEffectsImpl (chunk-RPCDYKBN.js?v=f6b91ddf:19490:11)
+    at flushPassiveEffects (chunk-RPCDYKBN.js?v=f6b91ddf:19447:22)
+    at commitRootImpl (chunk-RPCDYKBN.js?v=f6b91ddf:19416:13) Error Component Stack
+    at CompaniesPage (index.tsx:61:37)
+    at Route (wouter.js?v=f6b91ddf:323:16)
+    at Switch (wouter.js?v=f6b91ddf:379:17)
+    at Router (wouter.js?v=f6b91ddf:291:17)
+    at ClickCounterProvider (ClickCounterContext.tsx:30:77)
+    at Provider (chunk-E7IAXTU4.js?v=f6b91ddf:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=f6b91ddf:60:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=f6b91ddf:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+format @ logger.js:2
+error @ logger.js:7
+fetchCompanies @ index.tsx:124
+(anonymous) @ index.tsx:136
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=f6b91ddf:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=f6b91ddf:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=f6b91ddf:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=f6b91ddf:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=f6b91ddf:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=f6b91ddf:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=f6b91ddf:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=f6b91ddf:19416
+commitRoot @ chunk-RPCDYKBN.js?v=f6b91ddf:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=f6b91ddf:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=f6b91ddf:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=f6b91ddf:18627
+index.tsx:100 Failed to load positions: Invalid data
+overrideMethod @ hook.js:608
+fetchData @ index.tsx:100
+await in fetchData
+(anonymous) @ index.tsx:126
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=f6b91ddf:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=f6b91ddf:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=f6b91ddf:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=f6b91ddf:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=f6b91ddf:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=f6b91ddf:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=f6b91ddf:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=f6b91ddf:19416
+commitRoot @ chunk-RPCDYKBN.js?v=f6b91ddf:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=f6b91ddf:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=f6b91ddf:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=f6b91ddf:18627
