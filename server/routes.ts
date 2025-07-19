@@ -694,7 +694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('[Positions API] Request params:', { departmentId, language, raw: requestRawData, query: req.query });
       
-      if (isRawData) {
+      if (requestRawData) {
         // Return raw LocalizedContent objects for admin editing
         const positions = await storage.getAllPositions(departmentId); // No language parameter for raw data
         console.log('[Positions API] Returning raw positions:', positions);

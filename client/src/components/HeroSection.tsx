@@ -28,21 +28,41 @@ export const HeroSection = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [positionsData, departmentsData, companiesData, clickStatsResponse] = await Promise.all([
-          getPositions(),
+        const [positionsResponse, departmentsData, companiesData, clickStatsResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/positions?language=en`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Cache-Control': 'no-cache'
+            }
+          }),
           getDepartments(),
           getCompanies(),
           fetch(`${API_BASE_URL}/dashboard/click-stats`)
         ]);
 
+        if (!positionsResponse.ok) {
+          throw new Error(`Positions API failed: ${positionsResponse.status} ${positionsResponse.statusText}`);
+        }
+
+        const positionsData = await positionsResponse.json();
         const clickStatsData = await clickStatsResponse.json();
+        
+        // Debug logging
+        console.log('Positions response:', positionsData);
+        console.log('Positions response status:', positionsResponse.ok);
+        console.log('Companies data:', companiesData);
+        console.log('Departments data:', departmentsData);
+        console.log('Click stats:', clickStatsData);
+        
         // Use the total applies count from click stats as applicants data
         const realApplicantsCount = clickStatsData.success && clickStatsData.data ? clickStatsData.data.totalApplies : 0;
+        const positionsCount = positionsData.success && positionsData.data ? positionsData.data.length : 0;
 
         setStats({
           companies: companiesData?.data?.length || 0,
           departments: departmentsData?.length || 0,
-          positions: positionsData?.length || 0,
+          positions: positionsCount,
           applicants: realApplicantsCount // Real applicant data from database
         });
       } catch (error) {

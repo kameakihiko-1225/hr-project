@@ -195,6 +195,15 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const companyName = inheritedData.companyName;
   const companyLogoUrl = inheritedData.logoUrl;
   const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
+  
+  // Debug logging for logo URL
+  console.log('PositionCard Debug:', {
+    positionId: position.id,
+    companyName,
+    companyLogoUrl,
+    logoError,
+    logoExists: companyLogoUrl ? true : false
+  });
 
   const CompanyAvatar = () => (
     <Avatar className="w-full h-full border-2 border-white/30 shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
@@ -205,7 +214,8 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           className="object-contain object-center w-full h-full p-1 sm:p-2"
           loading="lazy"
           decoding="async"
-          onError={handleLogoError} 
+          onError={handleLogoError}
+          onLoad={() => console.log('✅ Logo loaded successfully:', companyLogoUrl)}
         />
       ) : (
         <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-sm sm:text-lg shadow-inner">
