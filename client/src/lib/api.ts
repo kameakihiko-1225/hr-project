@@ -4,6 +4,8 @@ import { Position, Company, Department } from '@shared/schema';
 // Export API base URL for other components  
 export const API_BASE_URL = '/api';
 
+
+
 // Individual entity fetchers for job position pages
 export const getPositionById = async (id: number): Promise<Position> => {
   const response = await fetch(`/api/positions/${id}`);
@@ -192,10 +194,35 @@ const post = async (endpoint: string, data: any) => {
   return response.json();
 };
 
+const put = async (endpoint: string, data: any) => {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};
+
+const del = async (endpoint: string) => {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' }
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};
+
 // Default export for backward compatibility
 const api = {
   get,
   post,
+  put,
+  delete: del,
   getPositions,
   getDepartments, 
   getCompanies,
@@ -215,3 +242,4 @@ const api = {
 };
 
 export default api;
+export { api };

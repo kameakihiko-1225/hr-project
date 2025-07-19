@@ -38,7 +38,7 @@ import { CompanyCard } from "@/components/CompanyCard";
 import { toast } from "@/components/ui/use-toast";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { generateRandomColor } from "@/lib/utils";
-import { getCompanies } from "@/lib/api";
+import { getCompanies, api } from "@/lib/api";
 import { Company, IndustryTag } from "@/types/company";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
