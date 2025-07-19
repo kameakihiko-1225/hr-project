@@ -25,12 +25,12 @@ export const CompanyCarousel = () => {
     const startAutoScroll = () => {
       intervalRef.current = window.setInterval(() => {
         if (!container) return;
-        container.scrollLeft += 1;
+        container.scrollLeft += 1.5;
         // reset for infinite scroll illusion
         if (container.scrollLeft >= container.scrollWidth / 2) {
           container.scrollLeft = 0;
         }
-      }, 20);
+      }, 30);
     };
 
     startAutoScroll();
@@ -52,7 +52,7 @@ export const CompanyCarousel = () => {
   }, []);
 
   return (
-    <section className="py-12 bg-gray-50 overflow-hidden">
+    <section className="py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
           {t('company_logos_title')}
@@ -60,23 +60,35 @@ export const CompanyCarousel = () => {
         <div className="relative">
           <div
             ref={scrollRef}
-            className="flex space-x-12 overflow-x-auto scrollbar-hide"
+            className="flex space-x-8 overflow-x-auto scrollbar-hide pb-4"
             style={{ 
               scrollBehavior: 'smooth',
-              WebkitOverflowScrolling: 'touch'
+              WebkitOverflowScrolling: 'touch',
+              height: '200px'
             }}
           >
             {logos.map((file, idx) => (
               <div
                 key={`${file}-${idx}`}
-                className="flex-shrink-0 w-56 h-44 bg-white rounded-2xl shadow-md ring-1 ring-gray-200 flex items-center justify-center px-4 transition-transform hover:shadow-xl hover:-translate-y-1"
-                style={{ minWidth: '224px', minHeight: '176px' }}
+                className="flex-shrink-0 bg-white rounded-2xl shadow-md ring-1 ring-gray-200 flex items-center justify-center p-6 transition-transform hover:shadow-xl hover:-translate-y-1"
+                style={{ 
+                  width: '200px', 
+                  height: '160px',
+                  minWidth: '200px',
+                  minHeight: '160px'
+                }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`/companies/${file}`}
-                  alt="Company logo"
-                  className="max-h-32 max-w-full object-contain"
+                  alt={`${file.split('.')[0]} logo`}
+                  className="max-h-24 max-w-full object-contain"
+                  style={{
+                    width: 'auto',
+                    height: 'auto',
+                    maxWidth: '100%',
+                    maxHeight: '96px'
+                  }}
                   onError={(e) => {
                     console.error(`Failed to load image: /companies/${file}`);
                     e.currentTarget.style.border = '2px solid red';
