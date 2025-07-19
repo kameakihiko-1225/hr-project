@@ -73,6 +73,12 @@ export const CompanyCarousel = () => {
                   src={`/companies/${file}`}
                   alt="Company logo"
                   className="max-h-32 max-w-full object-contain"
+                  onError={(e) => {
+                    console.error(`Failed to load image: /companies/${file}`);
+                    e.currentTarget.style.border = '2px solid red';
+                    e.currentTarget.alt = `Failed to load: ${file}`;
+                  }}
+                  onLoad={() => console.log(`Successfully loaded: /companies/${file}`)}
                 />
               </div>
             ))}
