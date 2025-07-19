@@ -693,6 +693,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Position stats endpoint - must come before /api/positions/:id
+  app.get("/api/positions/stats", async (req, res) => {
+    try {
+      let positionId: number | undefined = undefined;
+      
+      // Robust query parameter validation
+      if (req.query.positionId) {
+        const parsed = parseInt(req.query.positionId as string);
+        if (isNaN(parsed)) {
+          return res.status(400).json({ 
+            success: false, 
+            error: "Invalid positionId parameter. Must be a valid number." 
+          });
+        }
+        positionId = parsed;
+      }
+      
+      const stats = await storage.getPositionClickStats(positionId);
+      
+      res.json({ 
+        success: true, 
+        data: stats 
+      });
+    } catch (error) {
+      console.error('Error fetching position stats:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch position stats" });
+    }
+  });
+
   app.get("/api/positions/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -1192,34 +1221,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error tracking position click:', error);
       res.status(500).json({ success: false, error: "Failed to track position click" });
-    }
-  });
-
-  app.get("/api/positions/stats", async (req, res) => {
-    try {
-      let positionId: number | undefined = undefined;
-      
-      // Robust query parameter validation
-      if (req.query.positionId) {
-        const parsed = parseInt(req.query.positionId as string);
-        if (isNaN(parsed)) {
-          return res.status(400).json({ 
-            success: false, 
-            error: "Invalid positionId parameter. Must be a valid number." 
-          });
-        }
-        positionId = parsed;
-      }
-      
-      const stats = await storage.getPositionClickStats(positionId);
-      
-      res.json({ 
-        success: true, 
-        data: stats 
-      });
-    } catch (error) {
-      console.error('Error fetching position stats:', error);
-      res.status(500).json({ success: false, error: "Failed to fetch position stats" });
     }
   });
 
