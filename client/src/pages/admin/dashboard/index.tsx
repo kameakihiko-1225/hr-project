@@ -124,11 +124,44 @@ export default function Dashboard() {
     refetchOnWindowFocus: false,
   });
 
-  // Fetch positions for title mapping
-  const { data: positionsData } = useQuery<{ success: boolean; data: Array<{ id: number; title: string }> }>({
+  // Fetch positions with department and company information for title mapping
+  const { data: positionsData } = useQuery<{ success: boolean; data: Array<{ 
+    id: number; 
+    title: string; 
+    departmentId: number;
+  }> }>({
     queryKey: ['positions'],
     queryFn: async () => {
       const response = await fetch('/api/positions');
+      return response.json();
+    },
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  // Fetch departments for department names
+  const { data: departmentsData } = useQuery<{ success: boolean; data: Array<{ 
+    id: number; 
+    name: string; 
+    companyId: number;
+  }> }>({
+    queryKey: ['departments'],
+    queryFn: async () => {
+      const response = await fetch('/api/departments');
+      return response.json();
+    },
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  // Fetch companies for company names
+  const { data: companiesData } = useQuery<{ success: boolean; data: Array<{ 
+    id: number; 
+    name: string; 
+  }> }>({
+    queryKey: ['companies'],
+    queryFn: async () => {
+      const response = await fetch('/api/companies');
       return response.json();
     },
     retry: 1,
@@ -177,8 +210,15 @@ export default function Dashboard() {
 
   const stats = data?.data;
   const clickStats = clickStatsData?.success ? clickStatsData.data : { totalViews: 0, totalApplies: 0 };
-  const positionStats = positionStatsData?.success ? positionStatsData.data : [];
+  const allPositionStats = positionStatsData?.success ? positionStatsData.data : [];
   const positions = positionsData?.success ? positionsData.data : [];
+  const departments = departmentsData?.success ? departmentsData.data : [];
+  const companies = companiesData?.success ? companiesData.data : [];
+  
+  // Filter position stats to only include positions that exist in the database
+  const positionStats = allPositionStats.filter(stat => 
+    positions.some(position => position.id === stat.positionId)
+  );
 
   // Helper function to calculate conversion rate
   const calculateConversionRate = (views: number, applies: number) => {
@@ -186,10 +226,26 @@ export default function Dashboard() {
     return ((applies / views) * 100).toFixed(1);
   };
 
-  // Helper function to get position title
-  const getPositionTitle = (positionId: number) => {
+  // Helper function to get position title with department and company
+  const getPositionInfo = (positionId: number) => {
     const position = positions.find(p => p.id === positionId);
-    return position?.title || `Position #${positionId}`;
+    if (!position) {
+      return {
+        title: `Position #${positionId}`,
+        department: '',
+        company: ''
+      };
+    }
+    
+    // Find department and company information
+    const department = departments.find(d => d.id === position.departmentId);
+    const company = department ? companies.find(c => c.id === department.companyId) : null;
+    
+    return {
+      title: position.title || `Position #${positionId}`,
+      department: department?.name || '',
+      company: company?.name || ''
+    };
   };
 
   const statCards = [
@@ -444,37 +500,48 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="space-y-4">
-                {positionStats.map((stat) => (
-                  <div key={stat.positionId} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">{getPositionTitle(stat.positionId)}</h3>
-                      <p className="text-sm text-gray-500">Position ID: {stat.positionId}</p>
+                {positionStats.map((stat) => {
+                  const positionInfo = getPositionInfo(stat.positionId);
+                  return (
+                    <div key={stat.positionId} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="flex-1">
+                        <h3 className="font-medium text-gray-900">{positionInfo.title}</h3>
+                        <div className="text-sm text-gray-500 space-y-1">
+                          {positionInfo.department && (
+                            <p>Department: {positionInfo.department}</p>
+                          )}
+                          {positionInfo.company && (
+                            <p>Company: {positionInfo.company}</p>
+                          )}
+                          <p>Position ID: {stat.positionId}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-6 text-sm">
+                        <div className="text-center">
+                          <div className="font-semibold text-blue-600 flex items-center gap-1">
+                            <Eye className="h-4 w-4" />
+                            {stat.viewCount}
+                          </div>
+                          <div className="text-gray-500">Views</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-semibold text-green-600 flex items-center gap-1">
+                            <MousePointer className="h-4 w-4" />
+                            {stat.applyCount}
+                          </div>
+                          <div className="text-gray-500">Applies</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-semibold text-purple-600 flex items-center gap-1">
+                            <BarChart3 className="h-4 w-4" />
+                            {calculateConversionRate(stat.viewCount, stat.applyCount)}%
+                          </div>
+                          <div className="text-gray-500">Rate</div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-6 text-sm">
-                      <div className="text-center">
-                        <div className="font-semibold text-blue-600 flex items-center gap-1">
-                          <Eye className="h-4 w-4" />
-                          {stat.viewCount}
-                        </div>
-                        <div className="text-gray-500">Views</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="font-semibold text-green-600 flex items-center gap-1">
-                          <MousePointer className="h-4 w-4" />
-                          {stat.applyCount}
-                        </div>
-                        <div className="text-gray-500">Applies</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="font-semibold text-purple-600 flex items-center gap-1">
-                          <BarChart3 className="h-4 w-4" />
-                          {calculateConversionRate(stat.viewCount, stat.applyCount)}%
-                        </div>
-                        <div className="text-gray-500">Rate</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>
