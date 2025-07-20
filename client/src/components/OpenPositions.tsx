@@ -176,6 +176,11 @@ export const OpenPositions = ({
       });
 
     return companyMatch && departmentMatch && positionMatch;
+  }).sort((a, b) => {
+    // Sort by application count in descending order (most applied first)
+    const aCount = applicantCountMap.get(a.id)?.count || 0;
+    const bCount = applicantCountMap.get(b.id)?.count || 0;
+    return bCount - aCount; // Descending order: highest applications first
   });
 
   // Filtering is working correctly - removed debug logs
