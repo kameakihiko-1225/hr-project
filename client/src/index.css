@@ -40,7 +40,7 @@
 
 .founder-image-container .founder-name-text {
   position: absolute;
-  bottom: -40px;
+  bottom: -15px; /* Reduced from -40px for better desktop spacing */
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -55,6 +55,11 @@
   .founder-section-layout {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+  
+  /* Keep original mobile spacing */
+  .founder-image-container .founder-name-text {
+    bottom: -40px;
   }
 }
 
