@@ -29,7 +29,7 @@ export const OpenPositions = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const isMobile = useIsMobile();
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
 
   // Use React Query with optimized caching and language parameter for localization
   const [refreshKey, setRefreshKey] = useState(0);
@@ -77,10 +77,7 @@ export const OpenPositions = ({
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Set view mode based on mobile state
-  useEffect(() => {
-    setViewMode(isMobile ? "list" : "grid");
-  }, [isMobile]);
+
 
   // Use React Query for departments and companies with proper caching
   const { data: departmentsResponse } = useQuery({
@@ -192,9 +189,7 @@ export const OpenPositions = ({
   };
 
   // Toggle view mode
-  const toggleViewMode = () => {
-    setViewMode(viewMode === "grid" ? "list" : "grid");
-  };
+
 
   // Render pagination controls
   const renderPagination = () => {
@@ -263,86 +258,58 @@ export const OpenPositions = ({
             </div>
           )}
 
-          {isMobile && filteredPositions.length > 0 && hasSearched && (
-            <div className="mt-4">
-              <Button
-                onClick={toggleViewMode}
-                variant="outline"
-                size="sm"
-                className="text-xs"
-              >
-{viewMode === "grid" ? t('positions.switch_to_list') : t('positions.switch_to_grid')}
-              </Button>
-            </div>
-          )}
+
         </div>
 
         <div id="job-listings">
           {filteredPositions.length > 0 ? (
             <>
-              {viewMode === "grid" ? (
-                <div className="md:grid md:grid-cols-2 xl:grid-cols-3 md:gap-6 md:justify-items-center">
-                  {/* Mobile horizontal scroll container - Enhanced compact view */}
-                  <div className="md:hidden overflow-x-auto scrollbar-hide pb-2">
-                    <div className="flex gap-2 px-2 sm:gap-3 sm:px-3" style={{ width: 'max-content' }}>
-                      {currentPositions.map((pos, index) => {
-                        const applicantData = applicantCountMap.get(pos.id);
-                        return (
-                          <div 
-                            key={pos.id} 
-                            style={{ animationDelay: `${index * 100}ms` }} 
-                            className="animate-fade-in flex-shrink-0 w-[260px] sm:w-[300px]"
-                          >
-                            <PositionCard 
-                              position={pos} 
-                              applicantCount={applicantData?.count}
-                              topTierBadge={applicantData?.topTierBadge}
-                              compactMobile={true}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {/* Enhanced scroll indicator for mobile */}
-                    <div className="flex justify-center items-center mt-3">
-                      <div className="flex items-center space-x-1">
-                        {currentPositions.slice(0, Math.min(4, currentPositions.length)).map((_, index) => (
-                          <div key={index} className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                        ))}
-                        {currentPositions.length > 4 && (
-                          <div className="text-xs text-blue-600 ml-2 font-medium">
-                            +{currentPositions.length - 4} more →
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Desktop grid layout */}
-                  <div className="hidden md:contents">
+              {/* Always show horizontal scroll on mobile, grid on desktop */}
+              <div className="md:grid md:grid-cols-2 xl:grid-cols-3 md:gap-6 md:justify-items-center">
+                {/* Mobile horizontal scroll container - Always enabled */}
+                <div className="md:hidden overflow-x-auto scrollbar-hide pb-2">
+                  <div className="flex gap-2 px-2 sm:gap-3 sm:px-3" style={{ width: 'max-content' }}>
                     {currentPositions.map((pos, index) => {
                       const applicantData = applicantCountMap.get(pos.id);
                       return (
-                        <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[460px]">
+                        <div 
+                          key={pos.id} 
+                          style={{ animationDelay: `${index * 100}ms` }} 
+                          className="animate-fade-in flex-shrink-0 w-[260px] sm:w-[300px]"
+                        >
                           <PositionCard 
                             position={pos} 
                             applicantCount={applicantData?.count}
                             topTierBadge={applicantData?.topTierBadge}
+                            compactMobile={true}
                           />
                         </div>
                       );
                     })}
                   </div>
+                  {/* Enhanced scroll indicator for mobile */}
+                  <div className="flex justify-center items-center mt-3">
+                    <div className="flex items-center space-x-1">
+                      {currentPositions.slice(0, Math.min(4, currentPositions.length)).map((_, index) => (
+                        <div key={index} className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                      ))}
+                      {currentPositions.length > 4 && (
+                        <div className="text-xs text-blue-600 ml-2 font-medium">
+                          +{currentPositions.length - 4} more →
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div className="flex flex-col space-y-3 sm:space-y-4 md:space-y-6">
+                
+                {/* Desktop grid layout */}
+                <div className="hidden md:contents">
                   {currentPositions.map((pos, index) => {
                     const applicantData = applicantCountMap.get(pos.id);
                     return (
-                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in max-w-none">
+                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[460px]">
                         <PositionCard 
                           position={pos} 
-                          showDepartment={true} 
                           applicantCount={applicantData?.count}
                           topTierBadge={applicantData?.topTierBadge}
                         />
@@ -350,7 +317,7 @@ export const OpenPositions = ({
                     );
                   })}
                 </div>
-              )}
+              </div>
               
               {renderPagination()}
               
