@@ -180,11 +180,15 @@ export const OpenPositions = ({
 
   // Filtering is working correctly - removed debug logs
 
-  // Calculate pagination
+  // Calculate pagination - only for desktop, show all on mobile
   const totalPages = Math.ceil(filteredPositions.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPositions = filteredPositions.slice(indexOfFirstItem, indexOfLastItem);
+  
+  // Show all positions on mobile (no pagination), paginate on desktop
+  const currentPositions = isMobile 
+    ? filteredPositions 
+    : filteredPositions.slice(indexOfFirstItem, indexOfLastItem);
 
   // Generate page numbers for pagination
   const pageNumbers = [];
@@ -215,9 +219,9 @@ export const OpenPositions = ({
   // Toggle view mode
 
 
-  // Render pagination controls
+  // Render pagination controls - only on desktop
   const renderPagination = () => {
-    if (totalPages <= 1) return null;
+    if (totalPages <= 1 || isMobile) return null;
     
     return (
       <div className="mt-10">
@@ -362,9 +366,12 @@ export const OpenPositions = ({
               
               {renderPagination()}
               
-              <div className="text-center text-gray-500 mt-4">
-{t('positions.showing')} {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredPositions.length)} {t('positions.of')} {filteredPositions.length} {filteredPositions.length === 1 ? t('positions.position_found') : t('positions.positions_found')}
-              </div>
+              {/* Show position count info only on desktop */}
+              {!isMobile && (
+                <div className="text-center text-gray-500 mt-4">
+                  {t('positions.showing')} {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredPositions.length)} {t('positions.of')} {filteredPositions.length} {filteredPositions.length === 1 ? t('positions.position_found') : t('positions.positions_found')}
+                </div>
+              )}
             </>
           ) : !error && !isLoading ? (
             <Alert variant="default" className="bg-blue-50 border-blue-200 mb-12">
