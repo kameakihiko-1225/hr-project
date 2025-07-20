@@ -1702,15 +1702,15 @@ Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term`;
 
   const httpServer = createServer(app);
 
-  // Initialize gallery data on startup
-  setTimeout(async () => {
-    try {
-      await initializeGalleryData();
-      console.log("Gallery data initialized successfully");
-    } catch (error) {
-      console.error("Error initializing gallery data:", error);
-    }
-  }, 2000);
+  // Initialize gallery data on startup - DISABLED to preserve blog deletions
+  // setTimeout(async () => {
+  //   try {
+  //     await initializeGalleryData();
+  //     console.log("Gallery data initialized successfully");
+  //   } catch (error) {
+  //     console.error("Error initializing gallery data:", error);
+  //   }
+  // }, 2000);
 
   return httpServer;
 }
