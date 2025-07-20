@@ -33,22 +33,32 @@ export const OpenPositions = ({
 
   // Use React Query with optimized caching and language parameter for localization
   const [refreshKey, setRefreshKey] = useState(0);
-  const { data: positionsResponse, isLoading } = useQuery({
+  const { data: positionsResponse, isLoading, error } = useQuery({
     queryKey: ['positions', 'all', i18n.language, 'public'], // Optimized query key structure
     queryFn: async () => {
-      const response = await fetch(`/api/positions?language=${i18n.language}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Accept-Encoding': 'gzip, deflate, br', // Enable compression
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch positions');
-      return response.json();
+      try {
+        const response = await fetch(`/api/positions?language=${i18n.language}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br', // Enable compression
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: Failed to fetch positions`);
+        }
+        const data = await response.json();
+        return data;
+      } catch (err) {
+        console.error('Error fetching positions:', err);
+        throw err;
+      }
     },
     staleTime: 0,
     gcTime: 0, 
     refetchOnMount: true,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const allPositions = positionsResponse?.data || [];
@@ -134,8 +144,18 @@ export const OpenPositions = ({
     const department = departments.find(d => d.id === pos.departmentId);
     const company = department ? companies.find(c => c.id === department.companyId) : null;
 
-    const companyName = company?.name || '';
-    const departmentName = department?.name || '';
+    // Handle localized content properly
+    const getLocalizedText = (content: any) => {
+      if (!content) return '';
+      if (typeof content === 'string') return content;
+      if (typeof content === 'object') {
+        return content[i18n.language] || content.en || content.ru || content.uz || '';
+      }
+      return '';
+    };
+
+    const companyName = getLocalizedText(company?.name) || '';
+    const departmentName = getLocalizedText(department?.name) || '';
 
     const toLower = (s: string) => s.toLowerCase();
 
@@ -149,7 +169,11 @@ export const OpenPositions = ({
 
     const positionMatch =
       selectedPositions.length === 0 ||
-      selectedPositions.some(sel => toLower(pos.title || '').includes(toLower(sel)));
+      selectedPositions.some(sel => {
+        const posTitle = typeof pos.title === 'string' ? pos.title : 
+                        (pos.title && typeof pos.title === 'object' && pos.title.en) ? pos.title.en : '';
+        return toLower(posTitle).includes(toLower(sel));
+      });
 
     return companyMatch && departmentMatch && positionMatch;
   });
@@ -262,7 +286,24 @@ export const OpenPositions = ({
         </div>
 
         <div id="job-listings">
-          {filteredPositions.length > 0 ? (
+          {error && (
+            <Alert variant="destructive" className="mb-8">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error loading positions</AlertTitle>
+              <AlertDescription>
+                {error instanceof Error ? error.message : 'Failed to load positions. Please try again.'}
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {!error && isLoading && (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-gray-600">Loading positions...</span>
+            </div>
+          )}
+          
+          {!error && !isLoading && filteredPositions.length > 0 ? (
             <>
               {/* Always show horizontal scroll on mobile, grid on desktop */}
               <div className="md:grid md:grid-cols-2 xl:grid-cols-3 md:gap-6 md:justify-items-center">
@@ -325,7 +366,7 @@ export const OpenPositions = ({
 {t('positions.showing')} {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredPositions.length)} {t('positions.of')} {filteredPositions.length} {filteredPositions.length === 1 ? t('positions.position_found') : t('positions.positions_found')}
               </div>
             </>
-          ) : (
+          ) : !error && !isLoading ? (
             <Alert variant="default" className="bg-blue-50 border-blue-200 mb-12">
               <AlertCircle className="h-5 w-5 text-blue-600" />
               <AlertTitle className="text-xl font-semibold text-gray-800 mb-2">
@@ -349,7 +390,7 @@ export const OpenPositions = ({
                 )}
               </AlertDescription>
             </Alert>
-          )}
+          ) : null}
         </div>
       </div>
     </section>

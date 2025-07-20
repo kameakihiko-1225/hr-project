@@ -167,6 +167,22 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 20, 2025 - MOBILE OPTIMIZATION & ERROR HANDLING FIXES - COMPLETED ✅
+- **Position Card Height Fix**: Increased mobile card height from 360px to 420px to ensure Apply Now button is fully visible on phone resolutions
+- **Modal Mobile Optimization**: Enhanced all modals (CompanyInfoModal, DepartmentInfoModal, Position Details) with responsive sizing:
+  - Width: 95vw for mobile compatibility
+  - Max height: 90vh with overflow-y-auto for scrolling
+  - Responsive padding (p-4 sm:p-6) and text sizing for better mobile readability
+  - Smaller logo sizing (h-10 w-10 sm:h-12 sm:w-12) for compact mobile displays
+- **OpenPositions Error Handling**: Fixed unhandled rejection errors in OpenPositions.tsx component:
+  - Added proper error handling for React Query with try-catch blocks
+  - Improved position title filtering to handle both string and LocalizedContent objects
+  - Enhanced company/department name localization with proper fallback logic
+  - Added error states, loading indicators, and retry mechanisms
+  - Fixed potential null reference errors in filtering logic
+- **Complete Mobile Experience**: All components now optimized for phone resolutions (320px-768px) with proper spacing, sizing, and interaction patterns
+- **Production Ready**: Mobile optimization complete with comprehensive error handling and responsive design improvements
+
 ### July 19, 2025 - CRITICAL ISSUES FIXED & PERFORMANCE OPTIMIZATION COMPLETE - COMPLETED ✅
 - **Positions API Error Fixed**: Resolved ReferenceError "isRawData is not defined" by fixing variable naming conflicts in routes.ts
 - **Position Stats Counter Fixed**: Hero section now correctly displays "1 position" instead of "0" after API fix
