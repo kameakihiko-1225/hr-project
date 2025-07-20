@@ -38,7 +38,7 @@
 
 .founder-image-container .founder-name-text {
   position: absolute;
-  bottom: 0;
+  bottom: -40px;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
