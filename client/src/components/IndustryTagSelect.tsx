@@ -90,8 +90,14 @@ export function IndustryTagSelect({
         return;
       }
       
-      // Create new tag
-      const response = await api.post('/industry-tags', { name });
+      // Create new tag with LocalizedContent format
+      const response = await api.post('/industry-tags', { 
+        name: { 
+          en: name,
+          ru: name,
+          uz: name
+        }
+      });
       
       if (response.success && response.data) {
         const newTag = response.data;

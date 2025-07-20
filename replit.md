@@ -182,6 +182,8 @@ Preferred communication style: Simple, everyday language.
   - Fixed potential null reference errors in filtering logic
 - **Complete Mobile Experience**: All components now optimized for phone resolutions (320px-768px) with proper spacing, sizing, and interaction patterns
 - **Production Ready**: Mobile optimization complete with comprehensive error handling and responsive design improvements
+- **Industry Tags API Fix**: Resolved 400 error by updating frontend to send correct LocalizedContent format ({ name: { en: "...", ru: "...", uz: "..." } }) instead of simple string
+- **Mobile Pagination Removed**: Eliminated pagination on mobile devices for OpenPositions section - all positions now show with horizontal scrolling, while desktop maintains 6-per-page pagination
 
 ### July 19, 2025 - CRITICAL ISSUES FIXED & PERFORMANCE OPTIMIZATION COMPLETE - COMPLETED ✅
 - **Positions API Error Fixed**: Resolved ReferenceError "isRawData is not defined" by fixing variable naming conflicts in routes.ts
