@@ -12,8 +12,16 @@ import path from "path";
 import express from "express";
 import { processWebhookData } from "./webhook";
 import { AuthService, authenticateAdmin, requireRole, requireSuperAdmin, AuthRequest } from './auth';
+import { performanceMiddleware, performanceMonitor } from './middleware/performance';
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Apply performance middleware
+  app.use(performanceMiddleware.compression);
+  app.use(performanceMiddleware.requestTiming);
+  app.use(performanceMiddleware.adminCacheHeaders);
+  app.use(performanceMiddleware.optimizeDatabaseQueries);
+  app.use(performanceMiddleware.responseOptimization);
+  
   // Serve uploaded files statically
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   
@@ -97,32 +105,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // Companies endpoints with optimized caching headers
+  // Optimized companies endpoint with performance monitoring
   app.get("/api/companies", async (req, res) => {
+    const startTime = Date.now();
+    
     try {
-      // Optimized caching: Cache for 5 minutes for public data, no cache for admin
-      const companyIsRawData = req.query.raw === 'true';
-      if (companyIsRawData) {
-        // No cache for admin interface
-        res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-        res.set('Pragma', 'no-cache');
-        res.set('Expires', '0');
-      } else {
-        // Cache public data for 5 minutes
-        res.set('Cache-Control', 'public, max-age=300, s-maxage=300');
-        res.set('ETag', `companies-${Date.now()}`);
-      }
-      
       const language = req.query.language as string || 'en';
-      const requestRawData = req.query.raw === 'true'; // For admin interface
+      const requestRawData = req.query.raw === 'true';
+      const useOptimization = req.query._optimize === 'true';
       
       console.log(`[Companies API] Raw data requested: ${requestRawData}, language: ${language}`);
       
       if (requestRawData) {
-        // Return raw LocalizedContent objects for admin editing
-        const companies = await storage.getAllCompanies(); // No language parameter
+        // Optimized query for admin interface
+        const companies = useOptimization 
+          ? await storage.getAllCompaniesOptimized() 
+          : await storage.getAllCompanies();
+        
         console.log(`[Companies API] Raw companies count: ${companies.length}`);
-        console.log(`[Companies API] Raw companies IDs: ${companies.map(c => c.id).join(', ')}`);
+        performanceMonitor.trackQuery('getAllCompanies', startTime);
         
         // Create a simple test response with just essential data
         const simplifiedCompanies = companies.map(company => ({
