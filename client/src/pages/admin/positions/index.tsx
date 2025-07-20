@@ -72,16 +72,35 @@ export default function PositionsPage() {
     'Temporary'
   ];
 
-  // Load positions and departments with optimized parallel loading
+  // Load positions and departments with optimized batch loading
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Fetch departments, positions, companies, and applicant counts in parallel for better performance
+        // Use optimized batch endpoint for better performance
+        const response = await fetch(`/api/admin/positions-batch?includeStats=true${selectedDepartmentId !== 'all' ? `&departmentId=${selectedDepartmentId}` : ''}`);
+        const result = await response.json();
+        
+        if (result.success) {
+          const { positions, departments, companies, applicantCounts } = result.data;
+          
+          setPositions(positions || []);
+          setDepartments(departments || []);
+          setCompanies(companies || []);
+          setApplicantCounts(applicantCounts || []);
+          
+          console.log(`[PositionsPage] Batch loaded: ${positions?.length || 0} positions, ${departments?.length || 0} departments`);
+        } else {
+          throw new Error(result.error || 'Failed to fetch batch data');
+        }
+      } catch (error) {
+        console.error('[PositionsPage] Batch fetch failed, falling back to individual requests');
+        
+        // Fallback to individual requests if batch fails
         const [departmentsData, positionsData, companiesData, applicantCountsData] = await Promise.allSettled([
-          getDepartments(undefined, true, undefined, true), // Use raw=true for admin interface
-          fetch('/api/positions?raw=true').then(res => res.json()), // Use direct fetch for raw admin data
-          getCompanies(), // Fetch companies for department display
+          getDepartments(undefined, true, undefined, true),
+          fetch('/api/positions?raw=true').then(res => res.json()),
+          getCompanies(),
           fetch('/api/all-applied-positions').then(res => res.json())
         ]);
         
@@ -103,46 +122,28 @@ export default function PositionsPage() {
           setCompanies([]);
         }
 
-        // Handle applicant counts
-        if (applicantCountsData.status === 'fulfilled' && applicantCountsData.value?.data && Array.isArray(applicantCountsData.value.data)) {
-          setApplicantCounts(applicantCountsData.value.data);
-        } else {
-          console.error('Failed to load applicant counts:', applicantCountsData.status === 'rejected' ? applicantCountsData.reason : 'Invalid data');
-          setApplicantCounts([]);
-        }
-
         // Handle positions
-        if (positionsData.status === 'fulfilled' && positionsData.value?.success && Array.isArray(positionsData.value.data)) {
-          setPositions(positionsData.value.data);
+        if (positionsData.status === 'fulfilled' && positionsData.value && Array.isArray(positionsData.value)) {
+          setPositions(positionsData.value);
         } else {
           console.error('Failed to load positions:', positionsData.status === 'rejected' ? positionsData.reason : 'Invalid data');
           setPositions([]);
         }
-        
-        // Only show error toast if both requests failed
-        if (departmentsData.status === 'rejected' && positionsData.status === 'rejected') {
-          toast({
-            title: 'Error',
-            description: 'Failed to load data. Please try again.',
-            variant: 'destructive'
-          });
+
+        // Handle applicant counts
+        if (applicantCountsData.status === 'fulfilled' && applicantCountsData.value && Array.isArray(applicantCountsData.value)) {
+          setApplicantCounts(applicantCountsData.value);
+        } else {
+          console.error('Failed to load applicant counts:', applicantCountsData.status === 'rejected' ? applicantCountsData.reason : 'Invalid data');
+          setApplicantCounts([]);
         }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setDepartments([]);
-        setPositions([]);
-        toast({
-          title: 'Error',
-          description: 'Failed to load data. Please try again.',
-          variant: 'destructive'
-        });
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [selectedDepartmentId, toast]);
+  }, [selectedDepartmentId]);
 
   // Update URL when department filter changes (commented out - no longer needed)
   // useEffect(() => {

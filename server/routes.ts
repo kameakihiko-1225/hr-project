@@ -13,6 +13,7 @@ import express from "express";
 import { processWebhookData } from "./webhook";
 import { AuthService, authenticateAdmin, requireRole, requireSuperAdmin, AuthRequest } from './auth';
 import { performanceMiddleware, performanceMonitor } from './middleware/performance';
+import { registerAdminBatchRoutes } from './routes/admin-batch';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply performance middleware
@@ -24,6 +25,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Serve uploaded files statically
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  
+  // Register optimized admin batch routes
+  registerAdminBatchRoutes(app);
   
   // Health check endpoint for webhook
   app.get('/webhook', (req, res) => {
@@ -110,7 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const startTime = Date.now();
     
     try {
-      const language = req.query.language as string || 'en';
+      const language = (req.query.language as string || 'en') as 'en' | 'ru' | 'uz';
       const requestRawData = req.query.raw === 'true';
       const useOptimization = req.query._optimize === 'true';
       
@@ -124,6 +128,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log(`[Companies API] Raw companies count: ${companies.length}`);
         performanceMonitor.trackQuery('getAllCompanies', startTime);
+        
+        res.json({ success: true, data: companies });
+        return;
         
         // Create a simple test response with just essential data
         const simplifiedCompanies = companies.map(company => ({

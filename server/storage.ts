@@ -256,6 +256,29 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount > 0;
   }
 
+  // Optimized method for admin interface using shared optimization class
+  async getAllCompaniesOptimized(): Promise<CompanyWithIndustries[]> {
+    console.log('[Storage] getAllCompaniesOptimized: Starting optimized request');
+    
+    try {
+      // Use the shared optimization utility
+      const batchData = await import('./storage-optimizations');
+      const { StorageOptimizations } = batchData;
+      
+      // Get companies from batch data (more efficient)
+      const adminData = await StorageOptimizations.getAdminBatchData();
+      
+      console.log(`[Storage] getAllCompaniesOptimized: Returning ${adminData.companies.length} companies with optimized batch query`);
+      return adminData.companies;
+      
+    } catch (error) {
+      console.error('[Storage] Optimized query failed, falling back to standard method:', error);
+      
+      // Fallback to standard method
+      return this.getAllCompanies();
+    }
+  }
+
   // Department methods
   async getAllDepartments(companyId?: number, language?: SupportedLanguage): Promise<Department[]> {
     let result;

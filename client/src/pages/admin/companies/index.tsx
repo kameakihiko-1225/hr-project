@@ -94,8 +94,8 @@ export default function CompaniesPage() {
       logger.debug('Fetching companies from API');
       
       // For admin interface, we want to get the raw data without language filtering
-      // so we can edit all language versions
-      const response = await fetch('/api/companies?raw=true', {
+      // so we can edit all language versions with optimization
+      const response = await fetch('/api/companies?raw=true&_optimize=true', {
         headers: {
           'Content-Type': 'application/json',
         },

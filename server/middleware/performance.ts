@@ -53,8 +53,14 @@ export const performanceMiddleware = {
         console.warn(`[PERFORMANCE] Slow request: ${req.method} ${req.path} - ${duration}ms`);
       }
       
-      // Add performance headers
-      res.set('X-Response-Time', `${duration}ms`);
+      // Only set headers if response is not finished
+      if (!res.headersSent) {
+        try {
+          res.set('X-Response-Time', `${duration}ms`);
+        } catch (error) {
+          // Headers already sent, ignore
+        }
+      }
     });
     
     next();
