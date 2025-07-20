@@ -204,7 +204,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className={`animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 ${compactMobile ? 'h-[360px] sm:h-[400px]' : 'h-[400px] sm:h-[440px]'} w-full flex flex-col`}
+      className={`animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 ${compactMobile ? 'h-[420px] sm:h-[440px]' : 'h-[400px] sm:h-[440px]'} w-full flex flex-col`}
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -358,10 +358,10 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                 <span className="hidden sm:inline truncate">{t('position_card.view_details')}</span>
               </Button>
             </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md w-[95vw] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader>
-              <DialogTitle>{(position.title && getLocalizedContent(position.title)) || 'Position'}</DialogTitle>
-              <DialogDescription>{t('modals.position_details.title')}</DialogDescription>
+              <DialogTitle className="text-lg sm:text-xl leading-tight">{(position.title && getLocalizedContent(position.title)) || 'Position'}</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm">{t('modals.position_details.title')}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div>
