@@ -27,9 +27,10 @@ interface PositionCardProps {
   showDepartment?: boolean;
   applicantCount?: number;
   topTierBadge?: 1 | 2 | 3; // Badge for top 3 most applied positions
+  compactMobile?: boolean; // Enable compact mobile view
 }
 
-export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false, applicantCount, topTierBadge }: PositionCardProps) {
+export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false, applicantCount, topTierBadge, compactMobile = false }: PositionCardProps) {
   const { t, i18n } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -203,7 +204,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[400px] sm:h-[440px] w-full flex flex-col"
+      className={`animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 ${compactMobile ? 'h-[360px] sm:h-[400px]' : 'h-[400px] sm:h-[440px]'} w-full flex flex-col`}
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -270,8 +271,8 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       )}
 
-      <CardHeader className="flex items-start gap-3 pb-2 pt-3 sm:pt-4 px-3 sm:px-6 relative z-10">
-        <div className="w-12 h-12 sm:w-16 sm:h-16">
+      <CardHeader className={`flex items-start gap-3 pb-2 ${compactMobile ? 'pt-2 sm:pt-3' : 'pt-3 sm:pt-4'} px-3 sm:px-6 relative z-10`}>
+        <div className={`${compactMobile ? 'w-10 h-10 sm:w-14 sm:h-14' : 'w-12 h-12 sm:w-16 sm:h-16'}`}>
           {renderLogo()}
         </div>
         <div className="flex-1 min-w-0">
@@ -292,13 +293,13 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-2 pb-2 px-3 sm:px-6 relative z-10 flex-1 flex flex-col">
-        <CardTitle className="text-base sm:text-lg font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title line-clamp-2">
+      <CardContent className={`${compactMobile ? 'space-y-1' : 'space-y-2'} pb-2 px-3 sm:px-6 relative z-10 flex-1 flex flex-col`}>
+        <CardTitle className={`${compactMobile ? 'text-sm sm:text-base' : 'text-base sm:text-lg'} font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title line-clamp-2`}>
           {getLocalizedContent(position.title)}
         </CardTitle>
 
         {position.description && (
-          <p className="text-xs sm:text-sm text-muted-foreground job-card-description line-clamp-2">
+          <p className={`${compactMobile ? 'text-xs line-clamp-1' : 'text-xs sm:text-sm line-clamp-2'} text-muted-foreground job-card-description`}>
             {getLocalizedContent(position.description)}
           </p>
         )}
@@ -320,7 +321,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-center gap-2 sm:gap-3 border-t border-border pt-2 sm:pt-3 pb-3 sm:pb-4 px-3 sm:px-6 relative z-10 mt-auto shrink-0">
+      <CardFooter className={`flex flex-col items-center ${compactMobile ? 'gap-1 sm:gap-2 pt-1 sm:pt-2 pb-2 sm:pb-3' : 'gap-2 sm:gap-3 pt-2 sm:pt-3 pb-3 sm:pb-4'} border-t border-border px-3 sm:px-6 relative z-10 mt-auto shrink-0`}>
         {postedAgo && (
           <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
         )}

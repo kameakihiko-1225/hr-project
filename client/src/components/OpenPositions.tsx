@@ -282,34 +282,37 @@ export const OpenPositions = ({
             <>
               {viewMode === "grid" ? (
                 <div className="md:grid md:grid-cols-2 xl:grid-cols-3 md:gap-6 md:justify-items-center">
-                  {/* Mobile horizontal scroll container */}
+                  {/* Mobile horizontal scroll container - Enhanced compact view */}
                   <div className="md:hidden overflow-x-auto scrollbar-hide pb-2">
-                    <div className="flex gap-3 px-3" style={{ width: 'max-content' }}>
+                    <div className="flex gap-2 px-2 sm:gap-3 sm:px-3" style={{ width: 'max-content' }}>
                       {currentPositions.map((pos, index) => {
                         const applicantData = applicantCountMap.get(pos.id);
                         return (
                           <div 
                             key={pos.id} 
                             style={{ animationDelay: `${index * 100}ms` }} 
-                            className="animate-fade-in flex-shrink-0 w-[280px] sm:w-[320px]"
+                            className="animate-fade-in flex-shrink-0 w-[260px] sm:w-[300px]"
                           >
                             <PositionCard 
                               position={pos} 
                               applicantCount={applicantData?.count}
                               topTierBadge={applicantData?.topTierBadge}
+                              compactMobile={true}
                             />
                           </div>
                         );
                       })}
                     </div>
-                    {/* Scroll indicator for mobile */}
-                    <div className="flex justify-center mt-2">
-                      <div className="flex space-x-1">
-                        {currentPositions.slice(0, Math.min(5, currentPositions.length)).map((_, index) => (
-                          <div key={index} className="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
+                    {/* Enhanced scroll indicator for mobile */}
+                    <div className="flex justify-center items-center mt-3">
+                      <div className="flex items-center space-x-1">
+                        {currentPositions.slice(0, Math.min(4, currentPositions.length)).map((_, index) => (
+                          <div key={index} className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
                         ))}
-                        {currentPositions.length > 5 && (
-                          <div className="text-xs text-gray-500 ml-2">+{currentPositions.length - 5} more</div>
+                        {currentPositions.length > 4 && (
+                          <div className="text-xs text-blue-600 ml-2 font-medium">
+                            +{currentPositions.length - 4} more →
+                          </div>
                         )}
                       </div>
                     </div>

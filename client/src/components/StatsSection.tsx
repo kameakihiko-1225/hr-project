@@ -69,11 +69,11 @@ export const StatsSection = () => {
     setIsCompact(isMobile);
   }, [isMobile]);
 
-  // Render a compact horizontal stat card - Improved for mobile/tablet
+  // Render a compact horizontal stat card - Improved for mobile/tablet with center alignment
   const renderCompactStat = (stat: any, index: number) => (
     <div 
       key={stat.label}
-      className="bg-white p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
+      className="bg-white p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 w-full max-w-xs mx-auto"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-r ${stat.color} rounded-lg sm:rounded-xl flex items-center justify-center`}>
@@ -134,7 +134,7 @@ export const StatsSection = () => {
         {/* Render stats grid - Improved responsive layout */}
         <div className={`animate-fade-in ${
           isCompact 
-            ? "grid grid-cols-1 gap-3 max-w-md mx-auto" 
+            ? "flex flex-col items-center gap-3 max-w-sm mx-auto" 
             : "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6"
         }`}>
           {stats.map((stat, index) => 
