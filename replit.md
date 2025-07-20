@@ -167,6 +167,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 20, 2025 - MISSION STATEMENT UPDATE & POSITION SORTING ENHANCEMENT - COMPLETED ✅
+- **Mission Statement Update**: Changed founder mission from "Raising International People!" to "Repeat the Golden Age!"
+  - Updated all three language files (English, Russian, Uzbek) with new mission statement
+  - English: "Repeat the Golden Age!" / Russian: "Повторить Золотой Век!" / Uzbek: "Oltin Asrni Takrorlash!"
+- **Position Sorting Enhancement**: Implemented sorting by most applied criteria in OpenPositions component
+  - Positions now display ordered by highest application count first (descending order)
+  - Applied to both mobile horizontal scroll view and desktop grid view
+  - Uses real application data from database for accurate popularity ranking
+- **Header Branding Display**: Fixed header text visibility for company branding
+  - Desktop shows: "Millat Umidi Group Career" / Mobile shows: "MU Group Career"
+  - Proper responsive design with correct translation key implementation
+
 ### July 20, 2025 - HEADER BRANDING & CAROUSEL SPEED OPTIMIZATION - COMPLETED ✅
 - **Header Branding Enhancement**: Added multilingual "Millat Umidi Group Career" text next to logo in Header.tsx
   - Desktop shows full text: "Millat Umidi Group Career" / "Millat Umidi Group Карьера" / "Millat Umidi Group Karyera"
