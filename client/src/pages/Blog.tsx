@@ -37,11 +37,30 @@ export default function Blog() {
 
   // Fetch blog items from API
   const { data: blogResponse, isLoading, error } = useQuery({
-    queryKey: ['blog'],
-    queryFn: () => fetch('/api/gallery').then(res => res.json()),
+    queryKey: ['blog', 'gallery-items'],
+    queryFn: async () => {
+      const response = await fetch('/api/gallery', {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      const data = await response.json();
+      console.log('Blog API response:', data);
+      return data;
+    },
+    staleTime: 0, // Always refetch
+    gcTime: 0, // Don't cache
   });
 
   const blogItems: GalleryItem[] = blogResponse?.data || [];
+  
+  console.log('Blog data debug:', {
+    blogResponse,
+    blogItems,
+    blogItemsLength: blogItems.length,
+    filteredItemsLength: blogItems.length
+  });
 
 
 
@@ -161,7 +180,7 @@ export default function Blog() {
                           <div className="relative overflow-hidden">
                             <img 
                               src={item.imageUrl} 
-                              alt={item.title}
+                              alt={typeof item.title === 'string' ? item.title : item.title.en || ''}
                               className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
@@ -180,10 +199,10 @@ export default function Blog() {
                           </div>
                           <CardContent className="p-6">
                             <h3 className="text-xl font-semibold mb-3 group-hover:text-blue-600 transition-colors">
-                              {item.title}
+                              {typeof item.title === 'string' ? item.title : item.title.en || ''}
                             </h3>
                             <p className="text-gray-600 mb-4 line-clamp-3">
-                              {item.description}
+                              {typeof item.description === 'string' ? item.description : item.description.en || ''}
                             </p>
                           </CardContent>
                         </Card>
