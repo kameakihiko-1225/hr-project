@@ -83,10 +83,12 @@ export const Header = () => {
               onClick={handleLogoClick}
             >
               <img src="/logo%20png.png" alt="Millat Umidi HR Logo" className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 object-contain mr-2 sm:mr-3" />
-              <span className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight hidden xs:block" style={{ color: '#222' }}>
-                <span className="hidden sm:inline">Millat Umidi Group</span>
-                <span className="sm:hidden">Millat Umidi</span>
-              </span>
+              <div className="flex flex-col">
+                <span className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight hidden xs:block" style={{ color: '#222' }}>
+                  <span className="hidden sm:inline">{t('company_career_full')}</span>
+                  <span className="sm:hidden">{t('company_career_short')}</span>
+                </span>
+              </div>
             </div>
           </div>
 

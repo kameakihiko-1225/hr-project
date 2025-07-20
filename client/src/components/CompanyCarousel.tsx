@@ -29,14 +29,21 @@ export const CompanyCarousel = () => {
         </h2>
         <div className="relative overflow-hidden">
           <div
-            className={`flex space-x-4 sm:space-x-6 md:space-x-8 ${isPaused ? '' : 'animate-scroll'}`}
+            className={`flex space-x-4 sm:space-x-6 md:space-x-8 ${isPaused ? '' : 'animate-scroll'} scrollbar-hide`}
             style={{ 
-              height: isMobile ? '140px' : '200px'
+              height: isMobile ? '140px' : '200px',
+              overflowX: 'auto'
             }}
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
             onTouchStart={() => setIsPaused(true)}
             onTouchEnd={() => setTimeout(() => setIsPaused(false), 1000)}
+            onScroll={(e) => {
+              // Allow manual scrolling to temporarily pause auto-scroll
+              setIsPaused(true);
+              clearTimeout((window as any).scrollResetTimer);
+              (window as any).scrollResetTimer = setTimeout(() => setIsPaused(false), 3000);
+            }}
           >
             {logos.map((file, idx) => (
               <div
@@ -83,7 +90,7 @@ export const CompanyCarousel = () => {
           }
         }
         .animate-scroll {
-          animation: scroll 45s linear infinite;
+          animation: scroll 15s linear infinite;
         }
         
         /* Pause animation on hover for better user experience */

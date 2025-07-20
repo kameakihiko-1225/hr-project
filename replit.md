@@ -167,6 +167,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 20, 2025 - HEADER BRANDING & CAROUSEL SPEED OPTIMIZATION - COMPLETED ✅
+- **Header Branding Enhancement**: Added multilingual "Millat Umidi Group Career" text next to logo in Header.tsx
+  - Desktop shows full text: "Millat Umidi Group Career" / "Millat Umidi Group Карьера" / "Millat Umidi Group Karyera"
+  - Mobile shows compact text: "MU Group Career" / "MU Group Карьера" / "MU Group Karyera"
+  - Implemented responsive design with proper breakpoints (hidden sm:inline and sm:hidden)
+  - Added translation keys company_career_full and company_career_short to all language files
+- **CompanyCarousel Speed & Scrollability Enhancement**: Improved carousel performance and user interaction
+  - Increased autoscroll speed from 45 seconds to 15 seconds (3x faster) for better engagement
+  - Added manual scrollability with overflowX: 'auto' and scrollbar-hide class for smooth horizontal scrolling
+  - Implemented smart pause system: manual scroll pauses auto-scroll for 3 seconds before resuming
+  - Enhanced touch/hover interaction with proper event handling for both auto-scroll and manual scroll
+  - Maintained seamless infinite scroll with tripled logo array and CSS transform animations
+- **CTASection Hidden**: Temporarily commented out CTASection component until testimonials are ready for implementation
+- **Cross-Device Compatibility**: All changes optimized for desktop, tablet, and mobile with responsive interaction patterns
+
 ### July 20, 2025 - APPLY NOW BUTTON & CAROUSEL SMOOTHNESS FIXES - COMPLETED ✅
 - **Apply Now Button Localization Fix**: Fixed critical mobile localization issue where Apply Now button failed to use correct language parameter
   - Updated all getLocalizedContent function calls in PositionCard.tsx to pass current i18n.language parameter
