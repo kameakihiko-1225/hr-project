@@ -167,6 +167,22 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 20, 2025 - APPLY NOW BUTTON & CAROUSEL SMOOTHNESS FIXES - COMPLETED ✅
+- **Apply Now Button Localization Fix**: Fixed critical mobile localization issue where Apply Now button failed to use correct language parameter
+  - Updated all getLocalizedContent function calls in PositionCard.tsx to pass current i18n.language parameter
+  - Fixed Apply Now button to redirect to proper localized links based on selected language (English/Russian/Uzbek)
+  - Resolved LocalizedContent object handling throughout modal dialogs and position details
+  - Added defensive error handling for industry tag name display to prevent React error #31
+- **Companies Carousel Smooth Auto-Scrolling**: Replaced jerky JavaScript-based scrolling with smooth CSS animations
+  - Removed setInterval-based manual scrollLeft manipulation that caused choppy movement
+  - Implemented pure CSS keyframe animations with linear timing for seamless infinite scroll
+  - Added hover and touch pause functionality for better user interaction
+  - Tripled logo array for seamless infinite scroll effect (33.33% translateX animation)
+  - Set 45-second animation duration for optimal viewing speed across desktop and mobile
+  - Fixed scrollBehavior conflicts and optimized performance with hardware-accelerated transforms
+- **Enhanced User Experience**: Apply Now button now properly opens localized application links in new tabs with correct language content
+- **Cross-Device Compatibility**: Both fixes optimized for mobile, tablet, and desktop with responsive interaction handling
+
 ### July 20, 2025 - MOBILE OPTIMIZATION & ERROR HANDLING FIXES - COMPLETED ✅
 - **Position Card Height Fix**: Increased mobile card height from 360px to 420px to ensure Apply Now button is fully visible on phone resolutions
 - **Modal Mobile Optimization**: Enhanced all modals (CompanyInfoModal, DepartmentInfoModal, Position Details) with responsive sizing:
