@@ -74,17 +74,18 @@ export const Header = () => {
         scrolled ? 'shadow-md' : 'shadow-sm border-b border-gray-100'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
             <div 
               className="flex items-center cursor-pointer"
               onClick={handleLogoClick}
             >
-              <img src="/logo%20png.png" alt="Millat Umidi HR Logo" className="h-16 w-16 object-contain mr-3" />
-              <span className="text-3xl font-bold tracking-tight" style={{ color: '#222' }}>
-                Millat Umidi Group
+              <img src="/logo%20png.png" alt="Millat Umidi HR Logo" className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 object-contain mr-2 sm:mr-3" />
+              <span className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight hidden xs:block" style={{ color: '#222' }}>
+                <span className="hidden sm:inline">Millat Umidi Group</span>
+                <span className="sm:hidden">Millat Umidi</span>
               </span>
             </div>
           </div>
@@ -119,32 +120,32 @@ export const Header = () => {
           </nav>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center gap-3">
+          <div className="md:hidden flex items-center gap-1 sm:gap-2">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => scrollToSection("contact")}
-              className="rounded-full h-9 w-9 text-gray-700 hover:text-blue-600 hover:bg-transparent"
+              className="rounded-full h-8 w-8 sm:h-9 sm:w-9 text-gray-700 hover:text-blue-600 hover:bg-transparent"
               aria-label="Contact"
             >
-              <Phone className="h-5 w-5" />
+              <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
             <Button 
               size="sm"
               onClick={() => scrollToSection("filter-section")}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm"
             >
-              <BriefcaseBusiness className="h-4 w-4 mr-1" />
-              Apply
+              <BriefcaseBusiness className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" />
+              <span className="hidden xs:inline">Apply</span>
             </Button>
             {/* Language Selector for mobile */}
-            <LanguageSelector className="ml-2" />
+            <LanguageSelector className="ml-1 sm:ml-2" />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600 p-2 rounded-md hover:bg-gray-100 transition-colors"
+              className="text-gray-700 hover:text-blue-600 p-1.5 sm:p-2 rounded-md hover:bg-gray-100 transition-colors"
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
             </button>
           </div>
         </div>

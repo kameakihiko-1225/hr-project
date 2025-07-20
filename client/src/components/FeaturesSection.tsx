@@ -115,22 +115,22 @@ export const FeaturesSection = () => {
   );
 
   return (
-    <section className="relative py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white dark:bg-gray-950 overflow-hidden">
+    <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 px-3 sm:px-4 md:px-6 bg-white dark:bg-gray-950 overflow-hidden">
       {/* Subtle background decoration - same as hero */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       <div className="max-w-7xl mx-auto relative">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
-            <Target className="h-4 w-4 mr-2" />
+        <div className="text-center mb-6 sm:mb-8 md:mb-10">
+          <div className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+            <Target className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             {t('features.badge')}
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 px-2">
             {t('features.title_start')}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 block">
               {t('features.title_highlight')}
             </span>
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto px-2 sm:px-4">
             {t('features.subtitle')}
           </p>
           

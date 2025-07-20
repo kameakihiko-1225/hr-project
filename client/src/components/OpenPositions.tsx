@@ -236,27 +236,28 @@ export const OpenPositions = ({
   };
 
   return (
-    <section id="open-positions" className="relative py-12 sm:py-16 px-4 sm:px-6 bg-white dark:bg-gray-950 overflow-hidden">
+    <section id="open-positions" className="relative py-8 sm:py-12 md:py-16 px-3 sm:px-4 md:px-6 bg-white dark:bg-gray-950 overflow-hidden">
       {/* Subtle background decoration - same as hero */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       <div className="max-w-7xl mx-auto relative">
-        <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
+        <div className="text-center mb-6 sm:mb-8 md:mb-12">
+          <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-6 px-2">
             {t('positions.available_positions')}
           </h2>
-          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-4">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto px-2 sm:px-4">
             {t('positions.apply_instantly')}
           </p>
           
           {hasSearched && (
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-              <Badge variant="secondary" className="px-3 py-1 text-base">
+            <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-1 sm:gap-2 px-2">
+              <Badge variant="secondary" className="px-2 sm:px-3 py-1 text-xs sm:text-sm md:text-base">
                 {filteredPositions.length} {filteredPositions.length === 1 ? t('positions.position_found') : t('positions.positions_found')}
               </Badge>
               {(selectedCompanies.length > 0 || selectedDepartments.length > 0 || selectedPositions.length > 0) && (
-                <Badge variant="outline" className="px-3 py-1 text-sm">
-                  <Filter className="h-3 w-3 mr-1" />
-                  {getFilterSummary()}
+                <Badge variant="outline" className="px-2 sm:px-3 py-1 text-xs sm:text-sm">
+                  <Filter className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
+                  <span className="hidden sm:inline">{getFilterSummary()}</span>
+                  <span className="sm:hidden">Filtered</span>
                 </Badge>
               )}
             </div>
@@ -280,11 +281,11 @@ export const OpenPositions = ({
           {filteredPositions.length > 0 ? (
             <>
               {viewMode === "grid" ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 justify-items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6 justify-items-center">
                   {currentPositions.map((pos, index) => {
                     const applicantData = applicantCountMap.get(pos.id);
                     return (
-                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[400px] sm:max-w-[460px]">
+                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-full sm:max-w-[400px] lg:max-w-[460px]">
                         <PositionCard 
                           position={pos} 
                           applicantCount={applicantData?.count}
@@ -295,7 +296,7 @@ export const OpenPositions = ({
                   })}
                 </div>
               ) : (
-                <div className="flex flex-col space-y-6">
+                <div className="flex flex-col space-y-3 sm:space-y-4 md:space-y-6">
                   {currentPositions.map((pos, index) => {
                     const applicantData = applicantCountMap.get(pos.id);
                     return (

@@ -1,0 +1,51 @@
+Here’s a **prompt you can use (for your developer or AI tool)** to make `career.millatumidi.uz` fully responsive for **mobile/phone resolution**:
+
+---
+
+**Prompt:**
+Make the website `career.millatumidi.uz` fully responsive and optimized for phone screens (320px to 768px). Ensure the following:
+
+1. **Responsive Layout:**
+
+   * All elements (cards, buttons, navigation, text blocks) must automatically adjust to screen width using `flex`, `grid`, or `responsive breakpoints`.
+   * No horizontal scrolling should occur.
+   * Content should stack vertically where needed.
+
+2. **Navigation & Menus:**
+
+   * Convert the top navigation bar into a hamburger menu for mobile.
+   * Ensure smooth animations and that the menu opens full-screen or as a sliding drawer.
+
+3. **Cards & Content Blocks:**
+
+   * Scale down all cards proportionally.
+   * Titles and buttons must remain readable (minimum 14px font size).
+   * Images should be set to `max-width: 100%` and `height: auto` for fluid scaling.
+   * Buttons must stay within card boundaries and remain fully visible.
+
+4. **Typography & Spacing:**
+
+   * Adjust font sizes for readability on small screens (16px body text, 20–24px for headings).
+   * Reduce excessive padding/margin for compact view.
+
+5. **Performance:**
+
+   * Optimize images for faster loading on mobile (WebP or compressed JPG/PNG).
+   * Lazy-load non-critical images.
+
+6. **Testing:**
+
+   * Must be fully functional and visually clean on all major devices (iPhone SE, iPhone 14, Galaxy S21, Pixel 7).
+   * Test using Chrome DevTools and Lighthouse for mobile usability score (aim 90+).
+
+Deliver the updated version as responsive HTML/CSS (or Tailwind-based if used in the project) without breaking the desktop layout.
+
+---
+
+Would you like me to:
+
+1. **Make this prompt specifically for Tailwind (if your project uses it)?**
+2. **Or for plain CSS/SCSS?**
+3. **Or both, so you can choose?**
+
+Which one should I prepare? Or **do you want me to rewrite it as a developer task checklist (step-by-step)** instead of just a prompt?
