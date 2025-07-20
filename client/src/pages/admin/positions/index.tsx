@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
 import { useToast } from '../../../components/ui/use-toast';
 import { AdminPositionCard } from '../../../components/AdminPositionCard';
-import { createPosition, deletePosition, getPositions, getDepartments, updatePosition } from '../../../lib/api';
+import { createPosition, deletePosition, getPositions, getDepartments, updatePosition, getCompanies } from '../../../lib/api';
 import { Position } from '../../../types/position';
 import { Department } from '../../../types/department';
 import { Loader2, Plus, Briefcase, Search } from 'lucide-react';
@@ -28,9 +28,18 @@ export default function PositionsPage() {
     if (typeof content === 'string') return content;
     return content[i18n.language as keyof LocalizedContent] || content.en || '';
   };
+
+  // Helper function to get department display name with company
+  const getDepartmentDisplayName = (department: Department): string => {
+    const departmentName = getLocalizedContent(department.name);
+    const company = companies.find(c => c.id === department.companyId);
+    const companyName = company ? getLocalizedContent(company.name) : '';
+    return companyName ? `${departmentName} (${companyName})` : departmentName;
+  };
   
   const [positions, setPositions] = useState<Position[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [companies, setCompanies] = useState<any[]>([]);
   const [applicantCounts, setApplicantCounts] = useState<{ positionId: number; positionTitle: string; appliedCount: number; }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,10 +77,11 @@ export default function PositionsPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Fetch departments, positions, and applicant counts in parallel for better performance
-        const [departmentsData, positionsData, applicantCountsData] = await Promise.allSettled([
+        // Fetch departments, positions, companies, and applicant counts in parallel for better performance
+        const [departmentsData, positionsData, companiesData, applicantCountsData] = await Promise.allSettled([
           getDepartments(undefined, true, undefined, true), // Use raw=true for admin interface
           fetch('/api/positions?raw=true').then(res => res.json()), // Use direct fetch for raw admin data
+          getCompanies(), // Fetch companies for department display
           fetch('/api/all-applied-positions').then(res => res.json())
         ]);
         
@@ -83,6 +93,14 @@ export default function PositionsPage() {
         } else {
           console.error('Failed to load departments:', departmentsData.status === 'rejected' ? departmentsData.reason : 'Invalid data');
           setDepartments([]);
+        }
+
+        // Handle companies
+        if (companiesData.status === 'fulfilled' && companiesData.value?.success && Array.isArray(companiesData.value.data)) {
+          setCompanies(companiesData.value.data);
+        } else {
+          console.error('Failed to load companies:', companiesData.status === 'rejected' ? companiesData.reason : 'Invalid data');
+          setCompanies([]);
         }
 
         // Handle applicant counts
@@ -377,7 +395,7 @@ export default function PositionsPage() {
               <SelectItem value="all">All Departments</SelectItem>
               {Array.isArray(departments) && departments.map((department) => (
                 <SelectItem key={department.id} value={department.id}>
-                  {getLocalizedContent(department.name)}
+                  {getDepartmentDisplayName(department)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -449,7 +467,7 @@ export default function PositionsPage() {
                 <SelectContent>
                   {Array.isArray(departments) && departments.map((department) => (
                     <SelectItem key={department.id} value={department.id}>
-                      {getLocalizedContent(department.name)} {department.company ? `(${getLocalizedContent(department.company.name)})` : ''}
+                      {getDepartmentDisplayName(department)}
                     </SelectItem>
                   ))}
                 </SelectContent>
