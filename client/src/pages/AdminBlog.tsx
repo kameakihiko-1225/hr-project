@@ -43,21 +43,32 @@ export default function AdminBlog() {
       try {
         setIsLoading(true);
         const response = await fetch('/api/gallery');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
         if (data.success) {
           setBlogItems(data.data);
         } else {
+          console.error('API error:', data.error);
           toast({
             title: "Error",
-            description: "Failed to fetch blog items",
+            description: data.error || "Failed to fetch blog items",
             variant: "destructive"
           });
         }
       } catch (error) {
+        console.error('Fetch error:', error);
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          // Request was aborted, ignore this error
+          return;
+        }
         toast({
           title: "Error",
-          description: "Failed to fetch blog items",
+          description: error instanceof Error ? error.message : "Failed to fetch blog items",
           variant: "destructive"
         });
       } finally {
@@ -289,8 +300,8 @@ export default function AdminBlog() {
       category: item.category,
       imageUrl: item.imageUrl,
       tags: item.tags || [],
-      isActive: item.isActive,
-      sortOrder: item.sortOrder
+      isActive: item.isActive ?? true,
+      sortOrder: item.sortOrder ?? 0
     });
     setIsDialogOpen(true);
   };
@@ -535,9 +546,9 @@ export default function AdminBlog() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleToggleActive(item.id, item.isActive)}
+                      onClick={() => handleToggleActive(item.id, item.isActive ?? true)}
                     >
-                      {item.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {(item.isActive ?? true) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </Button>
                     <Button
                       size="sm"
