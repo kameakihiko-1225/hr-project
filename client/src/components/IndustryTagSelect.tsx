@@ -79,7 +79,10 @@ export function IndustryTagSelect({
       
       // Check if tag already exists
       const existingTag = availableTags.find(
-        tag => tag.name.toLowerCase() === name.toLowerCase()
+        tag => {
+          const tagName = typeof tag.name === 'string' ? tag.name : tag.name?.en || '';
+          return tagName.toLowerCase() === name.toLowerCase();
+        }
       );
       
       if (existingTag) {
@@ -167,9 +170,10 @@ export function IndustryTagSelect({
 
   const filteredTags = inputValue === ""
     ? availableTags
-    : availableTags.filter(tag =>
-        tag.name.toLowerCase().includes(inputValue.toLowerCase())
-      );
+    : availableTags.filter(tag => {
+        const tagName = typeof tag.name === 'string' ? tag.name : tag.name?.en || '';
+        return tagName.toLowerCase().includes(inputValue.toLowerCase());
+      });
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -181,7 +185,7 @@ export function IndustryTagSelect({
             className="flex items-center gap-1 px-3 py-1"
           >
             <Tag className="h-3 w-3" />
-            {tag.name}
+            {typeof tag.name === 'string' ? tag.name : tag.name?.en || 'Unknown'}
             <Button
               variant="ghost"
               size="sm"
@@ -245,14 +249,15 @@ export function IndustryTagSelect({
                           : "opacity-0"
                       )}
                     />
-                    {tag.name}
+                    {typeof tag.name === 'string' ? tag.name : tag.name?.en || 'Unknown'}
                   </CommandItem>
                 ))}
               </CommandGroup>
               
-              {inputValue && !filteredTags.some(tag => 
-                tag.name.toLowerCase() === inputValue.toLowerCase()
-              ) && (
+              {inputValue && !filteredTags.some(tag => {
+                const tagName = typeof tag.name === 'string' ? tag.name : tag.name?.en || '';
+                return tagName.toLowerCase() === inputValue.toLowerCase();
+              }) && (
                 <>
                   <CommandSeparator />
                   <CommandGroup>

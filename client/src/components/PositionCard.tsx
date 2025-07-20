@@ -16,7 +16,7 @@ import { CompanyInfoModal } from './CompanyInfoModal';
 import { DepartmentInfoModal } from './DepartmentInfoModal';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { LocalizedContent } from '@shared/schema';
+import { LocalizedContent, getLocalizedContent } from '@shared/schema';
 
 const logger = createLogger('positionCard');
 
@@ -136,11 +136,13 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     // Debug log to check position data
     console.log('Apply button clicked. Position data:', position);
     console.log('Apply link value:', position.applyLink);
+    console.log('Current language from i18n:', i18n.language);
 
     // If position has a direct apply link, use it
     if (position.applyLink) {
-      const applyLinkUrl = getLocalizedContent(position.applyLink);
+      const applyLinkUrl = getLocalizedContent(position.applyLink, i18n.language as any);
       console.log('Redirecting to custom apply link:', applyLinkUrl);
+      console.log('Using language:', i18n.language);
       window.open(applyLinkUrl, '_blank', 'noopener,noreferrer');
       toast({ 
         title: 'Redirected to Application', 
@@ -157,11 +159,11 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       // For now, since we don't have bot functionality set up, show a simple message
       toast({ 
         title: 'Application Initiated', 
-        description: `Thank you for your interest in the ${getLocalizedContent(position.title)} position! You will be contacted soon.` 
+        description: `Thank you for your interest in the ${getLocalizedContent(position.title, i18n.language as any)} position! You will be contacted soon.` 
       });
       
       // In a real implementation, this would integrate with Telegram bot or other application system
-      console.log(`Application submitted for position: ${getLocalizedContent(position.title)} (ID: ${position.id})`);
+      console.log(`Application submitted for position: ${getLocalizedContent(position.title, i18n.language as any)} (ID: ${position.id})`);
     } catch (error: any) {
       console.error('Apply via AI error:', error);
       toast({ title: 'Error', description: error?.message || 'Something went wrong' });
@@ -258,7 +260,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                 <DialogHeader>
                   <DialogTitle>Delete Position</DialogTitle>
                   <DialogDescription>
-                    Are you sure you want to delete the position "{getLocalizedContent(position.title)}"? This action cannot be undone.
+                    Are you sure you want to delete the position "{getLocalizedContent(position.title, i18n.language as any)}"? This action cannot be undone.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -284,7 +286,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
               <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
               {position.departments.map((dp, idx) => (
                 <span key={dp.department.id} className="flex items-center">
-                  {getLocalizedContent(dp.department.name)}
+                  {getLocalizedContent(dp.department.name, i18n.language as any)}
                   {idx < position.departments.length - 1 && <span className="mx-1">|</span>}
                 </span>
               ))}
@@ -295,19 +297,19 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
 
       <CardContent className={`${compactMobile ? 'space-y-1' : 'space-y-2'} pb-2 px-3 sm:px-6 relative z-10 flex-1 flex flex-col`}>
         <CardTitle className={`${compactMobile ? 'text-sm sm:text-base' : 'text-base sm:text-lg'} font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title line-clamp-2`}>
-          {getLocalizedContent(position.title)}
+          {getLocalizedContent(position.title, i18n.language as any)}
         </CardTitle>
 
         {position.description && (
           <p className={`${compactMobile ? 'text-xs line-clamp-1' : 'text-xs sm:text-sm line-clamp-2'} text-muted-foreground job-card-description`}>
-            {getLocalizedContent(position.description)}
+            {getLocalizedContent(position.description, i18n.language as any)}
           </p>
         )}
 
         {/* Salary after description */}
         {position.salaryRange && (
           <p className="text-xs sm:text-sm font-medium text-foreground flex items-center gap-1">
-            <DollarSign className="h-4 w-4" /> {getLocalizedContent(position.salaryRange)}
+            <DollarSign className="h-4 w-4" /> {getLocalizedContent(position.salaryRange, i18n.language as any)}
           </p>
         )}
 
@@ -360,16 +362,16 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
             </DialogTrigger>
           <DialogContent className="max-w-md w-[95vw] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl leading-tight">{(position.title && getLocalizedContent(position.title)) || 'Position'}</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl leading-tight">{(position.title && getLocalizedContent(position.title, i18n.language as any)) || 'Position'}</DialogTitle>
               <DialogDescription className="text-xs sm:text-sm">{t('modals.position_details.title')}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div>
                 <h4 className="text-sm font-medium mb-2">{t('modals.position_details.description')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  {(position.description && getLocalizedContent(position.description)) || 
-                   (departmentFromAPI?.description && getLocalizedContent(departmentFromAPI.description)) || 
-                   (companyFromAPI?.description && getLocalizedContent(companyFromAPI.description)) || 
+                  {(position.description && getLocalizedContent(position.description, i18n.language as any)) || 
+                   (departmentFromAPI?.description && getLocalizedContent(departmentFromAPI.description, i18n.language as any)) || 
+                   (companyFromAPI?.description && getLocalizedContent(companyFromAPI.description, i18n.language as any)) || 
                    t('modals.position_details.no_description')}
                 </p>
               </div>
@@ -379,7 +381,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <h4 className="text-sm font-medium mb-2">{t('modals.position_details.salary_range')}</h4>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    <span>{(position.salaryRange && getLocalizedContent(position.salaryRange)) || 'Not specified'}</span>
+                    <span>{(position.salaryRange && getLocalizedContent(position.salaryRange, i18n.language as any)) || 'Not specified'}</span>
                   </div>
                 </div>
               )}
@@ -389,7 +391,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <h4 className="text-sm font-medium mb-2">{t('modals.position_details.employment_type')}</h4>
                   <div className="flex items-center gap-2">
                     <Briefcase className="h-4 w-4" />
-                    <span>{(position.employmentType && getLocalizedContent(position.employmentType)) || 'Not specified'}</span>
+                    <span>{(position.employmentType && getLocalizedContent(position.employmentType, i18n.language as any)) || 'Not specified'}</span>
                   </div>
                 </div>
               )}
@@ -398,7 +400,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                 <h4 className="text-sm font-medium mb-2">{t('modals.position_details.department')}</h4>
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  <span>{(departmentFromAPI?.name && getLocalizedContent(departmentFromAPI.name)) || 'Department'}</span>
+                  <span>{(departmentFromAPI?.name && getLocalizedContent(departmentFromAPI.name, i18n.language as any)) || 'Department'}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-1 ml-6">
                   <span className="text-sm text-muted-foreground">
@@ -413,12 +415,12 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <div className="flex items-center gap-2">
                     <ExternalLink className="h-4 w-4" />
                     <a 
-                      href={(position.applyLink && getLocalizedContent(position.applyLink)) || '#'} 
+                      href={(position.applyLink && getLocalizedContent(position.applyLink, i18n.language as any)) || '#'} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline truncate max-w-[250px]"
                     >
-                      {(position.applyLink && getLocalizedContent(position.applyLink)) || 'No link available'}
+                      {(position.applyLink && getLocalizedContent(position.applyLink, i18n.language as any)) || 'No link available'}
                     </a>
                   </div>
                 </div>
