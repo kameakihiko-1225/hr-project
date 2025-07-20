@@ -36,7 +36,7 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
           <DialogTitle className="flex items-center gap-2 sm:gap-3">
             {company.logoUrl && (
               <img 
-                src={company.logoUrl} 
+                src={encodeURI(company.logoUrl)} 
                 alt={`${getLocalizedContent(company.name)} logo`}
                 className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg object-contain p-1 border"
               />

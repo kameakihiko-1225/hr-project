@@ -185,7 +185,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       <Avatar className="w-full h-full border-2 border-white/30 shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
         {logoUrl && !logoError ? (
           <AvatarImage 
-            src={logoUrl} 
+            src={encodeURI(logoUrl)} 
             alt={companyFromAPI?.name || 'Company'} 
             className="object-contain object-center w-full h-full p-1 sm:p-2"
             onError={() => setLogoError(true)}
@@ -206,7 +206,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleApply();
       }}
-      className={`animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 ${compactMobile ? 'h-[420px] sm:h-[440px]' : 'h-[400px] sm:h-[440px]'} w-full flex flex-col`}
+      className={`animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 ${compactMobile ? 'h-[420px] sm:h-[480px]' : 'h-[440px] sm:h-[480px]'} w-full flex flex-col`}
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
