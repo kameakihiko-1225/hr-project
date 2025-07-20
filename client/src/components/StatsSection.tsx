@@ -73,20 +73,20 @@ export const StatsSection = () => {
   const renderCompactStat = (stat: any, index: number) => (
     <div 
       key={stat.label}
-      className="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
+      className="bg-white p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
       style={{ animationDelay: `${index * 100}ms` }}
     >
-      <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center`}>
-        <stat.icon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+      <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-r ${stat.color} rounded-lg sm:rounded-xl flex items-center justify-center`}>
+        <stat.icon className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-white" />
       </div>
       
       <div className="flex-grow min-w-0">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900">{stat.number}</h3>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">{stat.number}</h3>
         </div>
         <div className="flex flex-col">
-          <h4 className="text-sm font-semibold text-gray-800 truncate">{stat.label}</h4>
-          <p className="text-xs text-gray-600 line-clamp-1">{stat.description}</p>
+          <h4 className="text-xs sm:text-sm font-semibold text-gray-800 truncate">{stat.label}</h4>
+          <p className="text-[10px] sm:text-xs text-gray-600 line-clamp-1">{stat.description}</p>
         </div>
       </div>
     </div>

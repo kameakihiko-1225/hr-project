@@ -102,7 +102,7 @@ export const HeroSection = () => {
         <div className="flex flex-col items-center text-center">
           {/* Content */}
           <div className="animate-fade-in max-w-4xl w-full">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight px-2">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-6 leading-tight px-1 sm:px-2">
               {t('hero.title_start')}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 block">
                 {t('hero.title_highlight')}

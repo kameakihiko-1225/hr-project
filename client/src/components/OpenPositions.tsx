@@ -281,19 +281,55 @@ export const OpenPositions = ({
           {filteredPositions.length > 0 ? (
             <>
               {viewMode === "grid" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6 justify-items-center">
-                  {currentPositions.map((pos, index) => {
-                    const applicantData = applicantCountMap.get(pos.id);
-                    return (
-                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-full sm:max-w-[400px] lg:max-w-[460px]">
-                        <PositionCard 
-                          position={pos} 
-                          applicantCount={applicantData?.count}
-                          topTierBadge={applicantData?.topTierBadge}
-                        />
+                <div className="md:grid md:grid-cols-2 xl:grid-cols-3 md:gap-6 md:justify-items-center">
+                  {/* Mobile horizontal scroll container */}
+                  <div className="md:hidden overflow-x-auto scrollbar-hide pb-2">
+                    <div className="flex gap-3 px-3" style={{ width: 'max-content' }}>
+                      {currentPositions.map((pos, index) => {
+                        const applicantData = applicantCountMap.get(pos.id);
+                        return (
+                          <div 
+                            key={pos.id} 
+                            style={{ animationDelay: `${index * 100}ms` }} 
+                            className="animate-fade-in flex-shrink-0 w-[280px] sm:w-[320px]"
+                          >
+                            <PositionCard 
+                              position={pos} 
+                              applicantCount={applicantData?.count}
+                              topTierBadge={applicantData?.topTierBadge}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Scroll indicator for mobile */}
+                    <div className="flex justify-center mt-2">
+                      <div className="flex space-x-1">
+                        {currentPositions.slice(0, Math.min(5, currentPositions.length)).map((_, index) => (
+                          <div key={index} className="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
+                        ))}
+                        {currentPositions.length > 5 && (
+                          <div className="text-xs text-gray-500 ml-2">+{currentPositions.length - 5} more</div>
+                        )}
                       </div>
-                    );
-                  })}
+                    </div>
+                  </div>
+                  
+                  {/* Desktop grid layout */}
+                  <div className="hidden md:contents">
+                    {currentPositions.map((pos, index) => {
+                      const applicantData = applicantCountMap.get(pos.id);
+                      return (
+                        <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[460px]">
+                          <PositionCard 
+                            position={pos} 
+                            applicantCount={applicantData?.count}
+                            topTierBadge={applicantData?.topTierBadge}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
                 <div className="flex flex-col space-y-3 sm:space-y-4 md:space-y-6">
