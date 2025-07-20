@@ -99,7 +99,7 @@ const Index = () => {
         hasSearched={hasSearched}
       />
 
-      <CTASection />
+      {/* <CTASection /> */}
       <Footer />
       
       {/* SEO and Performance Components */}
