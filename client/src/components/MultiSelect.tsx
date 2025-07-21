@@ -48,14 +48,17 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
     if (isOpen && dropdownRef.current) {
       const rect = dropdownRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
-      const minHeight = 200; // Minimum height for at least 4-5 options
+      const minHeight = 250; // Minimum height for at least 6-7 options
+      const maxHeight = 500; // Maximum height to prevent excessive scrolling
       const availableHeight = viewportHeight - rect.top - 20;
-      const proposedHeight = Math.max(minHeight, Math.min(384, availableHeight)); // min 200px, max 384px (96 * 4)
+      const proposedHeight = Math.max(minHeight, Math.min(maxHeight, availableHeight));
+      
+      // Always ensure adequate height for options visibility
+      dropdownRef.current.style.minHeight = `${minHeight}px`;
+      dropdownRef.current.style.maxHeight = `${proposedHeight}px`;
       
       if (rect.bottom > viewportHeight) {
-        dropdownRef.current.style.maxHeight = `${proposedHeight}px`;
-      } else {
-        dropdownRef.current.style.maxHeight = `${Math.min(384, availableHeight)}px`; // Ensure reasonable max height
+        dropdownRef.current.style.maxHeight = `${Math.max(minHeight, availableHeight)}px`;
       }
     }
   }, [isOpen]);
@@ -147,7 +150,7 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
       {isOpen && !disabled && (
         <div 
           ref={dropdownRef}
-          className="fixed md:absolute top-auto md:top-full left-0 md:left-auto right-0 md:right-auto mt-1 sm:mt-2 max-h-80 sm:max-h-96 overflow-y-auto 
+          className="fixed md:absolute top-auto md:top-full left-0 md:left-auto right-0 md:right-auto mt-1 sm:mt-2 min-h-[200px] max-h-[400px] sm:min-h-[250px] sm:max-h-[500px] overflow-y-auto 
                      bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] md:z-[60] animate-fade-in min-w-[300px] md:min-w-full"
           onMouseEnter={handleMouseEnter}
         >
@@ -172,8 +175,8 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
               <div
                 key={option}
                 className={`
-                  px-2 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition-all duration-200 hover:bg-blue-50 text-sm
-                  ${selected.includes(option) ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}
+                  px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer transition-all duration-200 hover:bg-blue-50 text-sm border-b border-gray-100 last:border-b-0
+                  ${selected.includes(option) ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'}
                 `}
                 onClick={() => toggleOption(option)}
               >
