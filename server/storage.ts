@@ -289,32 +289,34 @@ export class DatabaseStorage implements IStorage {
   // Position methods
   async getAllPositions(departmentId?: number, language?: SupportedLanguage): Promise<Position[]> {
     try {
-      let result;
+      let dbPositions;
       if (departmentId) {
-        result = await db.select().from(positions).where(eq(positions.departmentId, departmentId));
+        dbPositions = await db.select().from(positions).where(eq(positions.departmentId, departmentId));
       } else {
-        result = await db.select().from(positions);
+        dbPositions = await db.select().from(positions);
       }
       
-      if (language) {
-        // Localize position fields for public API
-        return result.map(position => ({
-          ...position,
-          title: getLocalizedContent(position.title, language),
-          description: getLocalizedContent(position.description, language),
-          location: getLocalizedContent(position.location, language),
-          city: getLocalizedContent(position.city, language),
-          country: getLocalizedContent(position.country, language),
-          salaryRange: getLocalizedContent(position.salaryRange, language),
-          employmentType: getLocalizedContent(position.employmentType, language),
-          languageRequirements: getLocalizedContent(position.languageRequirements, language),
-          qualifications: getLocalizedContent(position.qualifications, language),
-          responsibilities: getLocalizedContent(position.responsibilities, language),
-        }));
-      } else {
-        // Return raw LocalizedContent objects for admin interface
-        return result;
-      }
+      // Return the full LocalizedContent objects
+      return dbPositions.map(position => {
+        // Create a new object with the correct types
+        const result: any = { ...position };
+        
+        // If language is provided, add localized versions of the fields
+        if (language) {
+          result.localizedTitle = getLocalizedContent(position.title, language);
+          result.localizedDescription = getLocalizedContent(position.description, language);
+          result.localizedLocation = getLocalizedContent(position.location, language);
+          result.localizedCity = getLocalizedContent(position.city, language);
+          result.localizedCountry = getLocalizedContent(position.country, language);
+          result.localizedSalaryRange = getLocalizedContent(position.salaryRange, language);
+          result.localizedEmploymentType = getLocalizedContent(position.employmentType, language);
+          result.localizedLanguageRequirements = getLocalizedContent(position.languageRequirements, language);
+          result.localizedQualifications = getLocalizedContent(position.qualifications, language);
+          result.localizedResponsibilities = getLocalizedContent(position.responsibilities, language);
+        }
+        
+        return result as Position;
+      });
     } catch (error) {
       console.error('Database error in getAllPositions:', error);
       // Return empty array if there's a database error
@@ -324,23 +326,29 @@ export class DatabaseStorage implements IStorage {
 
   async getPositionById(id: number, language: SupportedLanguage = 'en'): Promise<Position | undefined> {
     const result = await db.select().from(positions).where(eq(positions.id, id));
-    if (result[0]) {
-      // Localize position fields
-      return {
-        ...result[0],
-        title: getLocalizedContent(result[0].title, language),
-        description: getLocalizedContent(result[0].description, language),
-        location: getLocalizedContent(result[0].location, language),
-        city: getLocalizedContent(result[0].city, language),
-        country: getLocalizedContent(result[0].country, language),
-        salaryRange: getLocalizedContent(result[0].salaryRange, language),
-        employmentType: getLocalizedContent(result[0].employmentType, language),
-        languageRequirements: getLocalizedContent(result[0].languageRequirements, language),
-        qualifications: getLocalizedContent(result[0].qualifications, language),
-        responsibilities: getLocalizedContent(result[0].responsibilities, language),
-      };
+    if (!result[0]) {
+      return undefined;
     }
-    return undefined;
+    
+    const position = result[0];
+    // Create a new object with the correct types
+    const resultPosition: any = { ...position };
+    
+    // If language is provided, add localized versions of the fields
+    if (language) {
+      resultPosition.localizedTitle = getLocalizedContent(position.title, language);
+      resultPosition.localizedDescription = getLocalizedContent(position.description, language);
+      resultPosition.localizedLocation = getLocalizedContent(position.location, language);
+      resultPosition.localizedCity = getLocalizedContent(position.city, language);
+      resultPosition.localizedCountry = getLocalizedContent(position.country, language);
+      resultPosition.localizedSalaryRange = getLocalizedContent(position.salaryRange, language);
+      resultPosition.localizedEmploymentType = getLocalizedContent(position.employmentType, language);
+      resultPosition.localizedLanguageRequirements = getLocalizedContent(position.languageRequirements, language);
+      resultPosition.localizedQualifications = getLocalizedContent(position.qualifications, language);
+      resultPosition.localizedResponsibilities = getLocalizedContent(position.responsibilities, language);
+    }
+    
+    return resultPosition as Position;
   }
 
   async createPosition(position: InsertPosition): Promise<Position> {
@@ -398,23 +406,30 @@ export class DatabaseStorage implements IStorage {
   // Gallery item methods
   async getAllGalleryItems(category?: string, language: SupportedLanguage = 'en'): Promise<GalleryItem[]> {
     try {
-      let items: GalleryItem[];
+      let dbItems: GalleryItem[];
       if (category) {
-        items = await db.select().from(galleryItems)
+        dbItems = await db.select().from(galleryItems)
           .where(and(eq(galleryItems.isActive, true), eq(galleryItems.category, category)))
           .orderBy(galleryItems.sortOrder, galleryItems.createdAt);
       } else {
-        items = await db.select().from(galleryItems)
+        dbItems = await db.select().from(galleryItems)
           .where(eq(galleryItems.isActive, true))
           .orderBy(galleryItems.sortOrder, galleryItems.createdAt);
       }
       
-      // Apply localization to title and description
-      return items.map(item => ({
-        ...item,
-        title: getLocalizedContent(item.title, language),
-        description: getLocalizedContent(item.description, language)
-      }));
+      // Return gallery items with localized fields if language is provided
+      return dbItems.map(item => {
+        // Create a new object with the correct types
+        const result: any = { ...item };
+        
+        // If language is provided, add localized versions of the fields
+        if (language) {
+          result.localizedTitle = getLocalizedContent(item.title, language);
+          result.localizedDescription = getLocalizedContent(item.description, language);
+        }
+        
+        return result as GalleryItem;
+      });
     } catch (error) {
       console.error("Error fetching gallery items:", error);
       return [];
@@ -426,12 +441,16 @@ export class DatabaseStorage implements IStorage {
       const [item] = await db.select().from(galleryItems).where(eq(galleryItems.id, id));
       if (!item) return undefined;
       
-      // Apply localization to title and description
-      return {
-        ...item,
-        title: getLocalizedContent(item.title, language),
-        description: getLocalizedContent(item.description, language)
-      };
+      // Create a new object with the correct types
+      const result: any = { ...item };
+      
+      // If language is provided, add localized versions of the fields
+      if (language) {
+        result.localizedTitle = getLocalizedContent(item.title, language);
+        result.localizedDescription = getLocalizedContent(item.description, language);
+      }
+      
+      return result as GalleryItem;
     } catch (error) {
       console.error("Error fetching gallery item:", error);
       return undefined;
@@ -475,13 +494,14 @@ export class DatabaseStorage implements IStorage {
   // Industry tag methods
   async getAllIndustryTags(language: SupportedLanguage = 'en'): Promise<IndustryTag[]> {
     try {
-      const tags = await db.select().from(industryTags);
+      const dbTags = await db.select().from(industryTags).orderBy(industryTags.name);
       
-      // Apply localization to name and description
-      return tags.map(tag => ({
+      // For industry tags, we'll just use the English version directly
+      return dbTags.map(tag => ({
         ...tag,
-        name: getLocalizedContent(tag.name, language),
-        description: getLocalizedContent(tag.description, language)
+        // Ensure name and description are strings (use English version)
+        name: typeof tag.name === 'object' ? tag.name.en || '' : tag.name || '',
+        description: typeof tag.description === 'object' ? tag.description.en || '' : tag.description || ''
       }));
     } catch (error) {
       console.error('Error fetching industry tags:', error);
@@ -494,11 +514,12 @@ export class DatabaseStorage implements IStorage {
       const [tag] = await db.select().from(industryTags).where(eq(industryTags.id, id));
       if (!tag) return undefined;
       
-      // Apply localization to name and description
+      // For industry tags, we'll just use the English version directly
       return {
         ...tag,
-        name: getLocalizedContent(tag.name, language),
-        description: getLocalizedContent(tag.description, language)
+        // Ensure name and description are strings (use English version)
+        name: typeof tag.name === 'object' ? tag.name.en || '' : tag.name || '',
+        description: typeof tag.description === 'object' ? tag.description.en || '' : tag.description || ''
       };
     } catch (error) {
       console.error('Error fetching industry tag:', error);
@@ -550,14 +571,15 @@ export class DatabaseStorage implements IStorage {
         .from(companyIndustryTags)
         .innerJoin(industryTags, eq(companyIndustryTags.industryTagId, industryTags.id))
         .where(eq(companyIndustryTags.companyId, companyId));
-      
+
       console.log(`[Storage] getCompanyIndustryTags: Found ${results.length} tags for company ${companyId}`);
       
-      // Localize industry tag fields
+      // For company industry tags, we'll just use the English version directly
       return results.map(tag => ({
         ...tag,
-        name: getLocalizedContent(tag.name, language),
-        description: getLocalizedContent(tag.description, language),
+        // Ensure name and description are strings (use English version)
+        name: typeof tag.name === 'object' ? tag.name.en || '' : tag.name || '',
+        description: typeof tag.description === 'object' ? tag.description.en || '' : tag.description || ''
       }));
     } catch (error) {
       console.error(`[Storage] Error fetching company industry tags for company ${companyId}:`, error);

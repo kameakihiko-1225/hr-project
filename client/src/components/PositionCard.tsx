@@ -85,10 +85,8 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const companies = companiesResponse?.data || [];
   const departments = departmentsResponse?.data || [];
   
-  const departmentFromAPI = departments?.find(d => d.id === position.departmentId);
-  const companyFromAPI = companies?.find(c => c.id === departmentFromAPI?.companyId);
-  
-  // Data loading is working correctly
+  const departmentFromAPI = departments?.find((d: { id: string }) => d.id === position.departmentId);
+  const companyFromAPI = companies?.find((c: { id: string }) => c.id === departmentFromAPI?.companyId);
 
   const handleEdit = () => {
     if (onEdit) {
@@ -106,6 +104,17 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   const handleLogoError = () => {
     logger.warn(`Failed to load logo for company: ${companyName}`);
     setLogoError(true);
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't trigger if clicking on interactive elements
+    if ((e.target as HTMLElement).closest('button, a, [role="button"]')) {
+      return;
+    }
+    // Only open details if not already open and not in admin mode
+    if (!onEdit && !isDetailsDialogOpen) {
+      setIsDetailsDialogOpen(true);
+    }
   };
 
   const handleApply = async () => {
@@ -169,32 +178,55 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     const department = departmentFromAPI;
     const company = companyFromAPI;
 
+    // Helper to safely get localized content with fallback
+    const safeGetLocalized = (content: string | LocalizedContent | undefined, fallback: string = '') => {
+      return content ? getLocalizedContent(content) : fallback;
+    };
+
     return {
-      // Logo: use position logo -> company logo -> fallback
-      logoUrl: basePosition.logoUrl || company?.logoUrl || null,
+      // Logo: use company logo
+      logoUrl: company?.logoUrl || null,
       
       // Location: use position location -> department location -> company location
-      city: getLocalizedContent(basePosition.city) || getLocalizedContent(department?.city) || getLocalizedContent(company?.city) || null,
-      country: getLocalizedContent(basePosition.country) || getLocalizedContent(department?.country) || getLocalizedContent(company?.country) || null,
+      city: safeGetLocalized(
+        basePosition.city || 
+        (department?.city as string | LocalizedContent | undefined) || 
+        (company?.city as string | LocalizedContent | undefined)
+      ),
+      
+      country: safeGetLocalized(
+        basePosition.country || 
+        (department?.country as string | LocalizedContent | undefined) || 
+        (company?.country as string | LocalizedContent | undefined)
+      ),
       
       // Company info
-      companyName: company ? getLocalizedContent(company.name) : 'Company',
+      companyName: safeGetLocalized(company?.name as string | LocalizedContent | undefined, 'Company'),
       companyColor: company?.color || '#b69b83',
       
       // Department info
-      departmentName: department ? getLocalizedContent(department.name) : 'Department',
+      departmentName: safeGetLocalized(department?.name as string | LocalizedContent | undefined, 'Department'),
       
       // Description inheritance
-      description: basePosition.description ? getLocalizedContent(basePosition.description) : 
-                   department?.description ? getLocalizedContent(department.description) : 
-                   company?.description ? getLocalizedContent(company.description) : null,
+      description: safeGetLocalized(
+        basePosition.description || 
+        (department?.description as string | LocalizedContent | undefined) || 
+        (company?.description as string | LocalizedContent | undefined)
+      ),
     };
   };
 
   const inheritedData = getInheritedData();
   const companyName = inheritedData.companyName;
   const companyLogoUrl = inheritedData.logoUrl;
-  const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
+  const postedAgo = position.createdAt 
+    ? formatDistanceToNow(
+        typeof position.createdAt === 'string' 
+          ? new Date(position.createdAt) 
+          : position.createdAt, 
+        { addSuffix: true }
+      )
+    : '';
 
   const CompanyAvatar = () => (
     <Avatar className="h-16 w-16 border-2 border-white/30 shadow-2xl group-hover:shadow-3xl group-hover:scale-105 transition-all duration-300">
@@ -209,7 +241,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         />
       ) : (
         <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-lg shadow-inner">
-          {companyName.charAt(0)}
+          {companyName?.charAt(0) || 'C'}
         </AvatarFallback>
       )}
     </Avatar>
@@ -219,10 +251,13 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     <Card
       tabIndex={0}
       role="button"
+      onClick={handleCardClick}
       onKeyDown={(e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') handleApply();
+        if (e.key === 'Enter') {
+          handleCardClick(e as unknown as React.MouseEvent);
+        }
       }}
-      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[440px] w-full max-w-[460px] flex flex-col"
+      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[440px] w-full max-w-[460px] flex flex-col cursor-pointer"
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -300,8 +335,8 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
               <Building2 className="h-4 w-4" />
               {position.departments.map((dp, idx) => (
                 <span key={dp.department.id} className="flex items-center">
-                  {getLocalizedContent(dp.department.name)}
-                  {idx < position.departments.length - 1 && <span className="mx-1">|</span>}
+                  {getLocalizedContent(dp.department.name as string | LocalizedContent)}
+                  {idx < position.departments!.length - 1 && <span className="mx-1">|</span>}
                 </span>
               ))}
             </p>
@@ -329,10 +364,19 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
 
         <div className="flex flex-wrap gap-2 mt-auto text-sm text-muted-foreground">
           {position.city && (
-            <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {position.city}{position.country ? `, ${position.country}` : ''}</span>
+            <span className="flex items-center gap-1">
+              <MapPin className="h-4 w-4" />
+              {getLocalizedContent(position.city)}
+              {position.country && (
+                <>, {getLocalizedContent(position.country)}</>
+              )}
+            </span>
           )}
           {position.employmentType && (
-            <span className="flex items-center gap-1"><Briefcase className="h-4 w-4" /> {position.employmentType}</span>
+            <span className="flex items-center gap-1">
+              <Briefcase className="h-4 w-4" />
+              {getLocalizedContent(position.employmentType)}
+            </span>
           )}
         </div>
       </CardContent>
@@ -369,7 +413,12 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <ExternalLink className="h-3 w-3 flex-shrink-0" />
                 <span className="hidden lg:inline truncate">{t('position_card.view_details')}</span>
               </Button>
@@ -440,7 +489,9 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
               <div>
                 <h4 className="text-sm font-medium mb-2">{t('modals.position_details.created')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(position.createdAt).toLocaleDateString()}
+                  {position.createdAt ? (
+                    new Date(position.createdAt).toLocaleDateString()
+                  ) : t('common.not_available')}
                 </p>
               </div>
             </div>
