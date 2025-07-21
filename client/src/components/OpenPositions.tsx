@@ -37,21 +37,36 @@ export const OpenPositions = ({
     queryKey: ['positions', 'all', i18n.language, 'public'], // Optimized query key structure
     queryFn: async () => {
       try {
+        const abortController = new AbortController();
+        const timeoutId = setTimeout(() => abortController.abort(), 10000); // 10 second timeout
+        
         const response = await fetch(`/api/positions?language=${i18n.language}`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
             'Accept-Encoding': 'gzip, deflate, br', // Enable compression
           },
+          signal: abortController.signal,
         });
+        
+        clearTimeout(timeoutId);
+        
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: Failed to fetch positions`);
         }
         const data = await response.json();
         return data;
-      } catch (err) {
-        console.error('Error fetching positions:', err);
-        throw err;
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          console.error('Request timed out:', err);
+          throw new Error('Request timed out. Please try again.');
+        } else if (err instanceof DOMException) {
+          console.error('DOM Exception during fetch:', err);
+          throw new Error('Network error occurred. Please check your connection.');
+        } else {
+          console.error('Error fetching positions:', err);
+          throw err;
+        }
       }
     },
     staleTime: 0,
@@ -69,7 +84,7 @@ export const OpenPositions = ({
       console.log('⇠ positions from API (React Query)', allPositions);
       console.log('🔄 Cache timestamp:', new Date().toISOString());
       // Log apply links to verify they're current
-      allPositions.forEach(pos => {
+      allPositions.forEach((pos: any) => {
         console.log(`Position ${pos.id} (${pos.title}) applyLink:`, pos.applyLink);
       });
     }
@@ -77,7 +92,7 @@ export const OpenPositions = ({
 
   // Refresh positions when coming from admin panel
   useEffect(() => {
-    const handleStorageChange = (e) => {
+    const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'positions_updated') {
         setRefreshKey(prev => prev + 1);
         localStorage.removeItem('positions_updated');
@@ -131,7 +146,7 @@ export const OpenPositions = ({
   // Create a map for easy lookup of applicant counts and determine top-tier badges
   const applicantCountMap = new Map<number, { count: number; topTierBadge?: 1 | 2 | 3 }>();
   
-  applicantCounts.forEach((item, index) => {
+  applicantCounts.forEach((item: any, index: number) => {
     const badge = index < 3 ? (index + 1) as (1 | 2 | 3) : undefined;
     applicantCountMap.set(item.positionId, { 
       count: item.appliedCount, 
@@ -139,10 +154,10 @@ export const OpenPositions = ({
     });
   });
 
-  const filteredPositions = allPositions.filter(pos => {
+  const filteredPositions = allPositions.filter((pos: any) => {
     // Find department and company data for this position
-    const department = departments.find(d => d.id === pos.departmentId);
-    const company = department ? companies.find(c => c.id === department.companyId) : null;
+    const department = departments.find((d: any) => d.id === pos.departmentId);
+    const company = department ? companies.find((c: any) => c.id === department.companyId) : null;
 
     // Handle localized content properly
     const getLocalizedText = (content: any) => {
@@ -176,7 +191,7 @@ export const OpenPositions = ({
       });
 
     return companyMatch && departmentMatch && positionMatch;
-  }).sort((a, b) => {
+  }).sort((a: any, b: any) => {
     // Sort by application count in descending order (most applied first)
     const aCount = applicantCountMap.get(a.id)?.count || 0;
     const bCount = applicantCountMap.get(b.id)?.count || 0;
@@ -196,7 +211,7 @@ export const OpenPositions = ({
     : filteredPositions.slice(indexOfFirstItem, indexOfLastItem);
 
   // Generate page numbers for pagination
-  const pageNumbers = [];
+  const pageNumbers: number[] = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
@@ -319,7 +334,7 @@ export const OpenPositions = ({
                 {/* Mobile horizontal scroll container - Always enabled */}
                 <div className="md:hidden overflow-x-auto scrollbar-hide pb-2">
                   <div className="flex gap-2 px-2 sm:gap-3 sm:px-3" style={{ width: 'max-content' }}>
-                    {currentPositions.map((pos, index) => {
+                    {currentPositions.map((pos: any, index: number) => {
                       const applicantData = applicantCountMap.get(pos.id);
                       return (
                         <div 
@@ -340,7 +355,7 @@ export const OpenPositions = ({
                   {/* Enhanced scroll indicator for mobile */}
                   <div className="flex justify-center items-center mt-3">
                     <div className="flex items-center space-x-1">
-                      {currentPositions.slice(0, Math.min(4, currentPositions.length)).map((_, index) => (
+                      {currentPositions.slice(0, Math.min(4, currentPositions.length)).map((_: any, index: number) => (
                         <div key={index} className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
                       ))}
                       {currentPositions.length > 4 && (
@@ -354,7 +369,7 @@ export const OpenPositions = ({
                 
                 {/* Desktop grid layout */}
                 <div className="hidden md:contents">
-                  {currentPositions.map((pos, index) => {
+                  {currentPositions.map((pos: any, index: number) => {
                     const applicantData = applicantCountMap.get(pos.id);
                     return (
                       <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[460px]">
