@@ -119,7 +119,7 @@ export const AllAppliedPositionsListing = () => {
         {displayedPositions.map((position, index) => (
           <div
             key={position.positionId}
-            className={`group flex items-center justify-between px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 ${
+            className={`group flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 ${
               index !== displayedPositions.length - 1 ? 'border-b border-gray-100 dark:border-gray-700' : ''
             }`}
           >

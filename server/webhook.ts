@@ -1,14 +1,20 @@
 // Import required modules - use exact same approach as working simple-server.js
 import axiosDefault from 'axios';
 import FormDataClass from 'form-data';
+import fs from 'fs';
+import path from 'path';
 
 const axios = axiosDefault;
 const FormData = FormDataClass;
 
 const BITRIX_BASE = 'https://millatumidi.bitrix24.kz/rest/21/wx0c9lt1mxcwkhz9';
+const TELEGRAM_API_BASE = 'https://api.telegram.org';
+
+// Hardcoded Telegram Bot Token - directly set like Bitrix24  
+const TELEGRAM_BOT_TOKEN = '7191717059:AAHIlA-fAxxzlwYEnse3vSBlQLH_4ozhPTY';
 
 function getBotToken() {
-  return process.env.TELEGRAM_BOT_TOKEN || '7191717059:AAHIlA-fAxxzlwYEnse3vSBlQLH_4ozhPTY';
+  return TELEGRAM_BOT_TOKEN;
 }
 
 function normalizePhone(phone: string): string {
@@ -37,10 +43,129 @@ function sanitizeFromBOM(text: any): any {
   return text.replace(/[\uFEFF\u200B\u200C\u200D\u2060]/g, '').trim();
 }
 
+// Telegram File Download Functions
+async function getTelegramFileInfo(fileId: string): Promise<{ file_path: string; file_size: number } | null> {
+  const botToken = getBotToken();
+  if (!botToken) {
+    console.log('❌ [TELEGRAM-FILE] No bot token available');
+    return null;
+  }
+
+  try {
+    const response = await axios.get(`${TELEGRAM_API_BASE}/bot${botToken}/getFile?file_id=${fileId}`, {
+      timeout: 3000
+    });
+    
+    if (response.data.ok && response.data.result) {
+      const fileInfo = response.data.result;
+      return {
+        file_path: fileInfo.file_path,
+        file_size: fileInfo.file_size || 0
+      };
+    } else {
+      return null;
+    }
+  } catch (error: any) {
+    return null;
+  }
+}
+
+async function downloadTelegramFile(fileId: string, fileName: string): Promise<string | null> {
+  const botToken = getBotToken();
+  if (!botToken) {
+    console.log('❌ [TELEGRAM-FILE] No bot token available for download');
+    return null;
+  }
+
+  try {
+    // Get file info first
+    const fileInfo = await getTelegramFileInfo(fileId);
+    if (!fileInfo) {
+      console.log(`❌ [TELEGRAM-FILE] Could not get file info for ${fileId}`);
+      return null;
+    }
+
+    console.log(`📥 [TELEGRAM-FILE] Downloading file: ${fileInfo.file_path}`);
+    
+    // Download the file
+    const downloadUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${fileInfo.file_path}`;
+    const response = await axios.get(downloadUrl, { responseType: 'stream' });
+
+    // Ensure uploads directory exists
+    const uploadsDir = path.join(process.cwd(), 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      console.log(`📁 [TELEGRAM-FILE] Created uploads directory: ${uploadsDir}`);
+    }
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const fileExtension = path.extname(fileInfo.file_path) || '.file';
+    const uniqueFileName = `telegram_${fileName}_${timestamp}${fileExtension}`;
+    const localFilePath = path.join(uploadsDir, uniqueFileName);
+
+    // Save file locally
+    const writer = fs.createWriteStream(localFilePath);
+    response.data.pipe(writer);
+
+    return new Promise((resolve, reject) => {
+      writer.on('finish', () => {
+        console.log(`✅ [TELEGRAM-FILE] File downloaded successfully: ${localFilePath}`);
+        // Return the public URL that Bitrix24 can access
+        const publicUrl = `/uploads/${uniqueFileName}`;
+        console.log(`🌐 [TELEGRAM-FILE] Public URL: ${publicUrl}`);
+        resolve(publicUrl);
+      });
+      writer.on('error', (error) => {
+        console.log(`❌ [TELEGRAM-FILE] Error saving file:`, error);
+        reject(error);
+      });
+    });
+
+  } catch (error: any) {
+    console.log(`❌ [TELEGRAM-FILE] Error downloading file:`, error.message);
+    return null;
+  }
+}
+
+async function convertTelegramFileIdToUrl(fileId: string, fieldName: string): Promise<string> {
+  if (!fileId || !isTelegramFileId(fileId)) {
+    return fileId; // Return as-is if not a valid file ID
+  }
+
+  const botToken = getBotToken();
+  if (!botToken) {
+    return fileId;
+  }
+
+  try {
+    // Get file info from Telegram with timeout
+    const fileInfo = await Promise.race([
+      getTelegramFileInfo(fileId),
+      new Promise<null>((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 3000)
+      )
+    ]);
+    
+    if (!fileInfo) {
+      return fileId;
+    }
+
+    // Create direct Telegram download URL
+    const telegramUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${fileInfo.file_path}`;
+    return telegramUrl;
+
+  } catch (error: any) {
+    return fileId; // Fallback to original ID if conversion fails
+  }
+}
+
 async function findExistingContact(phone: string): Promise<string | null> {
   if (!phone) return null;
   try {
-    const searchResp = await axios.get(`${BITRIX_BASE}/crm.contact.list.json?filter[PHONE]=${phone}`);
+    const searchResp = await axios.get(`${BITRIX_BASE}/crm.contact.list.json?filter[PHONE]=${phone}`, {
+      timeout: 5000
+    });
     const contacts = searchResp.data.result;
     return contacts && contacts.length > 0 ? contacts[0].ID : null;
   } catch {
@@ -163,34 +288,40 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  ❌ No valid phone number found. Raw: ${JSON.stringify(cleanedData.phone_number_uzbek)}`);
   }
 
-  // Handle file fields
+  // Handle file fields with Telegram download - INLINE PROCESSING
   console.log('');
-  console.log('📎 [WEBHOOK-PROCESSING] FILE FIELDS PROCESSING:');
+  console.log('📎 [WEBHOOK-PROCESSING] FILE FIELDS PROCESSING WITH TELEGRAM DOWNLOAD:');
   const resumeFileId = cleanedData.resume;
   const diplomaFileId = cleanedData.diploma;
   
   console.log(`  - Resume field: ${JSON.stringify(resumeFileId)}`);
-  console.log(`  - Resume is valid Telegram file ID: ${isTelegramFileId(resumeFileId)}`);
   console.log(`  - Diploma field: ${JSON.stringify(diplomaFileId)}`);
-  console.log(`  - Diploma is valid Telegram file ID: ${isTelegramFileId(diplomaFileId)}`);
   
+  // Process resume file directly
   if (resumeFileId && isTelegramFileId(resumeFileId)) {
-    contactFields.UF_CRM_1752621810 = resumeFileId;
-    console.log(`  ✅ Added resume file ID to UF_CRM_1752621810: ${resumeFileId}`);
+    console.log(`  🔄 Converting resume file ID...`);
+    const resumeUrl = await convertTelegramFileIdToUrl(resumeFileId, 'resume');
+    contactFields.UF_CRM_1752621810 = resumeUrl;
+    console.log(`  ✅ Resume URL set: ${resumeUrl}`);
   } else {
-    console.log(`  ❌ Resume file ID invalid or missing`);
+    contactFields.UF_CRM_1752621810 = resumeFileId || '';
+    console.log(`  ⚪ Resume kept as-is: ${resumeFileId}`);
   }
   
+  // Process diploma file directly  
   if (diplomaFileId && isTelegramFileId(diplomaFileId)) {
-    contactFields.UF_CRM_1752621831 = diplomaFileId;
-    console.log(`  ✅ Added diploma file ID to UF_CRM_1752621831: ${diplomaFileId}`);
+    console.log(`  🔄 Converting diploma file ID...`);
+    const diplomaUrl = await convertTelegramFileIdToUrl(diplomaFileId, 'diploma');
+    contactFields.UF_CRM_1752621831 = diplomaUrl;
+    console.log(`  ✅ Diploma URL set: ${diplomaUrl}`);
   } else {
-    console.log(`  ❌ Diploma file ID invalid or missing`);
+    contactFields.UF_CRM_1752621831 = diplomaFileId || '';
+    console.log(`  ⚪ Diploma kept as-is: ${diplomaFileId}`);
   }
 
-  // Handle phase2 answers
+  // Handle phase2 answers with file download support
   console.log('');
-  console.log('💬 [WEBHOOK-PROCESSING] PHASE2 ANSWERS PROCESSING:');
+  console.log('💬 [WEBHOOK-PROCESSING] PHASE2 ANSWERS PROCESSING WITH FILE SUPPORT:');
   const phase2_q1 = cleanedData.phase2_q_1 || '';
   const phase2_q2 = cleanedData.phase2_q_2 || '';
   const phase2_q3 = cleanedData.phase2_q_3 || '';
@@ -199,23 +330,52 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log(`  - Q2: ${JSON.stringify(phase2_q2)} (${phase2_q2 ? 'HAS VALUE' : 'EMPTY'})`);
   console.log(`  - Q3: ${JSON.stringify(phase2_q3)} (${phase2_q3 ? 'HAS VALUE' : 'EMPTY'})`);
 
+  // Process Q1 - check if it's a file ID or text
   if (phase2_q1) {
-    contactFields.UF_CRM_1752241370 = phase2_q1;
-    console.log(`  ✅ Added Q1 to UF_CRM_1752241370: ${phase2_q1}`);
-  }
-  if (phase2_q2) {
-    contactFields.UF_CRM_1752241378 = phase2_q2;
-    console.log(`  ✅ Added Q2 to UF_CRM_1752241378: ${phase2_q2}`);
-  }
-  if (phase2_q3) {
-    contactFields.UF_CRM_1752241386 = phase2_q3;
-    console.log(`  ✅ Added Q3 to UF_CRM_1752241386: ${phase2_q3}`);
+    if (isTelegramFileId(phase2_q1)) {
+      console.log(`  🎧 Q1 is file ID, converting to URL...`);
+      const q1Url = await convertTelegramFileIdToUrl(phase2_q1, 'phase2_q1');
+      contactFields.UF_CRM_1752621857 = q1Url; // Voice field
+      contactFields.UF_CRM_1752241370 = `Voice answer: ${q1Url}`; // Text field with URL
+      console.log(`  ✅ Q1 voice URL: ${q1Url}`);
+    } else {
+      contactFields.UF_CRM_1752241370 = phase2_q1; // Text field
+      console.log(`  ✅ Q1 text: ${phase2_q1}`);
+    }
   }
 
-  // Add comments
+  // Process Q2 - check if it's a file ID or text
+  if (phase2_q2) {
+    if (isTelegramFileId(phase2_q2)) {
+      console.log(`  🎧 Q2 is file ID, converting to URL...`);
+      const q2Url = await convertTelegramFileIdToUrl(phase2_q2, 'phase2_q2');
+      contactFields.UF_CRM_1752621874 = q2Url; // Voice field
+      contactFields.UF_CRM_1752241378 = `Voice answer: ${q2Url}`; // Text field with URL
+      console.log(`  ✅ Q2 voice URL: ${q2Url}`);
+    } else {
+      contactFields.UF_CRM_1752241378 = phase2_q2; // Text field
+      console.log(`  ✅ Q2 text: ${phase2_q2}`);
+    }
+  }
+
+  // Process Q3 - check if it's a file ID or text
+  if (phase2_q3) {
+    if (isTelegramFileId(phase2_q3)) {
+      console.log(`  🎧 Q3 is file ID, converting to URL...`);
+      const q3Url = await convertTelegramFileIdToUrl(phase2_q3, 'phase2_q3');
+      contactFields.UF_CRM_1752621887 = q3Url; // Voice field
+      contactFields.UF_CRM_1752241386 = `Voice answer: ${q3Url}`; // Text field with URL
+      console.log(`  ✅ Q3 voice URL: ${q3Url}`);
+    } else {
+      contactFields.UF_CRM_1752241386 = phase2_q3; // Text field
+      console.log(`  ✅ Q3 text: ${phase2_q3}`);
+    }
+  }
+
+  // Add comments with file URLs
   const comments = [];
-  if (resumeFileId) comments.push(`Resume: ${resumeFileId}`);
-  if (diplomaFileId) comments.push(`Diploma: ${diplomaFileId}`);
+  if (contactFields.UF_CRM_1752621810) comments.push(`Resume URL: ${contactFields.UF_CRM_1752621810}`);
+  if (contactFields.UF_CRM_1752621831) comments.push(`Diploma URL: ${contactFields.UF_CRM_1752621831}`);
   if (age) comments.push(`The Age is ${age}`);
   if (comments.length > 0) {
     contactFields.COMMENTS = comments.join('\\n');

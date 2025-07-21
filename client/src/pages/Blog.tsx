@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Heart, Award, Coffee, Lightbulb, Target, Images, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { type GalleryItem } from "@shared/schema";
+import SEOHead from "@/components/SEOHead";
+import { getPageSEO } from "@/utils/seoUtils";
 
 const categoryIcons = {
   teamwork: Users,
@@ -25,19 +27,40 @@ const categoryColors = {
 };
 
 export default function Blog() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+  
+  const seoData = getPageSEO('blog', i18n.language);
 
   // Fetch blog items from API
   const { data: blogResponse, isLoading, error } = useQuery({
-    queryKey: ['blog'],
-    queryFn: () => fetch('/api/gallery').then(res => res.json()),
+    queryKey: ['blog', 'gallery-items'],
+    queryFn: async () => {
+      const response = await fetch('/api/gallery', {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      const data = await response.json();
+      console.log('Blog API response:', data);
+      return data;
+    },
+    staleTime: 0, // Always refetch
+    gcTime: 0, // Don't cache
   });
 
   const blogItems: GalleryItem[] = blogResponse?.data || [];
+  
+  console.log('Blog data debug:', {
+    blogResponse,
+    blogItems,
+    blogItemsLength: blogItems.length,
+    filteredItemsLength: blogItems.length
+  });
 
 
 
@@ -80,6 +103,13 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead 
+        title={seoData.title}
+        description={seoData.description}
+        keywords={seoData.keywords}
+        canonical={seoData.canonical}
+        type="website"
+      />
       <Header />
       
       {/* Hero Section */}
@@ -129,12 +159,17 @@ export default function Blog() {
                 {filteredItems.length === 0 ? (
                   <div className="text-center py-16">
                     <Images className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-600 mb-2">No items found</h3>
+                    <h3 className="text-xl font-semibold text-gray-600 mb-2">No blog posts found</h3>
                     <p className="text-gray-500">
                       {selectedCategory === 'all' 
-                        ? 'No gallery items are currently available.' 
-                        : `No items found in the ${selectedCategory} category.`}
+                        ? 'No blog posts are currently available. Check back soon for updates!' 
+                        : `No blog posts found in the ${selectedCategory} category.`}
                     </p>
+                    <div className="mt-4">
+                      <p className="text-sm text-gray-400">
+                        API Response: {JSON.stringify(blogResponse)}
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -150,7 +185,7 @@ export default function Blog() {
                           <div className="relative overflow-hidden">
                             <img 
                               src={item.imageUrl} 
-                              alt={item.title}
+                              alt={typeof item.title === 'string' ? item.title : item.title.en || ''}
                               className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
@@ -169,10 +204,10 @@ export default function Blog() {
                           </div>
                           <CardContent className="p-6">
                             <h3 className="text-xl font-semibold mb-3 group-hover:text-blue-600 transition-colors">
-                              {item.title}
+                              {typeof item.title === 'string' ? item.title : item.title.en || ''}
                             </h3>
                             <p className="text-gray-600 mb-4 line-clamp-3">
-                              {item.description}
+                              {typeof item.description === 'string' ? item.description : item.description.en || ''}
                             </p>
                           </CardContent>
                         </Card>

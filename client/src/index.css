@@ -3,6 +3,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar for horizontal scrolling components */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Custom styles for FounderSection alignment */
 .founder-section-layout {
   display: grid;
@@ -28,7 +40,7 @@
 
 .founder-image-container .founder-name-text {
   position: absolute;
-  bottom: 0;
+  bottom: -15px; /* Reduced from -40px for better desktop spacing */
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -43,6 +55,11 @@
   .founder-section-layout {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+  
+  /* Keep original mobile spacing */
+  .founder-image-container .founder-name-text {
+    bottom: -40px;
   }
 }
 

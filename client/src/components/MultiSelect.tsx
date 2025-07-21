@@ -98,7 +98,7 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
     >
       <div
         className={`
-          min-h-[48px] p-3 border-2 border-gray-200 rounded-lg bg-white
+          min-h-[40px] sm:min-h-[48px] p-2 sm:p-3 border-2 border-gray-200 rounded-lg bg-white
           cursor-pointer transition-all duration-300 hover:border-blue-300 focus-within:border-blue-500
           ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}
           ${isOpen ? 'border-blue-500 shadow-lg shadow-blue-100' : ''}
@@ -111,16 +111,16 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
               selected.map((item) => (
                 <span
                   key={item}
-                  className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 
-                           border border-blue-200 rounded-md text-sm text-blue-800"
+                  className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-100 
+                           border border-blue-200 rounded-md text-xs sm:text-sm text-blue-800 max-w-full truncate"
                 >
-                  {item}
+                  <span className="truncate">{item}</span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       removeSelected(item);
                     }}
-                    className="text-blue-600 hover:text-blue-800 transition-colors ml-1"
+                    className="text-blue-600 hover:text-blue-800 transition-colors ml-1 flex-shrink-0"
                     aria-label={`Remove ${item}`}
                   >
                     ×
@@ -128,11 +128,11 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
                 </span>
               ))
             ) : (
-              <span className="text-gray-500">{placeholder}</span>
+              <span className="text-gray-500 text-sm sm:text-base">{placeholder}</span>
             )}
           </div>
           <ChevronDown 
-            className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${
+            className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-400 transition-transform duration-300 flex-shrink-0 ${
               isOpen ? 'rotate-180' : ''
             }`} 
           />
@@ -142,12 +142,12 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
       {isOpen && !disabled && (
         <div 
           ref={dropdownRef}
-          className="fixed md:absolute top-auto md:top-full left-0 md:left-auto right-0 md:right-auto mt-1 max-h-48 overflow-y-auto 
-                     bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] animate-fade-in min-w-[300px] md:min-w-full"
+          className="fixed md:absolute top-auto md:top-full left-0 md:left-auto right-0 md:right-auto mt-1 sm:mt-2 max-h-40 sm:max-h-48 overflow-y-auto 
+                     bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] md:z-[60] animate-fade-in min-w-[300px] md:min-w-full"
           onMouseEnter={handleMouseEnter}
         >
-          <div className="sticky top-0 bg-white border-b border-gray-200 p-2 flex justify-between items-center">
-            <span className="text-xs font-medium text-gray-600 truncate flex-1 mr-2">
+          <div className="sticky top-0 bg-white border-b border-gray-200 p-1.5 sm:p-2 flex justify-between items-center">
+            <span className="text-[10px] sm:text-xs font-medium text-gray-600 truncate flex-1 mr-2">
               {selected.length > 0 ? `${selected.length} selected` : 'Available options'}
             </span>
             <button
@@ -155,10 +155,10 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
                 e.stopPropagation();
                 setIsOpen(false);
               }}
-              className="p-1 hover:bg-gray-100 rounded-full flex-shrink-0"
+              className="p-0.5 sm:p-1 hover:bg-gray-100 rounded-full flex-shrink-0"
               aria-label="Close dropdown"
             >
-              <X className="w-3 h-3 text-gray-500" />
+              <X className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-500" />
             </button>
           </div>
           
@@ -167,15 +167,15 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
               <div
                 key={option}
                 className={`
-                  px-3 py-2 cursor-pointer transition-all duration-200 hover:bg-blue-50
+                  px-2 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition-all duration-200 hover:bg-blue-50 text-sm
                   ${selected.includes(option) ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}
                 `}
                 onClick={() => toggleOption(option)}
               >
                 <div className="flex items-center justify-between">
-                  <span>{option}</span>
+                  <span className="truncate">{option}</span>
                   {selected.includes(option) && (
-                    <span className="text-blue-600">✓</span>
+                    <span className="text-blue-600 ml-2 flex-shrink-0">✓</span>
                   )}
                 </div>
               </div>

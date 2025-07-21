@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
 import { useToast } from '../../../components/ui/use-toast';
 import { AdminPositionCard } from '../../../components/AdminPositionCard';
-import { createPosition, deletePosition, getPositions, getDepartments, updatePosition } from '../../../lib/api';
+import { createPosition, deletePosition, getPositions, getDepartments, updatePosition, getCompanies } from '../../../lib/api';
 import { Position } from '../../../types/position';
 import { Department } from '../../../types/department';
 import { Loader2, Plus, Briefcase, Search } from 'lucide-react';
@@ -28,9 +28,18 @@ export default function PositionsPage() {
     if (typeof content === 'string') return content;
     return content[i18n.language as keyof LocalizedContent] || content.en || '';
   };
+
+  // Helper function to get department display name with company
+  const getDepartmentDisplayName = (department: Department): string => {
+    const departmentName = getLocalizedContent(department.name);
+    const company = companies.find(c => c.id === department.companyId);
+    const companyName = company ? getLocalizedContent(company.name) : '';
+    return companyName ? `${departmentName} (${companyName})` : departmentName;
+  };
   
   const [positions, setPositions] = useState<Position[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [companies, setCompanies] = useState<any[]>([]);
   const [applicantCounts, setApplicantCounts] = useState<{ positionId: number; positionTitle: string; appliedCount: number; }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -63,15 +72,35 @@ export default function PositionsPage() {
     'Temporary'
   ];
 
-  // Load positions and departments with optimized parallel loading
+  // Load positions and departments with optimized batch loading
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Fetch departments, positions, and applicant counts in parallel for better performance
-        const [departmentsData, positionsData, applicantCountsData] = await Promise.allSettled([
-          getDepartments(undefined, true, undefined, true), // Use raw=true for admin interface
-          getPositions(undefined, undefined, true), // Use raw=true for admin interface
+        // Use optimized batch endpoint for better performance
+        const response = await fetch(`/api/admin/positions-batch?includeStats=true${selectedDepartmentId !== 'all' ? `&departmentId=${selectedDepartmentId}` : ''}`);
+        const result = await response.json();
+        
+        if (result.success) {
+          const { positions, departments, companies, applicantCounts } = result.data;
+          
+          setPositions(positions || []);
+          setDepartments(departments || []);
+          setCompanies(companies || []);
+          setApplicantCounts(applicantCounts || []);
+          
+          console.log(`[PositionsPage] Batch loaded: ${positions?.length || 0} positions, ${departments?.length || 0} departments`);
+        } else {
+          throw new Error(result.error || 'Failed to fetch batch data');
+        }
+      } catch (error) {
+        console.error('[PositionsPage] Batch fetch failed, falling back to individual requests');
+        
+        // Fallback to individual requests if batch fails
+        const [departmentsData, positionsData, companiesData, applicantCountsData] = await Promise.allSettled([
+          getDepartments(undefined, true, undefined, true),
+          fetch('/api/positions?raw=true').then(res => res.json()),
+          getCompanies(),
           fetch('/api/all-applied-positions').then(res => res.json())
         ]);
         
@@ -85,12 +114,12 @@ export default function PositionsPage() {
           setDepartments([]);
         }
 
-        // Handle applicant counts
-        if (applicantCountsData.status === 'fulfilled' && applicantCountsData.value?.data && Array.isArray(applicantCountsData.value.data)) {
-          setApplicantCounts(applicantCountsData.value.data);
+        // Handle companies
+        if (companiesData.status === 'fulfilled' && companiesData.value?.success && Array.isArray(companiesData.value.data)) {
+          setCompanies(companiesData.value.data);
         } else {
-          console.error('Failed to load applicant counts:', applicantCountsData.status === 'rejected' ? applicantCountsData.reason : 'Invalid data');
-          setApplicantCounts([]);
+          console.error('Failed to load companies:', companiesData.status === 'rejected' ? companiesData.reason : 'Invalid data');
+          setCompanies([]);
         }
 
         // Handle positions
@@ -100,31 +129,21 @@ export default function PositionsPage() {
           console.error('Failed to load positions:', positionsData.status === 'rejected' ? positionsData.reason : 'Invalid data');
           setPositions([]);
         }
-        
-        // Only show error toast if both requests failed
-        if (departmentsData.status === 'rejected' && positionsData.status === 'rejected') {
-          toast({
-            title: 'Error',
-            description: 'Failed to load data. Please try again.',
-            variant: 'destructive'
-          });
+
+        // Handle applicant counts
+        if (applicantCountsData.status === 'fulfilled' && applicantCountsData.value && Array.isArray(applicantCountsData.value)) {
+          setApplicantCounts(applicantCountsData.value);
+        } else {
+          console.error('Failed to load applicant counts:', applicantCountsData.status === 'rejected' ? applicantCountsData.reason : 'Invalid data');
+          setApplicantCounts([]);
         }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setDepartments([]);
-        setPositions([]);
-        toast({
-          title: 'Error',
-          description: 'Failed to load data. Please try again.',
-          variant: 'destructive'
-        });
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [selectedDepartmentId, toast]);
+  }, [selectedDepartmentId]);
 
   // Update URL when department filter changes (commented out - no longer needed)
   // useEffect(() => {
@@ -377,7 +396,7 @@ export default function PositionsPage() {
               <SelectItem value="all">All Departments</SelectItem>
               {Array.isArray(departments) && departments.map((department) => (
                 <SelectItem key={department.id} value={department.id}>
-                  {getLocalizedContent(department.name)}
+                  {getDepartmentDisplayName(department)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -449,7 +468,7 @@ export default function PositionsPage() {
                 <SelectContent>
                   {Array.isArray(departments) && departments.map((department) => (
                     <SelectItem key={department.id} value={department.id}>
-                      {getLocalizedContent(department.name)} {department.company ? `(${getLocalizedContent(department.company.name)})` : ''}
+                      {getDepartmentDisplayName(department)}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -9,6 +9,8 @@ import { IndustryTag } from "@/types/company";
 import { createLogger } from "@/lib/logger";
 import api from "@/lib/api";
 import { toast } from "@/components/ui/use-toast";
+import { getLocalizedContent } from "@shared/schema";
+import { useTranslation } from "react-i18next";
 
 const logger = createLogger('industryTagSelect');
 
@@ -28,6 +30,7 @@ export function IndustryTagSelect({
   const [isCreating, setIsCreating] = useState(false);
   const [availableTags, setAvailableTags] = useState<IndustryTag[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { i18n } = useTranslation();
 
   // Fetch available tags on mount
   useEffect(() => {
@@ -79,7 +82,10 @@ export function IndustryTagSelect({
       
       // Check if tag already exists
       const existingTag = availableTags.find(
-        tag => tag.name.toLowerCase() === name.toLowerCase()
+        tag => {
+          const tagName = typeof tag.name === 'string' ? tag.name : tag.name?.en || '';
+          return tagName.toLowerCase() === name.toLowerCase();
+        }
       );
       
       if (existingTag) {
@@ -90,8 +96,14 @@ export function IndustryTagSelect({
         return;
       }
       
-      // Create new tag
-      const response = await api.post('/industry-tags', { name });
+      // Create new tag with LocalizedContent format
+      const response = await api.post('/industry-tags', { 
+        name: { 
+          en: name,
+          ru: name,
+          uz: name
+        }
+      });
       
       if (response.success && response.data) {
         const newTag = response.data;
@@ -161,9 +173,10 @@ export function IndustryTagSelect({
 
   const filteredTags = inputValue === ""
     ? availableTags
-    : availableTags.filter(tag =>
-        tag.name.toLowerCase().includes(inputValue.toLowerCase())
-      );
+    : availableTags.filter(tag => {
+        const tagName = getLocalizedContent(tag.name, i18n.language as any);
+        return tagName.toLowerCase().includes(inputValue.toLowerCase());
+      });
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -175,7 +188,7 @@ export function IndustryTagSelect({
             className="flex items-center gap-1 px-3 py-1"
           >
             <Tag className="h-3 w-3" />
-            {tag.name}
+            {getLocalizedContent(tag.name, i18n.language as any)}
             <Button
               variant="ghost"
               size="sm"
@@ -183,7 +196,7 @@ export function IndustryTagSelect({
               onClick={() => handleRemoveTag(tag.id)}
             >
               <X className="h-3 w-3" />
-              <span className="sr-only">Remove {tag.name}</span>
+              <span className="sr-only">Remove {getLocalizedContent(tag.name, i18n.language as any)}</span>
             </Button>
           </Badge>
         ))}
@@ -225,7 +238,7 @@ export function IndustryTagSelect({
                 {filteredTags.map((tag, index) => (
                   <CommandItem
                     key={tag.id || `filtered-tag-${index}`}
-                    value={tag.name}
+                    value={getLocalizedContent(tag.name, i18n.language as any)}
                     onSelect={() => {
                       handleSelectTag(tag);
                       setOpen(false);
@@ -239,14 +252,15 @@ export function IndustryTagSelect({
                           : "opacity-0"
                       )}
                     />
-                    {tag.name}
+                    {getLocalizedContent(tag.name, i18n.language as any)}
                   </CommandItem>
                 ))}
               </CommandGroup>
               
-              {inputValue && !filteredTags.some(tag => 
-                tag.name.toLowerCase() === inputValue.toLowerCase()
-              ) && (
+              {inputValue && !filteredTags.some(tag => {
+                const tagName = getLocalizedContent(tag.name, i18n.language as any);
+                return tagName.toLowerCase() === inputValue.toLowerCase();
+              }) && (
                 <>
                   <CommandSeparator />
                   <CommandGroup>

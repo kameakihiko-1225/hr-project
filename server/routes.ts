@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema, insertIndustryTagSchema, fileAttachments, departments, companies } from "@shared/schema";
+import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema, insertIndustryTagSchema, fileAttachments, departments, companies, adminLoginSchema } from "@shared/schema";
+import { z } from 'zod';
 
 import { initializeGalleryData } from "./init-gallery-data";
 import { uploadSingle } from "./middleware/upload";
@@ -10,10 +11,23 @@ import { eq } from "drizzle-orm";
 import path from "path";
 import express from "express";
 import { processWebhookData } from "./webhook";
+import { AuthService, authenticateAdmin, requireRole, requireSuperAdmin, AuthRequest } from './auth';
+import { performanceMiddleware, performanceMonitor } from './middleware/performance';
+import { registerAdminBatchRoutes } from './routes/admin-batch';
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Apply performance middleware
+  app.use(performanceMiddleware.compression);
+  app.use(performanceMiddleware.requestTiming);
+  app.use(performanceMiddleware.adminCacheHeaders);
+  app.use(performanceMiddleware.optimizeDatabaseQueries);
+  app.use(performanceMiddleware.responseOptimization);
+  
   // Serve uploaded files statically
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  
+  // Register optimized admin batch routes
+  registerAdminBatchRoutes(app);
   
   // Health check endpoint for webhook
   app.get('/webhook', (req, res) => {
@@ -95,24 +109,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // Companies endpoints with caching headers
+  // Optimized companies endpoint with performance monitoring
   app.get("/api/companies", async (req, res) => {
+    const startTime = Date.now();
+    
     try {
-      // Disable cache headers to prevent caching issues
-      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.set('Pragma', 'no-cache');
-      res.set('Expires', '0');
+      const language = (req.query.language as string || 'en') as 'en' | 'ru' | 'uz';
+      const requestRawData = req.query.raw === 'true';
+      const useOptimization = req.query._optimize === 'true';
       
-      const language = req.query.language as string || 'en';
-      const rawData = req.query.raw === 'true'; // For admin interface
+      console.log(`[Companies API] Raw data requested: ${requestRawData}, language: ${language}`);
       
-      console.log(`[Companies API] Raw data requested: ${rawData}, language: ${language}`);
-      
-      if (rawData) {
-        // Return raw LocalizedContent objects for admin editing
-        const companies = await storage.getAllCompanies(); // No language parameter
+      if (requestRawData) {
+        // Optimized query for admin interface
+        const companies = useOptimization 
+          ? await storage.getAllCompaniesOptimized() 
+          : await storage.getAllCompanies();
+        
         console.log(`[Companies API] Raw companies count: ${companies.length}`);
-        console.log(`[Companies API] Raw companies IDs: ${companies.map(c => c.id).join(', ')}`);
+        performanceMonitor.trackQuery('getAllCompanies', startTime);
+        
+        res.json({ success: true, data: companies });
+        return;
         
         // Create a simple test response with just essential data
         const simplifiedCompanies = companies.map(company => ({
@@ -662,21 +680,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Positions endpoints with caching headers
+  // Positions endpoints with optimized caching headers
   app.get("/api/positions", async (req, res) => {
     try {
-      // Disable caching for positions to ensure fresh apply links
-      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.set('Pragma', 'no-cache');
-      res.set('Expires', '0');
+      // Optimized caching: Cache for 2 minutes for public data, no cache for admin
+      const positionIsRawData = req.query.raw === 'true';
+      if (positionIsRawData) {
+        // No cache for admin interface
+        res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+      } else {
+        // Cache public data for 2 minutes to ensure fresh apply links
+        res.set('Cache-Control', 'public, max-age=120, s-maxage=120');
+        res.set('ETag', `positions-${Date.now()}`);
+      }
       
       const departmentId = req.query.departmentId ? parseInt(req.query.departmentId as string) : undefined;
       const language = req.query.language as string || 'en';
-      const rawData = req.query.raw === 'true'; // For admin interface
+      const requestRawData = req.query.raw === 'true'; // For admin interface
       
-      console.log('[Positions API] Request params:', { departmentId, language, raw: rawData, query: req.query });
+      console.log('[Positions API] Request params:', { departmentId, language, raw: requestRawData, query: req.query });
       
-      if (rawData) {
+      if (requestRawData) {
         // Return raw LocalizedContent objects for admin editing
         const positions = await storage.getAllPositions(departmentId); // No language parameter for raw data
         console.log('[Positions API] Returning raw positions:', positions);
@@ -690,6 +716,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching positions:', error);
       res.status(500).json({ success: false, error: "Failed to fetch positions" });
+    }
+  });
+
+  // Position stats endpoint - must come before /api/positions/:id
+  app.get("/api/positions/stats", async (req, res) => {
+    try {
+      let positionId: number | undefined = undefined;
+      
+      // Robust query parameter validation
+      if (req.query.positionId) {
+        const parsed = parseInt(req.query.positionId as string);
+        if (isNaN(parsed)) {
+          return res.status(400).json({ 
+            success: false, 
+            error: "Invalid positionId parameter. Must be a valid number." 
+          });
+        }
+        positionId = parsed;
+      }
+      
+      const stats = await storage.getPositionClickStats(positionId);
+      
+      res.json({ 
+        success: true, 
+        data: stats 
+      });
+    } catch (error) {
+      console.error('Error fetching position stats:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch position stats" });
     }
   });
 
@@ -860,13 +915,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const companies = await storage.getAllCompanies();
       const departments = await storage.getAllDepartments();
       const positions = await storage.getAllPositions();
-      
       const candidatesData = await storage.getAllCandidates();
+      
+      // Get position click analytics using correct method
+      const clickStats = await storage.getDashboardStats();
+      
       const stats = {
         companies: companies.length,
         departments: departments.length,
         positions: positions.length,
-        candidates: candidatesData.length
+        bots: 1, // Telegram bot
+        candidates: candidatesData.length,
+        interviews: 0, // Not implemented yet
+        conversionRate: clickStats.totalViews > 0 ? ((clickStats.totalApplies / clickStats.totalViews) * 100).toFixed(1) : "0",
+        activeDeals: 0, // Not implemented yet
+        admins: 1, // Mock data for now
+        jobs: positions.length, // Same as positions
+        applications: clickStats.totalApplies,
+        recentActivity: [] // Not implemented yet
       };
       
       res.json({ success: true, data: stats });
@@ -1195,21 +1261,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/positions/stats", async (req, res) => {
-    try {
-      const positionId = req.query.positionId ? parseInt(req.query.positionId as string) : undefined;
-      const stats = await storage.getPositionClickStats(positionId);
-      
-      res.json({ 
-        success: true, 
-        data: stats 
-      });
-    } catch (error) {
-      console.error('Error fetching position stats:', error);
-      res.status(500).json({ success: false, error: "Failed to fetch position stats" });
-    }
-  });
-
   app.get("/api/dashboard/click-stats", async (req, res) => {
     try {
       const stats = await storage.getDashboardStats();
@@ -1288,19 +1339,378 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SEO Routes for Central Asia optimization
+  
+  // Generate dynamic sitemap.xml
+  app.get('/sitemap.xml', async (req, res) => {
+    try {
+      const positions = await storage.getAllPositions();
+      const languages = ['en', 'ru', 'uz'];
+      const baseUrl = 'https://career.millatumidi.uz';
+      const currentDate = new Date().toISOString().split('T')[0];
+      
+      let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">`;
 
+      // Homepage URLs for each language
+      languages.forEach(lang => {
+        const url = lang === 'en' ? baseUrl : `${baseUrl}/${lang}`;
+        const hreflangs = languages.map(l => {
+          const href = l === 'en' ? baseUrl : `${baseUrl}/${l}`;
+          const hreflang = l === 'en' ? 'en' : `${l}-UZ`;
+          return `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${href}/" />`;
+        }).join('\n');
+        
+        sitemap += `
+  <url>
+    <loc>${url}/</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+${hreflangs}
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/" />
+  </url>`;
+      });
+
+      // Blog URLs for each language
+      languages.forEach(lang => {
+        const url = lang === 'en' ? `${baseUrl}/blog` : `${baseUrl}/${lang}/blog`;
+        const hreflangs = languages.map(l => {
+          const href = l === 'en' ? `${baseUrl}/blog` : `${baseUrl}/${l}/blog`;
+          const hreflang = l === 'en' ? 'en' : `${l}-UZ`;
+          return `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${href}" />`;
+        }).join('\n');
+        
+        sitemap += `
+  <url>
+    <loc>${url}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+${hreflangs}
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/blog" />
+  </url>`;
+      });
+
+      sitemap += `
+</urlset>`;
+
+      res.setHeader('Content-Type', 'application/xml');
+      res.send(sitemap);
+    } catch (error) {
+      console.error('[SEO] Error generating sitemap:', error);
+      res.status(500).send('Error generating sitemap');
+    }
+  });
+
+  // Meta tags API for dynamic SEO
+  app.get('/api/seo/meta/:page', async (req, res) => {
+    try {
+      const page = req.params.page;
+      const language = req.query.language as string || 'en';
+      const baseUrl = 'https://career.millatumidi.uz';
+      
+      const metaData: any = {
+        en: {
+          home: {
+            title: 'Jobs in Uzbekistan | Millat Umidi Career Portal | Tashkent Employment',
+            description: 'Find top career opportunities in Uzbekistan with Millat Umidi. Leading HR platform connecting talent with employers in Tashkent, Samarkand, and across Central Asia. Apply now!',
+            keywords: 'jobs Uzbekistan, careers Tashkent, employment Central Asia, Millat Umidi jobs, work in Uzbekistan, HR platform, job search Tashkent, career opportunities, remote work Uzbekistan',
+            image: `${baseUrl}/logo png.png`
+          },
+          blog: {
+            title: 'Career Insights & HR News | Millat Umidi Blog | Job Market Uzbekistan',
+            description: 'Stay updated with the latest career trends, HR insights, and job market news in Uzbekistan and Central Asia. Expert advice for professionals and employers.',
+            keywords: 'HR blog Uzbekistan, career advice, job market trends, professional development, employment news Central Asia, workplace tips',
+            image: `${baseUrl}/logo png.png`
+          }
+        },
+        ru: {
+          home: {
+            title: 'Работа в Узбекистане | Портал карьеры Миллат Умиди | Трудоустройство в Ташкенте',
+            description: 'Найдите лучшие карьерные возможности в Узбекистане с Миллат Умиди. Ведущая HR платформа, соединяющая таланты с работодателями в Ташкенте, Самарканде и по всей Центральной Азии.',
+            keywords: 'работа Узбекистан, карьера Ташкент, трудоустройство Центральная Азия, вакансии Миллат Умиди, работа в Узбекистане, HR платформа, поиск работы Ташкент, карьерные возможности, удаленная работа',
+            image: `${baseUrl}/logo png.png`
+          },
+          blog: {
+            title: 'Карьерные инсайты и HR новости | Блог Миллат Умиди | Рынок труда Узбекистан',
+            description: 'Следите за последними карьерными трендами, HR инсайтами и новостями рынка труда в Узбекистане и Центральной Азии. Экспертные советы для профессионалов и работодателей.',
+            keywords: 'HR блог Узбекистан, карьерные советы, тренды рынка труда, профессиональное развитие, новости трудоустройства Центральная Азия',
+            image: `${baseUrl}/logo png.png`
+          }
+        },
+        uz: {
+          home: {
+            title: 'Oʻzbekistonda ish | Millat Umidi karyera portali | Toshkentda bandlik',
+            description: 'Millat Umidi bilan Oʻzbekistonda eng yaxshi karyera imkoniyatlarini toping. Toshkent, Samarqand va butun Markaziy Osiyoda iqtidorlarni ish beruvchilar bilan bogʻlovchi yetakchi HR platforma.',
+            keywords: 'ish Oʻzbekiston, karyera Toshkent, bandlik Markaziy Osiya, Millat Umidi ish, Oʻzbekistonda ishlash, HR platforma, ish qidirish Toshkent, karyera imkoniyatlari, masofaviy ish',
+            image: `${baseUrl}/logo png.png`
+          },
+          blog: {
+            title: 'Karyera tushunchalari va HR yangiliklari | Millat Umidi blogi | Oʻzbekiston mehnat bozori',
+            description: 'Oʻzbekiston va Markaziy Osiyodagi eng soʻnggi karyera tendensiyalari, HR tushunchalari va mehnat bozori yangiliklari bilan tanishib turing. Mutaxassislar va ish beruvchilar uchun ekspert maslahatlari.',
+            keywords: 'HR blog Oʻzbekiston, karyera maslahatlari, mehnat bozori tendensiyalari, kasbiy rivojlanish, bandlik yangiliklari Markaziy Osiya',
+            image: `${baseUrl}/logo png.png`
+          }
+        }
+      };
+
+      const langData = metaData[language] || metaData.en;
+      const pageData = langData[page] || langData.home;
+
+      res.json({
+        ...pageData,
+        canonical: `${baseUrl}${language === 'en' ? '' : `/${language}`}${page === 'home' ? '' : `/${page}`}`,
+        locale: language === 'en' ? 'en_UZ' : `${language}_UZ`,
+        alternates: [
+          { hreflang: 'en', href: `${baseUrl}${page === 'home' ? '' : `/${page}`}` },
+          { hreflang: 'ru-UZ', href: `${baseUrl}/ru${page === 'home' ? '' : `/${page}`}` },
+          { hreflang: 'uz-UZ', href: `${baseUrl}/uz${page === 'home' ? '' : `/${page}`}` },
+          { hreflang: 'x-default', href: `${baseUrl}${page === 'home' ? '' : `/${page}`}` }
+        ]
+      });
+    } catch (error) {
+      console.error('[SEO] Error generating meta data:', error);
+      res.status(500).json({ error: 'Error generating meta data' });
+    }
+  });
+
+  // Individual position endpoint for SEO pages
+  app.get('/api/positions/:id', async (req, res) => {
+    try {
+      const positionId = parseInt(req.params.id);
+      if (isNaN(positionId)) {
+        return res.status(400).json({ success: false, error: 'Invalid position ID' });
+      }
+
+      const position = await storage.getPositionById(positionId);
+      if (!position) {
+        return res.status(404).json({ success: false, error: 'Position not found' });
+      }
+
+      res.json({ success: true, data: position });
+    } catch (error) {
+      console.error('Error getting position by ID:', error);
+      res.status(500).json({ success: false, error: 'Failed to get position' });
+    }
+  });
+
+  // Individual company endpoint
+  app.get('/api/companies/:id', async (req, res) => {
+    try {
+      const companyId = parseInt(req.params.id);
+      if (isNaN(companyId)) {
+        return res.status(400).json({ success: false, error: 'Invalid company ID' });
+      }
+
+      const company = await storage.getCompanyById(companyId);
+      if (!company) {
+        return res.status(404).json({ success: false, error: 'Company not found' });
+      }
+
+      res.json({ success: true, data: company });
+    } catch (error) {
+      console.error('Error getting company by ID:', error);
+      res.status(500).json({ success: false, error: 'Failed to get company' });
+    }
+  });
+
+  // Individual department endpoint
+  app.get('/api/departments/:id', async (req, res) => {
+    try {
+      const departmentId = parseInt(req.params.id);
+      if (isNaN(departmentId)) {
+        return res.status(400).json({ success: false, error: 'Invalid department ID' });
+      }
+
+      const department = await storage.getDepartmentById(departmentId);
+      if (!department) {
+        return res.status(404).json({ success: false, error: 'Department not found' });
+      }
+
+      res.json({ success: true, data: department });
+    } catch (error) {
+      console.error('Error getting department by ID:', error);
+      res.status(500).json({ success: false, error: 'Failed to get department' });
+    }
+  });
+
+  // Dynamic sitemap generation for SEO
+  app.get('/sitemap.xml', async (req, res) => {
+    try {
+      console.log('[SEO] Generating dynamic sitemap');
+      
+      const baseUrl = 'https://career.millatumidi.uz';
+      const languages = ['en', 'ru', 'uz'];
+      
+      // Get all positions for individual pages
+      const positions = await storage.getAllPositions();
+      
+      // Static pages
+      const staticPages = [
+        { url: '', priority: '1.0', changefreq: 'daily' },
+        { url: '/blog', priority: '0.8', changefreq: 'weekly' }
+      ];
+      
+      let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">`;
+
+      // Add static pages with language alternates
+      staticPages.forEach(page => {
+        languages.forEach(lang => {
+          const url = lang === 'en' ? `${baseUrl}${page.url}` : `${baseUrl}/${lang}${page.url}`;
+          
+          sitemap += `
+  <url>
+    <loc>${url}</loc>
+    <priority>${page.priority}</priority>
+    <changefreq>${page.changefreq}</changefreq>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>`;
+
+          // Add hreflang alternates
+          languages.forEach(alternateLang => {
+            const alternateUrl = alternateLang === 'en' ? 
+              `${baseUrl}${page.url}` : 
+              `${baseUrl}/${alternateLang}${page.url}`;
+            
+            sitemap += `
+    <xhtml:link rel="alternate" hreflang="${alternateLang}" href="${alternateUrl}" />`;
+          });
+
+          sitemap += `
+  </url>`;
+        });
+      });
+
+      // Add individual position pages
+      positions.forEach(position => {
+        languages.forEach(lang => {
+          const url = `${baseUrl}/positions/${position.id}`;
+          
+          sitemap += `
+  <url>
+    <loc>${url}</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+    <lastmod>${position.createdAt ? new Date(position.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>`;
+
+          // Add hreflang alternates for position pages
+          languages.forEach(alternateLang => {
+            sitemap += `
+    <xhtml:link rel="alternate" hreflang="${alternateLang}" href="${url}?lang=${alternateLang}" />`;
+          });
+
+          sitemap += `
+  </url>`;
+        });
+      });
+
+      sitemap += `
+</urlset>`;
+
+      res.set('Content-Type', 'text/xml');
+      res.send(sitemap);
+      
+      console.log(`[SEO] Sitemap generated with ${staticPages.length * languages.length + positions.length * languages.length} URLs`);
+    } catch (error) {
+      console.error('[SEO] Error generating sitemap:', error);
+      res.status(500).send('Error generating sitemap');
+    }
+  });
+
+  // Robots.txt for Central Asia SEO optimization
+  app.get('/robots.txt', (req, res) => {
+    const robotsTxt = `User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /uploads/private/
+
+# Sitemap location
+Sitemap: https://career.millatumidi.uz/sitemap.xml
+
+# Google bot optimization for Central Asia
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Yandex bot optimization for Russian-speaking users
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 1
+
+# Bing bot for international reach
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Block unwanted bots
+User-agent: BadBot
+Disallow: /
+
+# Cache optimization
+User-agent: *
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term`;
+
+    res.set('Content-Type', 'text/plain');
+    res.send(robotsTxt);
+  });
+
+  // Authentication routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const loginData = adminLoginSchema.parse(req.body);
+      const result = await AuthService.login(loginData);
+      
+      if (!result) {
+        return res.status(401).json({ success: false, error: "Invalid username or password" });
+      }
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ success: false, error: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/logout", authenticateAdmin, async (req: AuthRequest, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : '';
+      
+      if (token) {
+        await AuthService.logout(token);
+      }
+
+      res.json({ success: true, message: "Logged out successfully" });
+    } catch (error) {
+      console.error('Logout error:', error);
+      res.status(500).json({ success: false, error: "Logout failed" });
+    }
+  });
+
+  app.get("/api/auth/me", authenticateAdmin, async (req: AuthRequest, res) => {
+    try {
+      res.json({ success: true, data: req.admin });
+    } catch (error) {
+      console.error('Get current admin error:', error);
+      res.status(500).json({ success: false, error: "Failed to get admin info" });
+    }
+  });
 
   const httpServer = createServer(app);
 
-  // Initialize gallery data on startup
-  setTimeout(async () => {
-    try {
-      await initializeGalleryData();
-      console.log("Gallery data initialized successfully");
-    } catch (error) {
-      console.error("Error initializing gallery data:", error);
-    }
-  }, 2000);
+  // Initialize gallery data on startup - DISABLED to preserve blog deletions
+  // setTimeout(async () => {
+  //   try {
+  //     await initializeGalleryData();
+  //     console.log("Gallery data initialized successfully");
+  //   } catch (error) {
+  //     console.error("Error initializing gallery data:", error);
+  //   }
+  // }, 2000);
 
   return httpServer;
 }

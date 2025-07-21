@@ -63,49 +63,49 @@ export const FeaturesSection = () => {
     setIsCompact(!isCompact);
   };
 
-  // Render a feature card - horizontal compact version
+  // Render a feature card - horizontal compact version for mobile/tablet
   const renderCompactFeature = (feature: any, index: number) => (
     <div
       key={feature.title}
-      className="group relative bg-white p-4 rounded-xl shadow border border-gray-100 hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex items-center gap-4"
+      className="group relative bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex items-center gap-3 sm:gap-4"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       {/* Icon */}
-      <div className={`flex-shrink-0 w-12 h-12 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-        <feature.icon className="h-6 w-6 text-white" />
+      <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+        <feature.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors truncate">
+        <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
           {feature.title}
         </h3>
-        <p className="text-gray-600 text-sm line-clamp-2">
+        <p className="text-gray-600 text-xs sm:text-sm line-clamp-2 leading-relaxed">
           {feature.description}
         </p>
       </div>
       
-      <ChevronRight className="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+      <ChevronRight className="flex-shrink-0 h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
     </div>
   );
 
-  // Render a feature card - original card version
+  // Render a feature card - original card version improved for mobile/tablet
   const renderFeatureCard = (feature: any, index: number) => (
     <div
       key={feature.title}
-      className="group relative bg-white p-6 rounded-xl shadow border border-gray-100 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 hover:-translate-y-1"
+      className="group relative bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 hover:-translate-y-1"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       {/* Icon */}
-      <div className={`w-14 h-14 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
-        <feature.icon className="h-7 w-7 text-white" />
+      <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-300`}>
+        <feature.icon className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
       </div>
 
       {/* Content */}
-      <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+      <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 sm:mb-3 group-hover:text-blue-600 transition-colors leading-tight">
         {feature.title}
       </h3>
-      <p className="text-gray-600 text-sm leading-relaxed mb-4">
+      <p className="text-gray-600 text-sm leading-relaxed mb-3 sm:mb-4">
         {feature.description}
       </p>
 
@@ -115,22 +115,22 @@ export const FeaturesSection = () => {
   );
 
   return (
-    <section className="relative py-20 px-4 md:py-24 md:px-6 bg-white dark:bg-gray-950 overflow-hidden">
+    <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 px-3 sm:px-4 md:px-6 bg-white dark:bg-gray-950 overflow-hidden">
       {/* Subtle background decoration - same as hero */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       <div className="max-w-7xl mx-auto relative">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
-            <Target className="h-4 w-4 mr-2" />
+        <div className="text-center mb-6 sm:mb-8 md:mb-10">
+          <div className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+            <Target className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             {t('features.badge')}
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 px-2">
             {t('features.title_start')}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 block">
               {t('features.title_highlight')}
             </span>
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto px-2 sm:px-4">
             {t('features.subtitle')}
           </p>
           
@@ -144,14 +144,14 @@ export const FeaturesSection = () => {
           )}
         </div>
 
-        <div className={isCompact 
-          ? "flex flex-col space-y-3" 
-          : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        }>
+        {/* Features Grid - Improved responsive layout */}
+        <div className={`animate-fade-in ${
+          isCompact 
+            ? "grid grid-cols-1 gap-3 sm:gap-4 max-w-2xl mx-auto" 
+            : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
+        }`}>
           {features.map((feature, index) => 
-            isCompact 
-              ? renderCompactFeature(feature, index)
-              : renderFeatureCard(feature, index)
+            isCompact ? renderCompactFeature(feature, index) : renderFeatureCard(feature, index)
           )}
         </div>
 

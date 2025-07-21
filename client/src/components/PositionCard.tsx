@@ -6,7 +6,6 @@ import { Badge } from './ui/badge';
 import { Pencil, Trash2, Building2, Briefcase, DollarSign, Clock, MapPin, Send, ExternalLink, Crown, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { toast } from '@/components/ui/use-toast';
-
 import { getBotByAdminId, createCandidateDeepLink, createPositionDeepLink } from '@/lib/api';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
@@ -27,9 +26,10 @@ interface PositionCardProps {
   showDepartment?: boolean;
   applicantCount?: number;
   topTierBadge?: 1 | 2 | 3; // Badge for top 3 most applied positions
+  compactMobile?: boolean; // Enable compact mobile view
 }
 
-export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false, applicantCount, topTierBadge }: PositionCardProps) {
+export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false, applicantCount, topTierBadge, compactMobile = false }: PositionCardProps) {
   const { t, i18n } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -68,25 +68,43 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     }
   }, [position.id, hasTrackedView]);
 
-  // Fetch company and department data with optimized caching
-  const { data: companiesResponse, isLoading: companiesLoading } = useQuery({
-    queryKey: ['/api/companies'],
-    staleTime: 30 * 60 * 1000, // 30 minutes - companies don't change often
-    gcTime: 60 * 60 * 1000, // 1 hour cache retention
+  // Data fetching for company and department information
+  const { data: companyData, isLoading: isLoadingCompanyData } = useQuery({
+    queryKey: ['company-department', position.departmentId],
+    queryFn: async () => {
+      if (!position.departmentId) return null;
+      
+      try {
+        // First get department to find company ID
+        const deptResponse = await fetch(`/api/departments/${position.departmentId}`);
+        if (!deptResponse.ok) throw new Error('Failed to fetch department');
+        const deptResult = await deptResponse.json();
+        
+        if (!deptResult.data?.companyId) {
+          throw new Error('Department missing company ID');
+        }
+        
+        // Then get company data
+        const companyResponse = await fetch(`/api/companies/${deptResult.data.companyId}`);
+        if (!companyResponse.ok) throw new Error('Failed to fetch company');
+        const companyResult = await companyResponse.json();
+        
+        return {
+          department: deptResult.data,
+          company: companyResult.data
+        };
+      } catch (error) {
+        console.error('Error fetching position data:', error);
+        return null;
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes
+    retry: 2
   });
   
-  const { data: departmentsResponse, isLoading: departmentsLoading } = useQuery({
-    queryKey: ['/api/departments'],
-    staleTime: 30 * 60 * 1000, // 30 minutes - departments don't change often
-    gcTime: 60 * 60 * 1000, // 1 hour cache retention
-  });
-  
-  // Extract data properly - both companies and departments return API wrapper format
-  const companies = companiesResponse?.data || [];
-  const departments = departmentsResponse?.data || [];
-  
-  const departmentFromAPI = departments?.find((d: { id: string }) => d.id === position.departmentId);
-  const companyFromAPI = companies?.find((c: { id: string }) => c.id === departmentFromAPI?.companyId);
+  const departmentFromAPI = companyData?.department;
+  const companyFromAPI = companyData?.company;
 
   const handleEdit = () => {
     if (onEdit) {
@@ -138,11 +156,13 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     // Debug log to check position data
     console.log('Apply button clicked. Position data:', position);
     console.log('Apply link value:', position.applyLink);
+    console.log('Current language from i18n:', i18n.language);
 
     // If position has a direct apply link, use it
     if (position.applyLink) {
-      const applyLinkUrl = getLocalizedContent(position.applyLink);
+      const applyLinkUrl = getLocalizedContent(position.applyLink, i18n.language as any);
       console.log('Redirecting to custom apply link:', applyLinkUrl);
+      console.log('Using language:', i18n.language);
       window.open(applyLinkUrl, '_blank', 'noopener,noreferrer');
       toast({ 
         title: 'Redirected to Application', 
@@ -159,11 +179,11 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       // For now, since we don't have bot functionality set up, show a simple message
       toast({ 
         title: 'Application Initiated', 
-        description: `Thank you for your interest in the ${getLocalizedContent(position.title)} position! You will be contacted soon.` 
+        description: `Thank you for your interest in the ${getLocalizedContent(position.title, i18n.language as any)} position! You will be contacted soon.` 
       });
       
       // In a real implementation, this would integrate with Telegram bot or other application system
-      console.log(`Application submitted for position: ${getLocalizedContent(position.title)} (ID: ${position.id})`);
+      console.log(`Application submitted for position: ${getLocalizedContent(position.title, i18n.language as any)} (ID: ${position.id})`);
     } catch (error: any) {
       console.error('Apply via AI error:', error);
       toast({ title: 'Error', description: error?.message || 'Something went wrong' });
@@ -172,6 +192,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     }
   };
 
+<<<<<<< HEAD
   // Data inheritance logic: position -> department -> company (same as AdminPositionCard)
   const getInheritedData = () => {
     const basePosition = position;
@@ -246,6 +267,34 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       )}
     </Avatar>
   );
+=======
+  // Simplified data extraction
+  const companyName = companyFromAPI?.name || 'Company';
+  const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
+
+  // Simplified logo rendering
+  const renderLogo = () => {
+    const logoUrl = companyFromAPI?.logoUrl;
+    const fallbackLetter = companyFromAPI?.name?.charAt(0) || 'C';
+    
+    return (
+      <Avatar className="w-full h-full border-2 border-white/30 shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
+        {logoUrl && !logoError ? (
+          <AvatarImage 
+            src={encodeURI(logoUrl)} 
+            alt={companyFromAPI?.name || 'Company'} 
+            className="object-contain object-center w-full h-full p-1 sm:p-2"
+            onError={() => setLogoError(true)}
+          />
+        ) : (
+          <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-sm sm:text-lg shadow-inner">
+            {fallbackLetter}
+          </AvatarFallback>
+        )}
+      </Avatar>
+    );
+  };
+>>>>>>> 4efca1018c292eed4d8f6c434cb429e49a1e7955
 
   return (
     <Card
@@ -257,7 +306,11 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           handleCardClick(e as unknown as React.MouseEvent);
         }
       }}
+<<<<<<< HEAD
       className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[440px] w-full max-w-[460px] flex flex-col cursor-pointer"
+=======
+      className={`animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 ${compactMobile ? 'h-[420px] sm:h-[480px]' : 'h-[440px] sm:h-[480px]'} w-full flex flex-col`}
+>>>>>>> 4efca1018c292eed4d8f6c434cb429e49a1e7955
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -311,7 +364,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                 <DialogHeader>
                   <DialogTitle>Delete Position</DialogTitle>
                   <DialogDescription>
-                    Are you sure you want to delete the position "{getLocalizedContent(position.title)}"? This action cannot be undone.
+                    Are you sure you want to delete the position "{getLocalizedContent(position.title, i18n.language as any)}"? This action cannot be undone.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -324,19 +377,26 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       )}
 
-      <CardHeader className="flex items-start gap-3 pb-2 pt-4 relative z-10">
-        <CompanyAvatar />
-        <div className="flex-1">
-          <h3 className="font-semibold text-base leading-tight text-foreground">
+      <CardHeader className={`flex items-start gap-3 pb-2 ${compactMobile ? 'pt-2 sm:pt-3' : 'pt-3 sm:pt-4'} px-3 sm:px-6 relative z-10`}>
+        <div className={`${compactMobile ? 'w-10 h-10 sm:w-14 sm:h-14' : 'w-12 h-12 sm:w-16 sm:h-16'}`}>
+          {renderLogo()}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-sm sm:text-base leading-tight text-foreground truncate">
             {companyName}
           </h3>
           {showDepartment && Array.isArray(position.departments) && position.departments.length > 0 && (
-            <p className="text-sm text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
-              <Building2 className="h-4 w-4" />
+            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 flex items-center gap-1 mt-1">
+              <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
               {position.departments.map((dp, idx) => (
                 <span key={dp.department.id} className="flex items-center">
+<<<<<<< HEAD
                   {getLocalizedContent(dp.department.name as string | LocalizedContent)}
                   {idx < position.departments!.length - 1 && <span className="mx-1">|</span>}
+=======
+                  {getLocalizedContent(dp.department.name, i18n.language as any)}
+                  {idx < position.departments.length - 1 && <span className="mx-1">|</span>}
+>>>>>>> 4efca1018c292eed4d8f6c434cb429e49a1e7955
                 </span>
               ))}
             </p>
@@ -344,21 +404,21 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-2 pb-2 relative z-10 flex-1 flex flex-col">
-        <CardTitle className="text-lg font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title">
-          {getLocalizedContent(position.title)}
+      <CardContent className={`${compactMobile ? 'space-y-1' : 'space-y-2'} pb-2 px-3 sm:px-6 relative z-10 flex-1 flex flex-col`}>
+        <CardTitle className={`${compactMobile ? 'text-sm sm:text-base' : 'text-base sm:text-lg'} font-semibold tracking-tight text-foreground group-hover:text-primary job-card-title line-clamp-2`}>
+          {getLocalizedContent(position.title, i18n.language as any)}
         </CardTitle>
 
         {position.description && (
-          <p className="text-sm text-muted-foreground job-card-description line-clamp-2">
-            {getLocalizedContent(position.description)}
+          <p className={`${compactMobile ? 'text-xs line-clamp-1' : 'text-xs sm:text-sm line-clamp-2'} text-muted-foreground job-card-description`}>
+            {getLocalizedContent(position.description, i18n.language as any)}
           </p>
         )}
 
         {/* Salary after description */}
         {position.salaryRange && (
-          <p className="text-sm font-medium text-foreground flex items-center gap-1">
-            <DollarSign className="h-4 w-4" /> {getLocalizedContent(position.salaryRange)}
+          <p className="text-xs sm:text-sm font-medium text-foreground flex items-center gap-1">
+            <DollarSign className="h-4 w-4" /> {getLocalizedContent(position.salaryRange, i18n.language as any)}
           </p>
         )}
 
@@ -381,7 +441,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-center gap-3 border-t border-border pt-3 pb-4 relative z-10 mt-auto shrink-0">
+      <CardFooter className={`flex flex-col items-center ${compactMobile ? 'gap-1 sm:gap-2 pt-1 sm:pt-2 pb-2 sm:pb-3' : 'gap-2 sm:gap-3 pt-2 sm:pt-3 pb-3 sm:pb-4'} border-t border-border px-3 sm:px-6 relative z-10 mt-auto shrink-0`}>
         {postedAgo && (
           <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
         )}
@@ -390,49 +450,56 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0"
+            className="flex items-center justify-center gap-1 flex-1 h-7 sm:h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 min-w-0"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
             }}
           >
             <Building2 className="h-3 w-3 flex-shrink-0" />
-            <span className="hidden lg:inline truncate">{t('position_card.company_info')}</span>
+            <span className="hidden sm:inline truncate">{t('position_card.company_info')}</span>
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0"
+            className="flex items-center justify-center gap-1 flex-1 h-7 sm:h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 min-w-0"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
             }}
           >
             <Briefcase className="h-3 w-3 flex-shrink-0" />
-            <span className="hidden lg:inline truncate">{t('position_card.department_info')}</span>
+            <span className="hidden sm:inline truncate">{t('position_card.department_info')}</span>
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
+<<<<<<< HEAD
               <Button 
                 variant="outline" 
                 size="sm" 
                 className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0"
                 onClick={(e) => e.stopPropagation()}
               >
+=======
+              <Button variant="outline" size="sm" className="flex items-center justify-center gap-1 flex-1 h-7 sm:h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 min-w-0">
+>>>>>>> 4efca1018c292eed4d8f6c434cb429e49a1e7955
                 <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                <span className="hidden lg:inline truncate">{t('position_card.view_details')}</span>
+                <span className="hidden sm:inline truncate">{t('position_card.view_details')}</span>
               </Button>
             </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md w-[95vw] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader>
-              <DialogTitle>{getLocalizedContent(position.title)}</DialogTitle>
-              <DialogDescription>{t('modals.position_details.title')}</DialogDescription>
+              <DialogTitle className="text-lg sm:text-xl leading-tight">{(position.title && getLocalizedContent(position.title, i18n.language as any)) || 'Position'}</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm">{t('modals.position_details.title')}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div>
                 <h4 className="text-sm font-medium mb-2">{t('modals.position_details.description')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  {inheritedData.description || t('modals.position_details.no_description')}
+                  {(position.description && getLocalizedContent(position.description, i18n.language as any)) || 
+                   (departmentFromAPI?.description && getLocalizedContent(departmentFromAPI.description, i18n.language as any)) || 
+                   (companyFromAPI?.description && getLocalizedContent(companyFromAPI.description, i18n.language as any)) || 
+                   t('modals.position_details.no_description')}
                 </p>
               </div>
               
@@ -441,7 +508,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <h4 className="text-sm font-medium mb-2">{t('modals.position_details.salary_range')}</h4>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    <span>{getLocalizedContent(position.salaryRange)}</span>
+                    <span>{(position.salaryRange && getLocalizedContent(position.salaryRange, i18n.language as any)) || 'Not specified'}</span>
                   </div>
                 </div>
               )}
@@ -451,7 +518,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <h4 className="text-sm font-medium mb-2">{t('modals.position_details.employment_type')}</h4>
                   <div className="flex items-center gap-2">
                     <Briefcase className="h-4 w-4" />
-                    <span>{getLocalizedContent(position.employmentType)}</span>
+                    <span>{(position.employmentType && getLocalizedContent(position.employmentType, i18n.language as any)) || 'Not specified'}</span>
                   </div>
                 </div>
               )}
@@ -460,11 +527,11 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                 <h4 className="text-sm font-medium mb-2">{t('modals.position_details.department')}</h4>
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  <span>{inheritedData.departmentName}</span>
+                  <span>{(departmentFromAPI?.name && getLocalizedContent(departmentFromAPI.name, i18n.language as any)) || 'Department'}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-1 ml-6">
                   <span className="text-sm text-muted-foreground">
-                    {inheritedData.companyName}
+                    {companyName}
                   </span>
                 </div>
               </div>
@@ -475,12 +542,12 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   <div className="flex items-center gap-2">
                     <ExternalLink className="h-4 w-4" />
                     <a 
-                      href={getLocalizedContent(position.applyLink)} 
+                      href={(position.applyLink && getLocalizedContent(position.applyLink, i18n.language as any)) || '#'} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline truncate max-w-[250px]"
                     >
-                      {getLocalizedContent(position.applyLink)}
+                      {(position.applyLink && getLocalizedContent(position.applyLink, i18n.language as any)) || 'No link available'}
                     </a>
                   </div>
                 </div>
@@ -507,24 +574,24 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         {position.applyLink ? (
           <button
             onClick={handleApply}
-            className="px-4 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 w-full justify-center"
+            className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 w-full justify-center h-8 sm:h-10"
           >
             <span className="hidden sm:inline">{t('position_card.apply')}</span>
             <span className="sm:hidden">{t('position_card.apply')}</span>
-            <ExternalLink className="h-4 w-4" />
+            <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
           </button>
         ) : (
           <Button
             onClick={handleApply}
             disabled={isApplying}
-            className="px-4 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 w-full justify-center"
+            className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 w-full justify-center h-8 sm:h-10"
           >
             {isApplying ? 'Generating…' : (
               <>
                 <span className="hidden sm:inline">{t('position_card.apply')}</span>
                 <span className="sm:hidden">{t('position_card.apply')}</span>
               </>
-            )} <Send className="h-4 w-4" />
+            )} <Send className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         )}
       </CardFooter>

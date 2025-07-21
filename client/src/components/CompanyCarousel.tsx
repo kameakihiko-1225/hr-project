@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useRef } from "react";
+import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // List of logos stored in public/companies. Add/remove files there and update list below.
 const LOGO_FILES = [
@@ -11,88 +12,90 @@ const LOGO_FILES = [
 ];
 
 export const CompanyCarousel = () => {
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  const intervalRef = useRef<number | undefined>();
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
+  const [isPaused, setIsPaused] = useState(false);
+  
   if (LOGO_FILES.length === 0) return null;
-  const logos = [...LOGO_FILES, ...LOGO_FILES]; // duplicate for seamless scroll
-
-  // auto-scroll
-  useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    const startAutoScroll = () => {
-      intervalRef.current = window.setInterval(() => {
-        if (!container) return;
-        container.scrollLeft += 1;
-        // reset for infinite scroll illusion
-        if (container.scrollLeft >= container.scrollWidth / 2) {
-          container.scrollLeft = 0;
-        }
-      }, 20);
-    };
-
-    startAutoScroll();
-
-    // pause on hover
-    const handleEnter = () => {
-      if (intervalRef.current !== undefined) window.clearInterval(intervalRef.current);
-    };
-    const handleLeave = () => startAutoScroll();
-
-    container.addEventListener("mouseenter", handleEnter);
-    container.addEventListener("mouseleave", handleLeave);
-
-    return () => {
-      if (intervalRef.current !== undefined) window.clearInterval(intervalRef.current);
-      container.removeEventListener("mouseenter", handleEnter);
-      container.removeEventListener("mouseleave", handleLeave);
-    };
-  }, []);
+  
+  // Triple the logos for seamless infinite scroll
+  const logos = [...LOGO_FILES, ...LOGO_FILES, ...LOGO_FILES];
 
   return (
-    <section className="py-12 bg-gray-50 overflow-hidden">
+    <section className="py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
           {t('company_logos_title')}
         </h2>
-        <div className="relative">
+        <div className="relative overflow-hidden">
           <div
-            ref={scrollRef}
-            className="flex space-x-12 overflow-hidden"
-            
+            className={`flex space-x-4 sm:space-x-6 md:space-x-8 ${isPaused ? '' : 'animate-scroll'} scrollbar-hide`}
+            style={{ 
+              height: isMobile ? '140px' : '200px',
+              overflowX: 'auto'
+            }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={() => setIsPaused(true)}
+            onTouchEnd={() => setTimeout(() => setIsPaused(false), 1000)}
+            onScroll={(e) => {
+              // Allow manual scrolling to temporarily pause auto-scroll
+              setIsPaused(true);
+              clearTimeout((window as any).scrollResetTimer);
+              (window as any).scrollResetTimer = setTimeout(() => setIsPaused(false), 3000);
+            }}
           >
             {logos.map((file, idx) => (
               <div
                 key={`${file}-${idx}`}
-                className="flex-shrink-0 w-56 h-44 bg-white rounded-2xl shadow-md ring-1 ring-gray-200 flex items-center justify-center px-4 transition-transform hover:shadow-xl hover:-translate-y-1"
+                className="flex-shrink-0 bg-white rounded-lg sm:rounded-xl md:rounded-2xl shadow-md ring-1 ring-gray-200 flex items-center justify-center p-3 sm:p-4 md:p-6 transition-transform hover:shadow-xl hover:-translate-y-1"
+                style={{ 
+                  width: isMobile ? '120px' : '200px', 
+                  height: isMobile ? '100px' : '160px',
+                  minWidth: isMobile ? '120px' : '200px',
+                  minHeight: isMobile ? '100px' : '160px'
+                }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`/companies/${file}`}
-                  alt="Company logo"
-                  className="max-h-32 max-w-full object-contain"
+                  alt={`${file.split('.')[0]} logo`}
+                  className="max-w-full object-contain"
+                  style={{
+                    width: 'auto',
+                    height: 'auto',
+                    maxWidth: '100%',
+                    maxHeight: isMobile ? '60px' : '96px'
+                  }}
+                  onError={(e) => {
+                    console.error(`Failed to load image: /companies/${file}`);
+                    e.currentTarget.style.border = '2px solid red';
+                    e.currentTarget.alt = `Failed to load: ${file}`;
+                  }}
+                  onLoad={() => console.log(`Successfully loaded: /companies/${file}`)}
                 />
               </div>
             ))}
           </div>
         </div>
       </div>
-      {/* tailwind keyframes */}
+      {/* Custom styles for smooth carousel animation */}
       <style>{`
         @keyframes scroll {
           0% {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(-50%);
+            transform: translateX(-33.33%);
           }
         }
         .animate-scroll {
-          animation-name: scroll;
-          animation-timing-function: linear;
-          animation-iteration-count: infinite;
+          animation: scroll 15s linear infinite;
+        }
+        
+        /* Pause animation on hover for better user experience */
+        .animate-scroll:hover {
+          animation-play-state: paused;
         }
       `}</style>
     </section>

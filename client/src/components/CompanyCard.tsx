@@ -79,7 +79,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
         >
           {!logoError && company.logoUrl ? (
             <img
-              src={company.logoUrl}
+              src={encodeURI(company.logoUrl)}
               alt={`${getLocalizedContent(company.name)} logo`}
               className="w-full h-full object-cover"
               onError={handleImageError}
@@ -179,7 +179,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
               >
                 {!logoError && company.logoUrl ? (
                   <img 
-                    src={company.logoUrl} 
+                    src={encodeURI(company.logoUrl)} 
                     alt={`${getLocalizedContent(company.name)} logo`} 
                     className="h-full w-full object-cover"
                     onError={handleImageError}

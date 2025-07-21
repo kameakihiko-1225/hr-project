@@ -31,19 +31,19 @@ export function CompanyInfoModal({ company, isOpen, onClose }: CompanyInfoModalP
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
+          <DialogTitle className="flex items-center gap-2 sm:gap-3">
             {company.logoUrl && (
               <img 
-                src={company.logoUrl} 
+                src={encodeURI(company.logoUrl)} 
                 alt={`${getLocalizedContent(company.name)} logo`}
-                className="h-12 w-12 rounded-lg object-contain p-1 border"
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg object-contain p-1 border"
               />
             )}
             <div>
-              <h2 className="text-xl font-semibold">{getLocalizedContent(company.name)}</h2>
-              <p className="text-sm text-muted-foreground">{t('modals.company_info.title')}</p>
+              <h2 className="text-lg sm:text-xl font-semibold leading-tight">{getLocalizedContent(company.name)}</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">{t('modals.company_info.title')}</p>
             </div>
           </DialogTitle>
         </DialogHeader>

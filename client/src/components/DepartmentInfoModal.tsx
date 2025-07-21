@@ -32,19 +32,19 @@ export function DepartmentInfoModal({ department, company, isOpen, onClose }: De
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
+          <DialogTitle className="flex items-center gap-2 sm:gap-3">
             {company?.logoUrl && (
               <img 
                 src={company.logoUrl} 
                 alt={`${getLocalizedContent(company.name)} logo`}
-                className="h-12 w-12 rounded-lg object-cover"
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg object-cover"
               />
             )}
             <div>
-              <h2 className="text-xl font-semibold">{getLocalizedContent(department.name)}</h2>
-              <p className="text-sm text-muted-foreground">
+              <h2 className="text-lg sm:text-xl font-semibold leading-tight">{getLocalizedContent(department.name)}</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 {t('modals.department_info.department_at')} {company ? getLocalizedContent(company.name) : 'Unknown Company'}
               </p>
             </div>

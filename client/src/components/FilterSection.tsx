@@ -139,52 +139,53 @@ export const FilterSection = ({
   const hasActiveFilters = selectedCompanies.length > 0 || selectedDepartments.length > 0 || selectedPositions.length > 0;
 
   return (
-    <section id="filter-section" className="relative py-16 px-6 bg-white dark:bg-gray-950 overflow-hidden">
+    <section id="filter-section" className="relative py-8 sm:py-12 md:py-16 px-3 sm:px-4 md:px-6 bg-white dark:bg-gray-950 overflow-hidden">
       {/* Subtle background decoration - same as hero */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       <div className="max-w-7xl mx-auto relative">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        <div className="text-center mb-6 sm:mb-8 md:mb-12">
+          <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-6 px-2">
             {t('filter.title')}
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto px-2 sm:px-4">
             {t('filter.subtitle')}
           </p>
         </div>
         
-        <div className="mb-8 flex flex-wrap justify-center gap-4">
+        <div className="mb-6 sm:mb-8 flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 px-2">
           <Button 
             onClick={handleSearch}
-            className="bg-blue-600 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 text-white px-8 py-6 rounded-xl text-lg font-medium transition-all duration-300"
-            size="lg"
+            className="bg-blue-600 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 rounded-lg sm:rounded-xl text-sm sm:text-base md:text-lg font-medium transition-all duration-300 flex-1 sm:flex-initial min-w-0"
+            size="default"
           >
-            <Search className="mr-2 h-5 w-5" />
-{t('filter.search_positions')}
+            <Search className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="truncate">{t('filter.search_positions')}</span>
           </Button>
           
           {hasActiveFilters && (
             <Button 
               onClick={clearAllFilters}
               variant="outline"
-              className="border-red-300 hover:bg-red-50 hover:shadow-xl hover:shadow-red-100 hover:-translate-y-1 text-red-600 hover:text-red-700 px-6 py-6 rounded-xl text-lg font-medium transition-all duration-300"
-              size="lg"
+              className="border-red-300 hover:bg-red-50 hover:shadow-xl hover:shadow-red-100 hover:-translate-y-1 text-red-600 hover:text-red-700 px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 rounded-lg sm:rounded-xl text-sm sm:text-base md:text-lg font-medium transition-all duration-300"
+              size="default"
             >
-              <X className="mr-2 h-5 w-5" />
-              Clear All Filters
+              <X className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="hidden xs:inline">Clear All Filters</span>
+              <span className="xs:hidden">Clear</span>
             </Button>
           )}
         </div>
 
-        <Card className="border shadow-md">
-          <CardContent className="pt-6">
-            <div className="flex items-center mb-6">
-              <Filter className="h-5 w-5 text-blue-600 mr-2" />
-              <h3 className="text-lg font-medium text-gray-800">{t('filter.filter_options')}</h3>
+        <Card className="border shadow-md mx-2 sm:mx-0">
+          <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
+            <div className="flex items-center mb-4 sm:mb-6">
+              <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 mr-2" />
+              <h3 className="text-base sm:text-lg font-medium text-gray-800">{t('filter.filter_options')}</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="space-y-2 sm:space-y-3">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700">
                   {t('filter.labels.companies')}
                 </label>
                 <MultiSelect
@@ -196,8 +197,8 @@ export const FilterSection = ({
                 />
               </div>
 
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">
+              <div className="space-y-2 sm:space-y-3">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700">
                   {t('filter.labels.departments')}
                 </label>
                 <MultiSelect
@@ -209,8 +210,8 @@ export const FilterSection = ({
                 />
               </div>
 
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">
+              <div className="space-y-2 sm:space-y-3 sm:col-span-2 lg:col-span-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700">
                   {t('filter.labels.positions')}
                 </label>
                 <MultiSelect

@@ -29,27 +29,36 @@ export const OpenPositions = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const isMobile = useIsMobile();
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // Use React Query with language parameter for localization
+
+  // Use React Query with optimized caching and language parameter for localization
   const [refreshKey, setRefreshKey] = useState(0);
-  const { data: positionsResponse, isLoading } = useQuery({
-    queryKey: ['/api/positions', refreshKey, i18n.language], // Include current language
+  const { data: positionsResponse, isLoading, error } = useQuery({
+    queryKey: ['positions', 'all', i18n.language, 'public'], // Optimized query key structure
     queryFn: async () => {
-      const response = await fetch(`/api/positions?language=${i18n.language}&_t=${Date.now()}`, {
-        method: 'GET',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-        },
-        cache: 'no-cache', // Disable browser cache
-      });
-      if (!response.ok) throw new Error('Failed to fetch positions');
-      return response.json();
+      try {
+        const response = await fetch(`/api/positions?language=${i18n.language}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br', // Enable compression
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: Failed to fetch positions`);
+        }
+        const data = await response.json();
+        return data;
+      } catch (err) {
+        console.error('Error fetching positions:', err);
+        throw err;
+      }
     },
     staleTime: 0,
     gcTime: 0, 
     refetchOnMount: true,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const allPositions = positionsResponse?.data || [];
@@ -78,10 +87,7 @@ export const OpenPositions = ({
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Set view mode based on mobile state
-  useEffect(() => {
-    setViewMode(isMobile ? "list" : "grid");
-  }, [isMobile]);
+
 
   // Use React Query for departments and companies with proper caching
   const { data: departmentsResponse } = useQuery({
@@ -138,8 +144,18 @@ export const OpenPositions = ({
     const department = departments.find(d => d.id === pos.departmentId);
     const company = department ? companies.find(c => c.id === department.companyId) : null;
 
-    const companyName = company?.name || '';
-    const departmentName = department?.name || '';
+    // Handle localized content properly
+    const getLocalizedText = (content: any) => {
+      if (!content) return '';
+      if (typeof content === 'string') return content;
+      if (typeof content === 'object') {
+        return content[i18n.language] || content.en || content.ru || content.uz || '';
+      }
+      return '';
+    };
+
+    const companyName = getLocalizedText(company?.name) || '';
+    const departmentName = getLocalizedText(department?.name) || '';
 
     const toLower = (s: string) => s.toLowerCase();
 
@@ -153,18 +169,31 @@ export const OpenPositions = ({
 
     const positionMatch =
       selectedPositions.length === 0 ||
-      selectedPositions.some(sel => toLower(pos.title || '').includes(toLower(sel)));
+      selectedPositions.some(sel => {
+        const posTitle = typeof pos.title === 'string' ? pos.title : 
+                        (pos.title && typeof pos.title === 'object' && pos.title.en) ? pos.title.en : '';
+        return toLower(posTitle).includes(toLower(sel));
+      });
 
     return companyMatch && departmentMatch && positionMatch;
+  }).sort((a, b) => {
+    // Sort by application count in descending order (most applied first)
+    const aCount = applicantCountMap.get(a.id)?.count || 0;
+    const bCount = applicantCountMap.get(b.id)?.count || 0;
+    return bCount - aCount; // Descending order: highest applications first
   });
 
   // Filtering is working correctly - removed debug logs
 
-  // Calculate pagination
+  // Calculate pagination - only for desktop, show all on mobile
   const totalPages = Math.ceil(filteredPositions.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPositions = filteredPositions.slice(indexOfFirstItem, indexOfLastItem);
+  
+  // Show all positions on mobile (no pagination), paginate on desktop
+  const currentPositions = isMobile 
+    ? filteredPositions 
+    : filteredPositions.slice(indexOfFirstItem, indexOfLastItem);
 
   // Generate page numbers for pagination
   const pageNumbers = [];
@@ -193,13 +222,11 @@ export const OpenPositions = ({
   };
 
   // Toggle view mode
-  const toggleViewMode = () => {
-    setViewMode(viewMode === "grid" ? "list" : "grid");
-  };
 
-  // Render pagination controls
+
+  // Render pagination controls - only on desktop
   const renderPagination = () => {
-    if (totalPages <= 1) return null;
+    if (totalPages <= 1 || isMobile) return null;
     
     return (
       <div className="mt-10">
@@ -237,51 +264,96 @@ export const OpenPositions = ({
   };
 
   return (
-    <section id="open-positions" className="relative py-16 px-6 bg-white dark:bg-gray-950 overflow-hidden">
+    <section id="open-positions" className="relative py-8 sm:py-12 md:py-16 px-3 sm:px-4 md:px-6 bg-white dark:bg-gray-950 overflow-hidden">
       {/* Subtle background decoration - same as hero */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       <div className="max-w-7xl mx-auto relative">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        <div className="text-center mb-6 sm:mb-8 md:mb-12">
+          <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-6 px-2">
             {t('positions.available_positions')}
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto px-2 sm:px-4">
             {t('positions.apply_instantly')}
           </p>
           
           {hasSearched && (
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-              <Badge variant="secondary" className="px-3 py-1 text-base">
+            <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-1 sm:gap-2 px-2">
+              <Badge variant="secondary" className="px-2 sm:px-3 py-1 text-xs sm:text-sm md:text-base">
                 {filteredPositions.length} {filteredPositions.length === 1 ? t('positions.position_found') : t('positions.positions_found')}
               </Badge>
               {(selectedCompanies.length > 0 || selectedDepartments.length > 0 || selectedPositions.length > 0) && (
-                <Badge variant="outline" className="px-3 py-1 text-sm">
-                  <Filter className="h-3 w-3 mr-1" />
-                  {getFilterSummary()}
+                <Badge variant="outline" className="px-2 sm:px-3 py-1 text-xs sm:text-sm">
+                  <Filter className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
+                  <span className="hidden sm:inline">{getFilterSummary()}</span>
+                  <span className="sm:hidden">Filtered</span>
                 </Badge>
               )}
             </div>
           )}
 
-          {isMobile && filteredPositions.length > 0 && hasSearched && (
-            <div className="mt-4">
-              <Button
-                onClick={toggleViewMode}
-                variant="outline"
-                size="sm"
-                className="text-xs"
-              >
-{viewMode === "grid" ? t('positions.switch_to_list') : t('positions.switch_to_grid')}
-              </Button>
-            </div>
-          )}
+
         </div>
 
         <div id="job-listings">
-          {filteredPositions.length > 0 ? (
+          {error && (
+            <Alert variant="destructive" className="mb-8">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error loading positions</AlertTitle>
+              <AlertDescription>
+                {error instanceof Error ? error.message : 'Failed to load positions. Please try again.'}
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {!error && isLoading && (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-gray-600">Loading positions...</span>
+            </div>
+          )}
+          
+          {!error && !isLoading && filteredPositions.length > 0 ? (
             <>
-              {viewMode === "grid" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-center">
+              {/* Always show horizontal scroll on mobile, grid on desktop */}
+              <div className="md:grid md:grid-cols-2 xl:grid-cols-3 md:gap-6 md:justify-items-center">
+                {/* Mobile horizontal scroll container - Always enabled */}
+                <div className="md:hidden overflow-x-auto scrollbar-hide pb-2">
+                  <div className="flex gap-2 px-2 sm:gap-3 sm:px-3" style={{ width: 'max-content' }}>
+                    {currentPositions.map((pos, index) => {
+                      const applicantData = applicantCountMap.get(pos.id);
+                      return (
+                        <div 
+                          key={pos.id} 
+                          style={{ animationDelay: `${index * 100}ms` }} 
+                          className="animate-fade-in flex-shrink-0 w-[260px] sm:w-[300px]"
+                        >
+                          <PositionCard 
+                            position={pos} 
+                            applicantCount={applicantData?.count}
+                            topTierBadge={applicantData?.topTierBadge}
+                            compactMobile={true}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Enhanced scroll indicator for mobile */}
+                  <div className="flex justify-center items-center mt-3">
+                    <div className="flex items-center space-x-1">
+                      {currentPositions.slice(0, Math.min(4, currentPositions.length)).map((_, index) => (
+                        <div key={index} className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                      ))}
+                      {currentPositions.length > 4 && (
+                        <div className="text-xs text-blue-600 ml-2 font-medium">
+                          +{currentPositions.length - 4} more →
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Desktop grid layout */}
+                <div className="hidden md:contents">
                   {currentPositions.map((pos, index) => {
                     const applicantData = applicantCountMap.get(pos.id);
                     return (
@@ -295,31 +367,18 @@ export const OpenPositions = ({
                     );
                   })}
                 </div>
-              ) : (
-                <div className="flex flex-col space-y-6">
-                  {currentPositions.map((pos, index) => {
-                    const applicantData = applicantCountMap.get(pos.id);
-                    return (
-                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in max-w-none">
-                        <PositionCard 
-                          position={pos} 
-                          showDepartment={true} 
-                          applicantCount={applicantData?.count}
-                          topTierBadge={applicantData?.topTierBadge}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              </div>
               
               {renderPagination()}
               
-              <div className="text-center text-gray-500 mt-4">
-{t('positions.showing')} {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredPositions.length)} {t('positions.of')} {filteredPositions.length} {filteredPositions.length === 1 ? t('positions.position_found') : t('positions.positions_found')}
-              </div>
+              {/* Show position count info only on desktop */}
+              {!isMobile && (
+                <div className="text-center text-gray-500 mt-4">
+                  {t('positions.showing')} {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredPositions.length)} {t('positions.of')} {filteredPositions.length} {filteredPositions.length === 1 ? t('positions.position_found') : t('positions.positions_found')}
+                </div>
+              )}
             </>
-          ) : (
+          ) : !error && !isLoading ? (
             <Alert variant="default" className="bg-blue-50 border-blue-200 mb-12">
               <AlertCircle className="h-5 w-5 text-blue-600" />
               <AlertTitle className="text-xl font-semibold text-gray-800 mb-2">
@@ -343,7 +402,7 @@ export const OpenPositions = ({
                 )}
               </AlertDescription>
             </Alert>
-          )}
+          ) : null}
         </div>
       </div>
     </section>
