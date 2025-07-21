@@ -3,6 +3,7 @@ import { PositionCard } from "@/components/PositionCard";
 import { getPositions } from "@/lib/api";
 import { getDepartments, getCompanies } from "@/lib/api";
 import { Position } from "@/types/position";
+import { getLocalizedContent } from "@shared/schema";
 import { AlertCircle, Filter } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -173,8 +174,9 @@ export const OpenPositions = ({
       return '';
     };
 
-    const companyName = getLocalizedText(company?.name) || '';
-    const departmentName = getLocalizedText(department?.name) || '';
+    // Use the same language as FilterSection for consistent matching
+    const companyName = company?.name ? getLocalizedContent(company.name, i18n.language as "en" | "ru" | "uz") : '';
+    const departmentName = department?.name ? getLocalizedContent(department.name, i18n.language as "en" | "ru" | "uz") : '';
 
     // Debug logging for all positions to find Millat Umidi School positions
     if (company?.id === 9 || companyName.includes('School') || pos.id === 23 || pos.id === 24) {
@@ -190,8 +192,8 @@ export const OpenPositions = ({
       selectedCompanies.length === 0 ||
       selectedCompanies.some(c => {
         const match = toLower(c) === toLower(companyName);
-        if (selectedCompanies.length > 0 && (companyName.includes('School') || c.includes('School'))) {
-          console.log('Company Match Check:', c, '===', companyName, '?', match);
+        if (selectedCompanies.length > 0 && (companyName.includes('School') || c.includes('School') || companyName.includes('Миллат') || c.includes('Миллат'))) {
+          console.log('🏫 Company Match Check:', c, '===', companyName, '?', match);
         }
         return match;
       });
