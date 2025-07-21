@@ -19,9 +19,9 @@ import { TopSearchRankingOptimization } from "@/components/TopSearchRankingOptim
 
 const Index = () => {
   const { i18n } = useTranslation();
-  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
-  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
-  const [selectedPositions, setSelectedPositions] = useState<string[]>([]);
+  const [selectedCompanies, setSelectedCompanies] = useState<number[]>([]);
+  const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
+  const [selectedPositions, setSelectedPositions] = useState<number[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   
   const seoData = getPageSEO('home', i18n.language);
@@ -30,7 +30,7 @@ const Index = () => {
   useWebVitals();
   
   // Handle company selection changes
-  const handleCompanyChange = (companies: string[]) => {
+  const handleCompanyChange = (companies: number[]) => {
     setSelectedCompanies(companies);
     
     // If companies are deselected, also clear departments and positions
@@ -41,7 +41,7 @@ const Index = () => {
   };
   
   // Handle department selection changes
-  const handleDepartmentChange = (departments: string[]) => {
+  const handleDepartmentChange = (departments: number[]) => {
     setSelectedDepartments(departments);
     
     // If departments are deselected, also clear positions
@@ -51,7 +51,7 @@ const Index = () => {
   };
   
   // Handle position selection changes
-  const handlePositionChange = (positions: string[]) => {
+  const handlePositionChange = (positions: number[]) => {
     setSelectedPositions(positions);
   };
   

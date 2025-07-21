@@ -14,9 +14,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from 'react-i18next';
 
 interface OpenPositionsProps {
-  selectedCompanies: string[];
-  selectedDepartments: string[];
-  selectedPositions: string[];
+  selectedCompanies: number[];
+  selectedDepartments: number[];
+  selectedPositions: number[];
   hasSearched: boolean;
 }
 
@@ -188,26 +188,20 @@ export const OpenPositions = ({
 
     const toLower = (s: string) => s.toLowerCase();
 
+    // Company filter logic - use ID comparison instead of name
     const companyMatch =
       selectedCompanies.length === 0 ||
-      selectedCompanies.some(c => {
-        const match = toLower(c) === toLower(companyName);
-        if (selectedCompanies.length > 0 && (companyName.includes('School') || c.includes('School') || companyName.includes('Миллат') || c.includes('Миллат'))) {
-          console.log('🏫 Company Match Check:', c, '===', companyName, '?', match);
-        }
-        return match;
-      });
+      selectedCompanies.includes(company?.id);
 
+    // Department filter logic - use ID comparison instead of name
     const departmentMatch =
       selectedDepartments.length === 0 ||
-      selectedDepartments.some(d => toLower(d) === toLower(departmentName));
+      selectedDepartments.includes(pos.departmentId);
 
+    // Position filter logic - use ID comparison instead of name
     const positionMatch =
       selectedPositions.length === 0 ||
-      selectedPositions.some(sel => {
-        const posTitle = getLocalizedText(pos.title);
-        return toLower(posTitle).includes(toLower(sel));
-      });
+      selectedPositions.includes(pos.id);
 
     const matches = companyMatch && departmentMatch && positionMatch;
     

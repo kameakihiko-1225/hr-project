@@ -8,20 +8,20 @@ import { useTranslation } from 'react-i18next';
 import { getLocalizedContent } from "@shared/schema";
 
 interface FilterSectionProps {
-  selectedCompanies: string[];
-  setSelectedCompanies: (companies: string[]) => void;
-  selectedDepartments: string[];
-  setSelectedDepartments: (departments: string[]) => void;
-  selectedPositions: string[];
-  setSelectedPositions: (positions: string[]) => void;
+  selectedCompanies: number[];
+  setSelectedCompanies: (companies: number[]) => void;
+  selectedDepartments: number[];
+  setSelectedDepartments: (departments: number[]) => void;
+  selectedPositions: number[];
+  setSelectedPositions: (positions: number[]) => void;
   onFilterComplete: () => void;
 }
 
 // Dynamic option states will be populated via API
 
-interface CompanyOption { id: string; name: string }
-interface DepartmentOption { id: string; name: string; companyId: string }
-interface PositionOption { id: string; title: string; departmentIds: string[] }
+interface CompanyOption { id: number; name: any; }
+interface DepartmentOption { id: number; name: any; companyId: number; }
+interface PositionOption { id: number; title: any; departmentId: number; }
 
 export const FilterSection = ({
   selectedCompanies,
@@ -68,16 +68,13 @@ export const FilterSection = ({
       }
       setIsLoadingDepartments(true);
       try {
-        const allDeps: DepartmentOption[] = [];
-        for (const companyName of selectedCompanies) {
-          const company = companyOptions.find(c => getLocalizedContent(c.name, i18n.language as "en" | "ru" | "uz") === companyName);
-          if (!company) continue;
-          const deps = await getDepartments();
-          if (Array.isArray(deps)) {
-            allDeps.push(...(deps as any));
-          }
-        }
-        setDepartmentOptions(allDeps);
+        const deps = await getDepartments();
+        const allDeps = Array.isArray(deps) ? deps : deps?.data || [];
+        // Filter departments that belong to selected companies
+        const filteredDeps = allDeps.filter((dep: any) => 
+          selectedCompanies.includes(dep.companyId)
+        );
+        setDepartmentOptions(filteredDeps);
       } catch (error) {
         console.error('Failed to load departments', error);
       } finally {
@@ -100,16 +97,13 @@ export const FilterSection = ({
       }
       setIsLoadingPositions(true);
       try {
-        const allPositions: PositionOption[] = [];
-        for (const deptName of selectedDepartments) {
-          const dept = departmentOptions.find(d => getLocalizedContent(d.name, i18n.language as "en" | "ru" | "uz") === deptName);
-          if (!dept) continue;
-          const positions = await getPositions();
-          if (Array.isArray(positions)) {
-            allPositions.push(...(positions as any));
-          }
-        }
-        setPositionOptions(allPositions);
+        const positions = await getPositions();
+        const allPositions = Array.isArray(positions) ? positions : positions?.data || [];
+        // Filter positions that belong to selected departments
+        const filteredPositions = allPositions.filter((pos: any) => 
+          selectedDepartments.includes(pos.departmentId)
+        );
+        setPositionOptions(filteredPositions);
       } catch (error) {
         console.error('Failed to load positions', error);
       } finally {
@@ -121,14 +115,25 @@ export const FilterSection = ({
     setSelectedPositions([]);
   }, [selectedDepartments, i18n.language]);
 
-  // Ensure unique values to avoid duplicate keys in lists
-  const availableCompanies = Array.from(new Set(companyOptions.map(c => getLocalizedContent(c.name, i18n.language as "en" | "ru" | "uz"))));
-  const availableDepartments = Array.from(new Set(departmentOptions.map(d => getLocalizedContent(d.name, i18n.language as "en" | "ru" | "uz"))));
-  const availablePositions = Array.from(new Set(positionOptions.map(p => getLocalizedContent(p.title, i18n.language as "en" | "ru" | "uz"))));
+  // Create display arrays with ID-name pairs for MultiSelect
+  const availableCompanies = companyOptions.map(c => ({
+    id: c.id.toString(),
+    name: getLocalizedContent(c.name, i18n.language as "en" | "ru" | "uz")
+  }));
+  
+  const availableDepartments = departmentOptions.map(d => ({
+    id: d.id.toString(),
+    name: getLocalizedContent(d.name, i18n.language as "en" | "ru" | "uz")
+  }));
+  
+  const availablePositions = positionOptions.map(p => ({
+    id: p.id.toString(),
+    name: getLocalizedContent(p.title, i18n.language as "en" | "ru" | "uz")
+  }));
 
-  // Debug logging for company names
-  console.log('FilterSection Available Companies:', availableCompanies);
-  console.log('FilterSection Raw Company Options:', companyOptions);
+  // Debug logging 
+  console.log('FilterSection Company Options:', availableCompanies);
+  console.log('Selected Company IDs:', selectedCompanies);
 
   const handleSearch = () => {
     onFilterComplete();
@@ -193,9 +198,17 @@ export const FilterSection = ({
                   {t('filter.labels.companies')}
                 </label>
                 <MultiSelect
-                  options={availableCompanies}
-                  selected={selectedCompanies}
-                  onChange={setSelectedCompanies}
+                  options={availableCompanies.map(c => c.name)}
+                  selected={selectedCompanies.map(id => 
+                    availableCompanies.find(c => c.id === id.toString())?.name || ''
+                  ).filter(Boolean)}
+                  onChange={(names) => {
+                    const ids = names.map(name => {
+                      const company = availableCompanies.find(c => c.name === name);
+                      return company ? parseInt(company.id) : null;
+                    }).filter(id => id !== null) as number[];
+                    setSelectedCompanies(ids);
+                  }}
                   placeholder={isLoadingCompanies ? t('filter.placeholders.loading') : t('filter.placeholders.companies')}
                   disabled={isLoadingCompanies}
                 />
@@ -206,9 +219,17 @@ export const FilterSection = ({
                   {t('filter.labels.departments')}
                 </label>
                 <MultiSelect
-                  options={availableDepartments}
-                  selected={selectedDepartments}
-                  onChange={setSelectedDepartments}
+                  options={availableDepartments.map(d => d.name)}
+                  selected={selectedDepartments.map(id => 
+                    availableDepartments.find(d => d.id === id.toString())?.name || ''
+                  ).filter(Boolean)}
+                  onChange={(names) => {
+                    const ids = names.map(name => {
+                      const department = availableDepartments.find(d => d.name === name);
+                      return department ? parseInt(department.id) : null;
+                    }).filter(id => id !== null) as number[];
+                    setSelectedDepartments(ids);
+                  }}
                   placeholder={isLoadingDepartments ? t('filter.placeholders.loading') : t('filter.placeholders.departments')}
                   disabled={selectedCompanies.length === 0 || isLoadingDepartments}
                 />
@@ -219,9 +240,17 @@ export const FilterSection = ({
                   {t('filter.labels.positions')}
                 </label>
                 <MultiSelect
-                  options={availablePositions}
-                  selected={selectedPositions}
-                  onChange={setSelectedPositions}
+                  options={availablePositions.map(p => p.name)}
+                  selected={selectedPositions.map(id => 
+                    availablePositions.find(p => p.id === id.toString())?.name || ''
+                  ).filter(Boolean)}
+                  onChange={(names) => {
+                    const ids = names.map(name => {
+                      const position = availablePositions.find(p => p.name === name);
+                      return position ? parseInt(position.id) : null;
+                    }).filter(id => id !== null) as number[];
+                    setSelectedPositions(ids);
+                  }}
                   placeholder={isLoadingPositions ? t('filter.placeholders.loading') : t('filter.placeholders.positions')}
                   disabled={selectedDepartments.length === 0 || isLoadingPositions}
                 />
