@@ -43,14 +43,19 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
     };
   }, []);
 
-  // Ensure dropdown stays in view
+  // Ensure dropdown stays in view and has adequate height
   useEffect(() => {
     if (isOpen && dropdownRef.current) {
       const rect = dropdownRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
+      const minHeight = 200; // Minimum height for at least 4-5 options
+      const availableHeight = viewportHeight - rect.top - 20;
+      const proposedHeight = Math.max(minHeight, Math.min(384, availableHeight)); // min 200px, max 384px (96 * 4)
       
       if (rect.bottom > viewportHeight) {
-        dropdownRef.current.style.maxHeight = `${viewportHeight - rect.top - 20}px`;
+        dropdownRef.current.style.maxHeight = `${proposedHeight}px`;
+      } else {
+        dropdownRef.current.style.maxHeight = `${Math.min(384, availableHeight)}px`; // Ensure reasonable max height
       }
     }
   }, [isOpen]);
@@ -142,7 +147,7 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
       {isOpen && !disabled && (
         <div 
           ref={dropdownRef}
-          className="fixed md:absolute top-auto md:top-full left-0 md:left-auto right-0 md:right-auto mt-1 sm:mt-2 max-h-40 sm:max-h-48 overflow-y-auto 
+          className="fixed md:absolute top-auto md:top-full left-0 md:left-auto right-0 md:right-auto mt-1 sm:mt-2 max-h-80 sm:max-h-96 overflow-y-auto 
                      bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] md:z-[60] animate-fade-in min-w-[300px] md:min-w-full"
           onMouseEnter={handleMouseEnter}
         >

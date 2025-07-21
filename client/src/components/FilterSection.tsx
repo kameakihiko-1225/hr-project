@@ -46,8 +46,8 @@ export const FilterSection = ({
     const loadCompanies = async () => {
       setIsLoadingCompanies(true);
       try {
-        const res = await getCompanies(i18n.language);
-        if (res.success && Array.isArray(res.data)) {
+        const res = await getCompanies();
+        if (res.data && Array.isArray(res.data)) {
           setCompanyOptions(res.data as any);
         }
       } catch (error) {
@@ -72,7 +72,7 @@ export const FilterSection = ({
         for (const companyName of selectedCompanies) {
           const company = companyOptions.find(c => getLocalizedContent(c.name, i18n.language as "en" | "ru" | "uz") === companyName);
           if (!company) continue;
-          const deps = await getDepartments(company.id, false, i18n.language);
+          const deps = await getDepartments();
           if (Array.isArray(deps)) {
             allDeps.push(...(deps as any));
           }
@@ -104,7 +104,7 @@ export const FilterSection = ({
         for (const deptName of selectedDepartments) {
           const dept = departmentOptions.find(d => getLocalizedContent(d.name, i18n.language as "en" | "ru" | "uz") === deptName);
           if (!dept) continue;
-          const positions = await getPositions(dept.id, i18n.language);
+          const positions = await getPositions();
           if (Array.isArray(positions)) {
             allPositions.push(...(positions as any));
           }
