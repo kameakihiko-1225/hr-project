@@ -159,12 +159,17 @@ export default function Blog() {
                 {filteredItems.length === 0 ? (
                   <div className="text-center py-16">
                     <Images className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-600 mb-2">No items found</h3>
+                    <h3 className="text-xl font-semibold text-gray-600 mb-2">No blog posts found</h3>
                     <p className="text-gray-500">
                       {selectedCategory === 'all' 
-                        ? 'No gallery items are currently available.' 
-                        : `No items found in the ${selectedCategory} category.`}
+                        ? 'No blog posts are currently available. Check back soon for updates!' 
+                        : `No blog posts found in the ${selectedCategory} category.`}
                     </p>
+                    <div className="mt-4">
+                      <p className="text-sm text-gray-400">
+                        API Response: {JSON.stringify(blogResponse)}
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <>

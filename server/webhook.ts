@@ -52,22 +52,20 @@ async function getTelegramFileInfo(fileId: string): Promise<{ file_path: string;
   }
 
   try {
-    console.log(`🔍 [TELEGRAM-FILE] Getting file info for file ID: ${fileId}`);
-    const response = await axios.get(`${TELEGRAM_API_BASE}/bot${botToken}/getFile?file_id=${fileId}`);
+    const response = await axios.get(`${TELEGRAM_API_BASE}/bot${botToken}/getFile?file_id=${fileId}`, {
+      timeout: 3000
+    });
     
     if (response.data.ok && response.data.result) {
       const fileInfo = response.data.result;
-      console.log(`✅ [TELEGRAM-FILE] File info retrieved:`, fileInfo);
       return {
         file_path: fileInfo.file_path,
         file_size: fileInfo.file_size || 0
       };
     } else {
-      console.log(`❌ [TELEGRAM-FILE] Failed to get file info:`, response.data);
       return null;
     }
   } catch (error: any) {
-    console.log(`❌ [TELEGRAM-FILE] Error getting file info:`, error.message);
     return null;
   }
 }
@@ -132,34 +130,32 @@ async function downloadTelegramFile(fileId: string, fileName: string): Promise<s
 
 async function convertTelegramFileIdToUrl(fileId: string, fieldName: string): Promise<string> {
   if (!fileId || !isTelegramFileId(fileId)) {
-    console.log(`⚪ [TELEGRAM-FILE] Invalid file ID for ${fieldName}: ${fileId}`);
     return fileId; // Return as-is if not a valid file ID
   }
 
-  console.log(`🔄 [TELEGRAM-FILE] Converting ${fieldName} file ID to downloadable URL: ${fileId}`);
-  
   const botToken = getBotToken();
   if (!botToken) {
-    console.log(`❌ [TELEGRAM-FILE] No bot token available for ${fieldName}`);
     return fileId;
   }
 
   try {
-    // Get file info from Telegram
-    const fileInfo = await getTelegramFileInfo(fileId);
+    // Get file info from Telegram with timeout
+    const fileInfo = await Promise.race([
+      getTelegramFileInfo(fileId),
+      new Promise<null>((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 3000)
+      )
+    ]);
+    
     if (!fileInfo) {
-      console.log(`❌ [TELEGRAM-FILE] Invalid or expired file ID for ${fieldName}: ${fileId}`);
-      console.log(`⚠️  [TELEGRAM-FILE] Note: Bitrix24 will receive the file ID instead of downloadable URL`);
       return fileId;
     }
 
     // Create direct Telegram download URL
     const telegramUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${fileInfo.file_path}`;
-    console.log(`✅ [TELEGRAM-FILE] ${fieldName} converted to Telegram URL: ${telegramUrl}`);
     return telegramUrl;
 
   } catch (error: any) {
-    console.log(`❌ [TELEGRAM-FILE] Error converting ${fieldName}: ${error.message}`);
     return fileId; // Fallback to original ID if conversion fails
   }
 }
@@ -167,7 +163,9 @@ async function convertTelegramFileIdToUrl(fileId: string, fieldName: string): Pr
 async function findExistingContact(phone: string): Promise<string | null> {
   if (!phone) return null;
   try {
-    const searchResp = await axios.get(`${BITRIX_BASE}/crm.contact.list.json?filter[PHONE]=${phone}`);
+    const searchResp = await axios.get(`${BITRIX_BASE}/crm.contact.list.json?filter[PHONE]=${phone}`, {
+      timeout: 5000
+    });
     const contacts = searchResp.data.result;
     return contacts && contacts.length > 0 ? contacts[0].ID : null;
   } catch {
