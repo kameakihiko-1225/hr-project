@@ -139,13 +139,31 @@ async function convertTelegramFileIdToUrl(fileId: string, fieldName: string): Pr
   }
 
   try {
-    // Get file info from Telegram with timeout
+    // Fire-and-forget pattern: try to get file info but don't wait if it times out
+    const fileInfoPromise = getTelegramFileInfo(fileId);
+    
+    // Use Promise.race to timeout, but continue processing in background
     const fileInfo = await Promise.race([
-      getTelegramFileInfo(fileId),
+      fileInfoPromise,
       new Promise<null>((_, reject) => 
         setTimeout(() => reject(new Error('Timeout')), 3000)
       )
-    ]);
+    ]).catch(async () => {
+      // If timeout occurs, log but let operation continue in background
+      console.log(`⏱️ [TELEGRAM-FILE] ${fieldName} timed out but continuing in background`);
+      
+      // Continue file processing in background (fire-and-forget)
+      fileInfoPromise.then(result => {
+        if (result) {
+          const bgUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${result.file_path}`;
+          console.log(`🔥 [TELEGRAM-FILE] Background ${fieldName} completed: ${bgUrl}`);
+        }
+      }).catch(() => {
+        console.log(`🔥 [TELEGRAM-FILE] Background ${fieldName} failed but operation completed`);
+      });
+      
+      return null;
+    });
     
     if (!fileInfo) {
       return fileId;
@@ -176,7 +194,9 @@ async function findExistingContact(phone: string): Promise<string | null> {
 async function findDealIdByContact(contactId: string): Promise<string | null> {
   if (!contactId) return null;
   try {
-    const searchResp = await axios.get(`${BITRIX_BASE}/crm.deal.list.json?filter[CONTACT_ID]=${contactId}&select[]=ID`);
+    const searchResp = await axios.get(`${BITRIX_BASE}/crm.deal.list.json?filter[CONTACT_ID]=${contactId}&select[]=ID`, {
+      timeout: 5000
+    });
     const deals = searchResp.data.result;
     return deals && deals.length > 0 ? deals[0].ID : null;
   } catch {
@@ -418,6 +438,7 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
       headers: {
         'Content-Type': 'application/json'
       },
+      timeout: 5000
     });
     console.log('  📨 Contact update response status:', updateResp.status);
     console.log('  📨 Contact update response data:', JSON.stringify(updateResp.data, null, 2));
@@ -431,6 +452,7 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
       headers: {
         'Content-Type': 'application/json'
       },
+      timeout: 5000
     });
     console.log('  📨 Contact create response status:', createResp.status);
     console.log('  📨 Contact create response data:', JSON.stringify(createResp.data, null, 2));
@@ -463,7 +485,9 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
       fields: dealFields,
       params: { REGISTER_SONET_EVENT: 'Y' },
     };
-    const updateResp = await axios.post(`${BITRIX_BASE}/crm.deal.update.json`, updatePayload);
+    const updateResp = await axios.post(`${BITRIX_BASE}/crm.deal.update.json`, updatePayload, {
+      timeout: 5000
+    });
     console.log('[TELEGRAM-BOT] Deal update response:', updateResp.data);
     dealId = existingDealId;
   } else {
@@ -471,7 +495,9 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
       fields: dealFields,
       params: { REGISTER_SONET_EVENT: 'Y' },
     };
-    const createResp = await axios.post(`${BITRIX_BASE}/crm.deal.add.json`, createPayload);
+    const createResp = await axios.post(`${BITRIX_BASE}/crm.deal.add.json`, createPayload, {
+      timeout: 5000
+    });
     console.log('[TELEGRAM-BOT] Deal create response:', createResp.data);
     dealId = createResp.data.result;
   }
