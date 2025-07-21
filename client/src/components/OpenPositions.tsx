@@ -154,6 +154,10 @@ export const OpenPositions = ({
     });
   });
 
+  // Log current filter selections
+  console.log('Current filter selections:', { selectedCompanies, selectedDepartments, selectedPositions });
+  console.log('Total positions to filter:', allPositions.length);
+
   const filteredPositions = allPositions.filter((pos: any) => {
     // Find department and company data for this position
     const department = departments.find((d: any) => d.id === pos.departmentId);
@@ -172,20 +176,25 @@ export const OpenPositions = ({
     const companyName = getLocalizedText(company?.name) || '';
     const departmentName = getLocalizedText(department?.name) || '';
 
-    // Debug logging for Millat Umidi School filtering
-    if (selectedCompanies.length > 0 && companyName.includes('Millat Umidi School')) {
-      console.log('DEBUG Filter - Position:', pos.id, 'Title:', getLocalizedText(pos.title));
-      console.log('Company Name from position:', companyName);
-      console.log('Selected Companies:', selectedCompanies);
-      console.log('Department Name:', departmentName);
-      console.log('Selected Departments:', selectedDepartments);
+    // Debug logging for all positions to find Millat Umidi School positions
+    if (company?.id === 9 || companyName.includes('School') || pos.id === 23 || pos.id === 24) {
+      console.log('🏫 School Position Found - ID:', pos.id, 'Title:', getLocalizedText(pos.title));
+      console.log('Company ID:', company?.id, 'Company Name:', companyName);
+      console.log('Department ID:', department?.id, 'Department Name:', departmentName);
+      console.log('Raw company object:', company);
     }
 
     const toLower = (s: string) => s.toLowerCase();
 
     const companyMatch =
       selectedCompanies.length === 0 ||
-      selectedCompanies.some(c => toLower(c) === toLower(companyName));
+      selectedCompanies.some(c => {
+        const match = toLower(c) === toLower(companyName);
+        if (selectedCompanies.length > 0 && (companyName.includes('School') || c.includes('School'))) {
+          console.log('Company Match Check:', c, '===', companyName, '?', match);
+        }
+        return match;
+      });
 
     const departmentMatch =
       selectedDepartments.length === 0 ||
