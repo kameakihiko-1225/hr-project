@@ -139,7 +139,7 @@ export const FilterSection = ({
   const hasActiveFilters = selectedCompanies.length > 0 || selectedDepartments.length > 0 || selectedPositions.length > 0;
 
   return (
-    <section id="filter-section" className="relative py-8 sm:py-12 md:py-16 px-3 sm:px-4 md:px-6 bg-white dark:bg-gray-950 overflow-hidden">
+    <section id="filter-section" className="relative py-8 sm:py-12 md:py-16 px-3 sm:px-4 md:px-6 bg-white dark:bg-gray-950 overflow-visible z-10">
       {/* Subtle background decoration - same as hero */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-indigo-50/30 dark:from-blue-950/30 dark:via-transparent dark:to-indigo-950/20"></div>
       <div className="max-w-7xl mx-auto relative">

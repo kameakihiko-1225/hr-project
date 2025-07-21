@@ -99,7 +99,7 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
 
   return (
     <div 
-      className="relative" 
+      className="relative z-50" 
       ref={containerRef} 
       onMouseLeave={handleMouseLeave}
       onMouseEnter={handleMouseEnter}
@@ -151,7 +151,7 @@ export const MultiSelect = ({ options, selected, onChange, placeholder, disabled
         <div 
           ref={dropdownRef}
           className="fixed md:absolute top-auto md:top-full left-0 md:left-auto right-0 md:right-auto mt-1 sm:mt-2 min-h-[200px] max-h-[400px] sm:min-h-[250px] sm:max-h-[500px] overflow-y-auto 
-                     bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] md:z-[60] animate-fade-in min-w-[300px] md:min-w-full"
+                     bg-white border border-gray-200 rounded-lg shadow-xl z-[99999] animate-fade-in min-w-[300px] md:min-w-full"
           onMouseEnter={handleMouseEnter}
         >
           <div className="sticky top-0 bg-white border-b border-gray-200 p-1.5 sm:p-2 flex justify-between items-center">
