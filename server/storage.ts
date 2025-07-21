@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { eq, and, desc, count } from "drizzle-orm";
+import { eq, and, desc, count, lt } from "drizzle-orm";
 import dotenv from "dotenv";
 import { 
   companies, departments, positions, candidates, galleryItems, industryTags, companyIndustryTags, positionClicks, adminUsers, adminSessions,
@@ -253,7 +253,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCompany(id: number): Promise<boolean> {
     const result = await db.delete(companies).where(eq(companies.id, id));
-    return result.rowCount > 0;
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   // Optimized method for admin interface using shared optimization class
@@ -363,7 +363,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteDepartment(id: number): Promise<boolean> {
     const result = await db.delete(departments).where(eq(departments.id, id));
-    return result.rowCount > 0;
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   // Position methods
@@ -443,7 +443,7 @@ export class DatabaseStorage implements IStorage {
 
   async deletePosition(id: number): Promise<boolean> {
     const result = await db.delete(positions).where(eq(positions.id, id));
-    return result.rowCount > 0;
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   // Candidate methods
@@ -480,7 +480,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCandidate(id: string): Promise<boolean> {
     const result = await db.delete(candidates).where(eq(candidates.id, id));
-    return result.rowCount > 0;
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   // Gallery item methods
@@ -564,7 +564,7 @@ export class DatabaseStorage implements IStorage {
   async deleteGalleryItem(id: number): Promise<boolean> {
     try {
       const result = await db.delete(galleryItems).where(eq(galleryItems.id, id));
-      return result.rowCount > 0;
+      return result.rowCount !== null && result.rowCount > 0;
     } catch (error) {
       console.error("Error deleting gallery item:", error);
       return false;
@@ -578,11 +578,11 @@ export class DatabaseStorage implements IStorage {
       
       // For industry tags, we'll just use the English version directly
       return dbTags.map(tag => ({
-        ...tag,
-        // Ensure name and description are strings (use English version)
-        name: typeof tag.name === 'object' ? tag.name.en || '' : tag.name || '',
-        description: typeof tag.description === 'object' ? tag.description.en || '' : tag.description || ''
-      }));
+        id: tag.id,
+        name: typeof tag.name === 'object' && tag.name ? (tag.name.en || tag.name.ru || tag.name.uz || '') : (tag.name || ''),
+        description: typeof tag.description === 'object' && tag.description ? (tag.description.en || tag.description.ru || tag.description.uz || '') : (tag.description || ''),
+        createdAt: tag.createdAt
+      } as IndustryTag));
     } catch (error) {
       console.error('Error fetching industry tags:', error);
       return [];
@@ -596,11 +596,11 @@ export class DatabaseStorage implements IStorage {
       
       // For industry tags, we'll just use the English version directly
       return {
-        ...tag,
-        // Ensure name and description are strings (use English version)
-        name: typeof tag.name === 'object' ? tag.name.en || '' : tag.name || '',
-        description: typeof tag.description === 'object' ? tag.description.en || '' : tag.description || ''
-      };
+        id: tag.id,
+        name: typeof tag.name === 'object' && tag.name ? (tag.name.en || tag.name.ru || tag.name.uz || '') : (tag.name || ''),
+        description: typeof tag.description === 'object' && tag.description ? (tag.description.en || tag.description.ru || tag.description.uz || '') : (tag.description || ''),
+        createdAt: tag.createdAt
+      } as IndustryTag;
     } catch (error) {
       console.error('Error fetching industry tag:', error);
       return undefined;
@@ -658,8 +658,8 @@ export class DatabaseStorage implements IStorage {
       return results.map(tag => ({
         ...tag,
         // Ensure name and description are strings (use English version)
-        name: typeof tag.name === 'object' ? tag.name.en || '' : tag.name || '',
-        description: typeof tag.description === 'object' ? tag.description.en || '' : tag.description || ''
+        name: typeof tag.name === 'object' && tag.name ? (tag.name.en || tag.name.ru || tag.name.uz || '') : (tag.name || ''),
+        description: typeof tag.description === 'object' && tag.description ? (tag.description.en || tag.description.ru || tag.description.uz || '') : (tag.description || '')
       }));
     } catch (error) {
       console.error(`[Storage] Error fetching company industry tags for company ${companyId}:`, error);
@@ -1034,7 +1034,7 @@ export class DatabaseStorage implements IStorage {
 
   async cleanExpiredSessions(): Promise<void> {
     try {
-      await db.delete(adminSessions).where(new Date() > adminSessions.expiresAt);
+      await db.delete(adminSessions).where(lt(adminSessions.expiresAt, new Date()));
     } catch (error) {
       console.error('Error cleaning expired sessions:', error);
     }

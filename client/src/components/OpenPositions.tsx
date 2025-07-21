@@ -331,7 +331,7 @@ export const OpenPositions = ({
                             position={pos} 
                             applicantCount={applicantData?.count}
                             topTierBadge={applicantData?.topTierBadge}
-                            compactMobile={true}
+            
                           />
                         </div>
                       );

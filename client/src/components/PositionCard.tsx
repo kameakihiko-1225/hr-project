@@ -26,10 +26,10 @@ interface PositionCardProps {
   showDepartment?: boolean;
   applicantCount?: number;
   topTierBadge?: 1 | 2 | 3; // Badge for top 3 most applied positions
-  compactMobile?: boolean; // Enable compact mobile view
+
 }
 
-export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false, applicantCount, topTierBadge, compactMobile = false }: PositionCardProps) {
+export const PositionCard = React.memo(function PositionCard({ position, onEdit, onDelete, showDepartment = false, applicantCount, topTierBadge }: PositionCardProps) {
   const { t, i18n } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
