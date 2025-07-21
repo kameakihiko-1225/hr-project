@@ -277,7 +277,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           handleCardClick(e as unknown as React.MouseEvent);
         }
       }}
-      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[440px] w-full max-w-[460px] flex flex-col cursor-pointer"
+      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[520px] w-full max-w-[480px] flex flex-col cursor-pointer"
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -403,7 +403,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-center gap-2 sm:gap-3 pt-2 sm:pt-3 pb-3 sm:pb-4 border-t border-border px-3 sm:px-6 relative z-10 mt-auto shrink-0">
+      <CardFooter className="flex flex-col items-center gap-3 sm:gap-4 pt-3 sm:pt-4 pb-4 sm:pb-5 border-t border-border px-3 sm:px-6 relative z-10 mt-auto shrink-0">
         {postedAgo && (
           <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> {postedAgo}</span>
         )}
@@ -532,24 +532,20 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         {position.applyLink ? (
           <button
             onClick={handleApply}
-            className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 w-full justify-center h-8 sm:h-10"
+            className="px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-bold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-2xl hover:shadow-blue-200 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center gap-2 w-full justify-center h-12 sm:h-14 border-0 ring-2 ring-transparent hover:ring-blue-300"
           >
-            <span className="hidden sm:inline">{t('position_card.apply')}</span>
-            <span className="sm:hidden">{t('position_card.apply')}</span>
-            <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span>{t('position_card.apply')}</span>
+            <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         ) : (
           <Button
             onClick={handleApply}
             disabled={isApplying}
-            className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-100 hover:from-blue-600/90 hover:to-indigo-600/90 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 w-full justify-center h-8 sm:h-10"
+            className="px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-bold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-2xl hover:shadow-blue-200 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center gap-2 disabled:opacity-60 w-full justify-center h-12 sm:h-14 border-0 ring-2 ring-transparent hover:ring-blue-300"
           >
             {isApplying ? 'Generating…' : (
-              <>
-                <span className="hidden sm:inline">{t('position_card.apply')}</span>
-                <span className="sm:hidden">{t('position_card.apply')}</span>
-              </>
-            )} <Send className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span>{t('position_card.apply')}</span>
+            )} <Send className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         )}
       </CardFooter>

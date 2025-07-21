@@ -167,6 +167,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 21, 2025 - FILTER LOCALIZATION BUG FIX & POSITION CARD SIZE OPTIMIZATION - COMPLETED ✅
+- **Critical Filter Localization Bug Fixed**: Resolved filter system language mismatch that prevented Millat Umidi School positions from appearing
+  - **Root Cause**: FilterSection displayed company names in one language while OpenPositions compared using different language
+  - **Solution**: Both components now use getLocalizedContent() with consistent i18n.language parameter for matching
+  - **Verification**: School positions (SAT teacher, IELTS teacher) now display correctly when filtering by Millat Umidi School
+  - **Enhanced Debug Logging**: Added comprehensive console logging to track company matching logic and position detection
+- **Position Card Size Enhancement**: Optimized card dimensions and Apply Now button visibility across all resolutions
+  - **Card Dimensions**: Increased from 440px to 520px height, 460px to 480px max width for better content layout
+  - **Apply Now Button**: Enhanced with larger size (h-12/h-14), bold font, rounded-xl styling, and improved hover effects
+  - **Footer Spacing**: Increased padding and gaps for better visual separation and button prominence
+  - **Cross-Device Compatibility**: Optimized for mobile, tablet, and desktop with responsive sizing and proper spacing
+- **Grid Layout Updates**: Updated OpenPositions component max-width to accommodate larger cards (480px)
+- **Production Ready**: All filter functionality working correctly with proper localization and enhanced user experience
+
 ### July 21, 2025 - DROPDOWN VISIBILITY FIX & SYSTEM STABILIZATION - COMPLETED ✅
 - **Dropdown Visibility Issues Fixed**: Resolved critical MultiSelect dropdown height problems preventing option visibility
   - **Minimum Heights**: Set 200px mobile/250px desktop minimum heights ensuring 6-7 options always visible

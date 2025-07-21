@@ -399,7 +399,7 @@ export const OpenPositions = ({
                   {currentPositions.map((pos: any, index: number) => {
                     const applicantData = applicantCountMap.get(pos.id);
                     return (
-                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[460px]">
+                      <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[480px]">
                         <PositionCard 
                           position={pos} 
                           applicantCount={applicantData?.count}
