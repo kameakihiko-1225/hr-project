@@ -126,6 +126,10 @@ export const FilterSection = ({
   const availableDepartments = Array.from(new Set(departmentOptions.map(d => getLocalizedContent(d.name, i18n.language as "en" | "ru" | "uz"))));
   const availablePositions = Array.from(new Set(positionOptions.map(p => getLocalizedContent(p.title, i18n.language as "en" | "ru" | "uz"))));
 
+  // Debug logging for company names
+  console.log('FilterSection Available Companies:', availableCompanies);
+  console.log('FilterSection Raw Company Options:', companyOptions);
+
   const handleSearch = () => {
     onFilterComplete();
   };

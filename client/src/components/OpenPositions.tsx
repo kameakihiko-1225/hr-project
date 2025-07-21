@@ -172,6 +172,15 @@ export const OpenPositions = ({
     const companyName = getLocalizedText(company?.name) || '';
     const departmentName = getLocalizedText(department?.name) || '';
 
+    // Debug logging for Millat Umidi School filtering
+    if (selectedCompanies.length > 0 && companyName.includes('Millat Umidi School')) {
+      console.log('DEBUG Filter - Position:', pos.id, 'Title:', getLocalizedText(pos.title));
+      console.log('Company Name from position:', companyName);
+      console.log('Selected Companies:', selectedCompanies);
+      console.log('Department Name:', departmentName);
+      console.log('Selected Departments:', selectedDepartments);
+    }
+
     const toLower = (s: string) => s.toLowerCase();
 
     const companyMatch =
@@ -185,12 +194,19 @@ export const OpenPositions = ({
     const positionMatch =
       selectedPositions.length === 0 ||
       selectedPositions.some(sel => {
-        const posTitle = typeof pos.title === 'string' ? pos.title : 
-                        (pos.title && typeof pos.title === 'object' && pos.title.en) ? pos.title.en : '';
+        const posTitle = getLocalizedText(pos.title);
         return toLower(posTitle).includes(toLower(sel));
       });
 
-    return companyMatch && departmentMatch && positionMatch;
+    const matches = companyMatch && departmentMatch && positionMatch;
+    
+    // More debug logging
+    if (selectedCompanies.length > 0 && companyName.includes('Millat Umidi School')) {
+      console.log('Company Match:', companyMatch, 'Department Match:', departmentMatch, 'Position Match:', positionMatch);
+      console.log('Overall Match:', matches);
+    }
+
+    return matches;
   }).sort((a: any, b: any) => {
     // Sort by application count in descending order (most applied first)
     const aCount = applicantCountMap.get(a.id)?.count || 0;
