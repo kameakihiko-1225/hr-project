@@ -69,11 +69,23 @@ export const StatsSection = () => {
     setIsCompact(isMobile);
   }, [isMobile]);
 
+  // Scroll to open positions section
+  const scrollToOpenPositions = () => {
+    const openPositionsElement = document.getElementById('open-positions-section');
+    if (openPositionsElement) {
+      openPositionsElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   // Render a compact horizontal stat card - Improved for mobile/tablet with center alignment
   const renderCompactStat = (stat: any, index: number) => (
     <div 
       key={stat.label}
-      className="bg-white p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 w-full max-w-xs mx-auto"
+      onClick={index === 2 ? scrollToOpenPositions : undefined} // Only positions card is clickable
+      className={`bg-white p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 w-full max-w-xs mx-auto ${index === 2 ? 'cursor-pointer' : ''}`}
       style={{ animationDelay: `${index * 100}ms` }}
     >
       <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-r ${stat.color} rounded-lg sm:rounded-xl flex items-center justify-center`}>
@@ -96,7 +108,8 @@ export const StatsSection = () => {
   const renderStatCard = (stat: any, index: number) => (
     <div 
       key={stat.label}
-      className="text-center bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
+      onClick={index === 2 ? scrollToOpenPositions : undefined} // Only positions card is clickable
+      className={`text-center bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300 ${index === 2 ? 'cursor-pointer' : ''}`}
       style={{ animationDelay: `${index * 150}ms` }}
     >
       <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4`}>
