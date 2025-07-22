@@ -179,12 +179,17 @@ Preferred communication style: Simple, everyday language.
   - **Accessibility Features**: Keyboard navigation support (Enter key), proper focus states, and screen reader compatibility
   - **Data Inheritance System**: Smart data inheritance from position → department → company for complete information display
   - **View Tracking Integration**: Position view tracking for analytics when cards are displayed
-- **Stats Card Navigation**: Implemented smooth scroll-to-positions functionality from hero stats section
-  - **Clickable Positions Stats Card**: Third stats card (positions) now clickable to navigate users to open positions section
+- **Stats Card Navigation**: Implemented smooth scroll-to-positions functionality from hero and stats sections
+  - **HeroSection Clickable Stats**: Third stats card (positions) now clickable to navigate users to open positions section
+  - **StatsSection Clickable Stats**: Positions stats card also clickable with same smooth scroll functionality
   - **Smooth Scrolling**: Added smooth scroll behavior with proper target identification using 'open-positions-section' ID
-  - **Enhanced User Flow**: Users can easily navigate from hero statistics to actual job listings with single click
-  - **Visual Feedback**: Cursor pointer indication on clickable positions stats card for better UX
+  - **Enhanced User Flow**: Users can easily navigate from either hero or stats sections to actual job listings with single click
+  - **Visual Feedback**: Cursor pointer indication on clickable positions stats cards for better UX
   - **Cross-Device Compatibility**: Scroll functionality works consistently across desktop, tablet, and mobile devices
+- **Apply Now Button Translation Fix**: Corrected translation key from 'buttons.apply_now' to 'position_card.apply'
+  - **Multi-language Support**: Apply Now button now properly translates to English, Russian, and Uzbek languages
+  - **Translation Key Alignment**: Uses existing position_card.apply translation keys across all language files
+  - **Consistent Localization**: All position card elements now use proper translation structure
 
 ### July 22, 2025 - COMPANY CAROUSEL INFINITE LOOP & FILTER ID-BASED MATCHING - COMPLETED ✅
 - **Company Carousel Seamless Loop**: Fixed carousel to use true CSS-only infinite scroll without replay effect
