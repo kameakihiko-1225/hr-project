@@ -167,6 +167,24 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 22, 2025 - COMPANY CAROUSEL INFINITE LOOP & FILTER ID-BASED MATCHING - COMPLETED ✅
+- **Company Carousel Seamless Loop**: Fixed carousel to use true CSS-only infinite scroll without replay effect
+  - **Seamless Animation**: Removed manual scrolling conflicts and implemented pure CSS keyframe animation
+  - **Logo Size Fix**: Optimized card dimensions (160x100px desktop, 120x80px mobile) to prevent logo cutoff
+  - **Continuous Loop**: Double logo array with 50% translateX creates seamless first-to-last transition
+  - **Performance Optimized**: 20-second animation duration with hover pause functionality
+  - **No Replay Effect**: Animation continuously loops without visible restart or jump
+- **Filter System ID-Based Matching**: Converted entire filter system from localized name matching to ID-based comparison
+  - **Root Cause Resolution**: Fixed language mismatch where FilterSection displayed names in one language while OpenPositions compared in another
+  - **ID Array Implementation**: Updated all filter states from string[] to number[] for companies, departments, positions
+  - **MultiSelect Integration**: Enhanced MultiSelect components to convert between display names and IDs seamlessly
+  - **Cross-Language Compatibility**: Filter system now works correctly across English, Russian, and Uzbek languages
+  - **Technical Implementation**: Company ID 9 (Millat Umidi School), Department ID 28 (Academic), Position IDs 23,24 (SAT/IELTS teachers)
+- **Position Card Optimization**: Enhanced position cards from 440px to 520px height with improved Apply Now button visibility
+  - **Button Styling**: Larger size (h-12/h-14), bold font, rounded-xl styling, enhanced hover effects
+  - **Responsive Design**: Optimized for mobile, tablet, and desktop with proper spacing and content layout
+- **Production Ready**: Both carousel animation and filter functionality working correctly with comprehensive debug logging
+
 ### July 21, 2025 - FILTER LOCALIZATION BUG FIX & POSITION CARD SIZE OPTIMIZATION - COMPLETED ✅
 - **Critical Filter Localization Bug Fixed**: Resolved filter system language mismatch that prevented Millat Umidi School positions from appearing
   - **Root Cause**: FilterSection displayed company names in one language while OpenPositions compared using different language
