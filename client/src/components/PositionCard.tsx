@@ -288,18 +288,19 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   );
 
   return (
-    <Card
-      tabIndex={0}
-      role="button"
-      onClick={handleCardClick}
-      onKeyDown={(e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-          handleCardClick(e as unknown as React.MouseEvent);
-        }
-      }}
-      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[520px] w-full max-w-[480px] flex flex-col cursor-pointer"
-      data-testid="position-card"
-    >
+    <>
+      <Card
+        tabIndex={0}
+        role="button"
+        onClick={handleCardClick}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          if (e.key === 'Enter') {
+            handleCardClick(e as unknown as React.MouseEvent);
+          }
+        }}
+        className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[520px] w-full max-w-[480px] flex flex-col cursor-pointer"
+        data-testid="position-card"
+      >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
@@ -544,122 +545,31 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
                   </div>
                 </div>
               )}
-
-        {/* Apply Now Button - Enhanced Size and Visibility */}
-        <Button 
-          className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm sm:text-base rounded-xl shadow-lg hover:shadow-xl hover:shadow-blue-200 hover:-translate-y-1 transition-all duration-300"
-          onClick={handleApply}
-        >
-          {t('buttons.apply_now')}
-        </Button>
-      </CardFooter>
-
-      {/* Position Details Modal - Outside of Card */}
-      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="max-w-md w-[95vw] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl leading-tight">{(position.title && getLocalizedContent(position.title, i18n.language)) || 'Position'}</DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm">{t('modals.position_details.title')}</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <h4 className="text-sm font-medium mb-2">{t('modals.position_details.description')}</h4>
-              <p className="text-sm text-muted-foreground">
-                {(position.description && getLocalizedContent(position.description, i18n.language)) || 
-                 (departmentFromAPI?.description && getLocalizedContent(departmentFromAPI.description, i18n.language)) || 
-                 (companyFromAPI?.description && getLocalizedContent(companyFromAPI.description, i18n.language)) || 
-                 t('modals.position_details.no_description')}
-              </p>
             </div>
-            
-            {position.salaryRange && (
-              <div>
-                <h4 className="text-sm font-medium mb-2">{t('modals.position_details.salary_range')}</h4>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  <span>{(position.salaryRange && getLocalizedContent(position.salaryRange, i18n.language)) || 'Not specified'}</span>
-                </div>
-              </div>
-            )}
-            
-            {position.employmentType && (
-              <div>
-                <h4 className="text-sm font-medium mb-2">{t('modals.position_details.employment_type')}</h4>
-                <div className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  <span>{(position.employmentType && getLocalizedContent(position.employmentType, i18n.language)) || 'Not specified'}</span>
-                </div>
-              </div>
-            )}
-            
-            <div>
-              <h4 className="text-sm font-medium mb-2">{t('modals.position_details.department')}</h4>
-              <p className="text-sm text-muted-foreground">
-                {departmentFromAPI?.name ? getLocalizedContent(departmentFromAPI.name, i18n.language) : 'Not specified'}
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="text-sm font-medium mb-2">{t('modals.position_details.company')}</h4>
-              <p className="text-sm text-muted-foreground">
-                {companyFromAPI?.name ? getLocalizedContent(companyFromAPI.name, i18n.language) : 'Not specified'}
-              </p>
-            </div>
-            
-            {position.applyLink && (
-              <div>
-                <h4 className="text-sm font-medium mb-2">{t('modals.position_details.apply_link')}</h4>
-                <div className="flex items-center gap-2">
-                  <ExternalLink className="h-4 w-4" />
-                  <a 
-                    href={(position.applyLink && getLocalizedContent(position.applyLink, i18n.language)) || '#'} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline truncate max-w-[250px]"
-                  >
-                    {(position.applyLink && getLocalizedContent(position.applyLink, i18n.language)) || 'No link available'}
-                  </a>
-                </div>
-              </div>
-            )}
-            
-            <div>
-              <h4 className="text-sm font-medium mb-2">{t('modals.position_details.created')}</h4>
-              <p className="text-sm text-muted-foreground">
-                {position.createdAt ? (
-                  new Date(position.createdAt).toLocaleDateString()
-                ) : t('common.not_available')}
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
-              {t('modals.position_details.close')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Company Info Modal */}
-      <CompanyInfoModal 
-        company={companyFromAPI}
-        isOpen={isCompanyModalOpen}
-        onClose={() => {
-          console.log('Closing company modal');
-          setIsCompanyModalOpen(false);
-        }}
-      />
-      
-      {/* Department Info Modal */}
-      <DepartmentInfoModal 
-        department={departmentFromAPI}
-        company={companyFromAPI}
-        isOpen={isDepartmentModalOpen}
-        onClose={() => {
-          console.log('Closing department modal');
-          setIsDepartmentModalOpen(false);
-        }}
-      />
-    </Card>
+          </DialogContent>
+        </Dialog>
+      </Card>
+    
+    {/* Company Info Modal */}
+    <CompanyInfoModal 
+      company={companyFromAPI}
+      isOpen={isCompanyModalOpen}
+      onClose={() => {
+        console.log('Closing company modal');
+        setIsCompanyModalOpen(false);
+      }}
+    />
+    
+    {/* Department Info Modal */}
+    <DepartmentInfoModal 
+      department={departmentFromAPI}
+      company={companyFromAPI}
+      isOpen={isDepartmentModalOpen}
+      onClose={() => {
+        console.log('Closing department modal');
+        setIsDepartmentModalOpen(false);
+      }}
+    />
+    </>
   );
 });
