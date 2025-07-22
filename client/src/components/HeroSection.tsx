@@ -148,7 +148,10 @@ export const HeroSection = () => {
                 <div className="text-[10px] xs:text-xs sm:text-sm text-gray-600 leading-tight px-1">{t('stats_cards.departments')}</div>
               </div>
               
-              <div className="bg-white/80 backdrop-blur-sm p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl shadow-sm border border-gray-100 text-center hover:shadow-md transition-all duration-300">
+              <div 
+                className="bg-white/80 backdrop-blur-sm p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl shadow-sm border border-gray-100 text-center hover:shadow-md transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-1"
+                onClick={() => scrollToSection("open-positions-section")}
+              >
                 <div className="flex items-center justify-center mb-1 sm:mb-2">
                   <Briefcase className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-purple-600" />
                 </div>

@@ -474,7 +474,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm sm:text-base rounded-xl shadow-lg hover:shadow-xl hover:shadow-blue-200 hover:-translate-y-1 transition-all duration-300"
           onClick={handleApply}
         >
-          {t('buttons.apply_now')}
+          {t('position_card.apply')}
         </Button>
       </CardFooter>
 
