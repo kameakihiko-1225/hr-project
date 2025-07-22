@@ -126,13 +126,25 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
+    console.log('Card clicked!', position.title);
+    
     // Don't trigger if clicking on interactive elements
-    if ((e.target as HTMLElement).closest('button, a, [role="button"]')) {
+    const target = e.target as HTMLElement;
+    const isInteractiveElement = target.closest('button, a, [role="button"], input, select, textarea');
+    
+    console.log('Interactive element check:', isInteractiveElement);
+    
+    if (isInteractiveElement) {
+      console.log('Clicked on interactive element, not opening modal');
       return;
     }
-    // Only open details if not already open and not in admin mode
-    if (!onEdit && !isDetailsDialogOpen) {
+    
+    // Always open details modal when clicking on card (regardless of admin mode)
+    if (!isDetailsDialogOpen) {
+      console.log('Opening position details modal');
       setIsDetailsDialogOpen(true);
+    } else {
+      console.log('Modal already open');
     }
   };
 
@@ -279,6 +291,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
         }
       }}
       className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[520px] w-full max-w-[480px] flex flex-col cursor-pointer"
+      data-testid="position-card"
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
