@@ -116,11 +116,41 @@ export const CompanyCarousel = () => {
           animation-play-state: paused;
         }
         
-        /* Responsive adjustments */
-        @media (max-width: 640px) {
-          .logo-group {
+        /* Enhanced responsive adjustments */
+        @media (max-width: 480px) {
+          .carousel-track {
             gap: 12px;
-            padding-right: 12px;
+          }
+          .logo-card {
+            width: 100px !important;
+            height: 70px !important;
+            min-width: 100px !important;
+            padding: 8px !important;
+            border-radius: 6px !important;
+          }
+        }
+        
+        @media (min-width: 481px) and (max-width: 768px) {
+          .carousel-track {
+            gap: 20px;
+          }
+          .logo-card {
+            width: 140px !important;
+            height: 90px !important;
+            min-width: 140px !important;
+            padding: 14px !important;
+            border-radius: 10px !important;
+          }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .carousel-track {
+            gap: 28px;
+          }
+          .logo-card {
+            width: 150px !important;
+            height: 95px !important;
+            min-width: 150px !important;
           }
         }
       `}</style>
