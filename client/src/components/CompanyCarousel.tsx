@@ -24,42 +24,25 @@ export const CompanyCarousel = () => {
         </h2>
         <div className="carousel-container relative overflow-hidden">
           <div className="carousel-track">
-            {/* First set of logos */}
-            <div className="logo-group">
-              {LOGO_FILES.map((file, idx) => (
-                <div
-                  key={`original-${file}-${idx}`}
-                  className="logo-card"
-                >
-                  <img
-                    src={`/companies/${file}`}
-                    alt={`${file.split('.')[0]} logo`}
-                    className="logo-image"
-                    onError={(e) => {
-                      console.error(`Failed to load image: /companies/${file}`);
-                      e.currentTarget.style.border = '2px solid red';
-                      e.currentTarget.alt = `Failed to load: ${file}`;
-                    }}
-                    onLoad={() => console.log(`Successfully loaded: /companies/${file}`)}
-                  />
-                </div>
-              ))}
-            </div>
-            {/* Duplicate set for seamless loop */}
-            <div className="logo-group" aria-hidden="true">
-              {LOGO_FILES.map((file, idx) => (
-                <div
-                  key={`duplicate-${file}-${idx}`}
-                  className="logo-card"
-                >
-                  <img
-                    src={`/companies/${file}`}
-                    alt={`${file.split('.')[0]} logo`}
-                    className="logo-image"
-                  />
-                </div>
-              ))}
-            </div>
+            {/* Create a continuous stream by repeating logos multiple times */}
+            {[...LOGO_FILES, ...LOGO_FILES, ...LOGO_FILES].map((file, idx) => (
+              <div
+                key={`logo-${file}-${idx}`}
+                className="logo-card"
+              >
+                <img
+                  src={`/companies/${file}`}
+                  alt={`${file.split('.')[0]} logo`}
+                  className="logo-image"
+                  onError={(e) => {
+                    console.error(`Failed to load image: /companies/${file}`);
+                    e.currentTarget.style.border = '2px solid red';
+                    e.currentTarget.alt = `Failed to load: ${file}`;
+                  }}
+                  onLoad={() => console.log(`Successfully loaded: /companies/${file}`)}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -83,15 +66,10 @@ export const CompanyCarousel = () => {
         
         .carousel-track {
           display: flex;
-          width: fit-content;
-          animation: scroll 20s linear infinite;
-          will-change: transform;
-        }
-        
-        .logo-group {
-          display: flex;
           gap: ${isMobile ? '16px' : '32px'};
-          padding-right: ${isMobile ? '16px' : '32px'};
+          width: fit-content;
+          animation: scroll 30s linear infinite;
+          will-change: transform;
         }
         
         .logo-card {
@@ -129,7 +107,7 @@ export const CompanyCarousel = () => {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(-100%);
+            transform: translateX(-33.33%);
           }
         }
         
