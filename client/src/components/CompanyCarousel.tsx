@@ -15,9 +15,6 @@ export const CompanyCarousel = () => {
   const isMobile = useIsMobile();
   
   if (LOGO_FILES.length === 0) return null;
-  
-  // Double the logos for seamless infinite loop
-  const logos = [...LOGO_FILES, ...LOGO_FILES];
 
   return (
     <section className="py-12 bg-gray-50">
@@ -25,61 +22,128 @@ export const CompanyCarousel = () => {
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
           {t('company_logos_title')}
         </h2>
-        <div className="relative overflow-hidden">
-          <div className="carousel-track flex gap-6 md:gap-8">
-            {logos.map((file, idx) => (
-              <div
-                key={`${file}-${idx}`}
-                className="carousel-item flex-shrink-0 bg-white rounded-lg sm:rounded-xl md:rounded-2xl shadow-md ring-1 ring-gray-200 flex items-center justify-center p-4 md:p-6 transition-transform hover:shadow-xl hover:-translate-y-1"
-              >
-                <img
-                  src={`/companies/${file}`}
-                  alt={`${file.split('.')[0]} logo`}
-                  className="w-auto h-auto object-contain"
-                  style={{
-                    maxWidth: isMobile ? '100px' : '140px',
-                    maxHeight: isMobile ? '60px' : '80px',
-                    width: 'auto',
-                    height: 'auto'
-                  }}
-                  onError={(e) => {
-                    console.error(`Failed to load image: /companies/${file}`);
-                    e.currentTarget.style.border = '2px solid red';
-                    e.currentTarget.alt = `Failed to load: ${file}`;
-                  }}
-                  onLoad={() => console.log(`Successfully loaded: /companies/${file}`)}
-                />
-              </div>
-            ))}
+        <div className="carousel-container relative overflow-hidden">
+          <div className="carousel-track">
+            {/* First set of logos */}
+            <div className="logo-group">
+              {LOGO_FILES.map((file, idx) => (
+                <div
+                  key={`original-${file}-${idx}`}
+                  className="logo-card"
+                >
+                  <img
+                    src={`/companies/${file}`}
+                    alt={`${file.split('.')[0]} logo`}
+                    className="logo-image"
+                    onError={(e) => {
+                      console.error(`Failed to load image: /companies/${file}`);
+                      e.currentTarget.style.border = '2px solid red';
+                      e.currentTarget.alt = `Failed to load: ${file}`;
+                    }}
+                    onLoad={() => console.log(`Successfully loaded: /companies/${file}`)}
+                  />
+                </div>
+              ))}
+            </div>
+            {/* Duplicate set for seamless loop */}
+            <div className="logo-group" aria-hidden="true">
+              {LOGO_FILES.map((file, idx) => (
+                <div
+                  key={`duplicate-${file}-${idx}`}
+                  className="logo-card"
+                >
+                  <img
+                    src={`/companies/${file}`}
+                    alt={`${file.split('.')[0]} logo`}
+                    className="logo-image"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
       
       {/* CSS-only infinite scroll animation */}
       <style>{`
-        .carousel-track {
-          width: fit-content;
-          animation: infiniteScroll 20s linear infinite;
+        .carousel-container {
+          mask-image: linear-gradient(
+            to right,
+            transparent,
+            black 10% 90%,
+            transparent
+          );
+          -webkit-mask-image: linear-gradient(
+            to right,
+            transparent,
+            black 10% 90%,
+            transparent
+          );
         }
         
-        .carousel-item {
+        .carousel-track {
+          display: flex;
+          width: fit-content;
+          animation: scroll 20s linear infinite;
+          will-change: transform;
+        }
+        
+        .logo-group {
+          display: flex;
+          gap: ${isMobile ? '16px' : '32px'};
+          padding-right: ${isMobile ? '16px' : '32px'};
+        }
+        
+        .logo-card {
           width: ${isMobile ? '120px' : '160px'};
           height: ${isMobile ? '80px' : '100px'};
           min-width: ${isMobile ? '120px' : '160px'};
+          background: white;
+          border-radius: ${isMobile ? '8px' : '12px'};
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: ${isMobile ? '12px' : '16px'};
+          transition: all 0.3s ease;
+          flex-shrink: 0;
         }
         
-        @keyframes infiniteScroll {
+        .logo-card:hover {
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          transform: translateY(-4px);
+        }
+        
+        .logo-image {
+          max-width: 100%;
+          max-height: 100%;
+          width: auto;
+          height: auto;
+          object-fit: contain;
+          filter: contrast(1.1) saturate(1.1);
+        }
+        
+        @keyframes scroll {
           0% {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(-50%);
+            transform: translateX(-100%);
           }
         }
         
-        /* Pause on hover for better UX */
-        .carousel-track:hover {
+        /* Pause animation on hover */
+        .carousel-container:hover .carousel-track {
           animation-play-state: paused;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+          .logo-group {
+            gap: 12px;
+            padding-right: 12px;
+          }
         }
       `}</style>
     </section>
