@@ -1,16 +1,41 @@
 User-agent: *
 Allow: /
 
-# Priority pages for search engines
+# Priority pages for Central Asian job searches
 Allow: /positions/*
+Allow: /blog*
 Allow: /sitemap.xml
+
+# High-priority job-related pages for better indexing
+Allow: /jobs/*
+Allow: /careers/*
+Allow: /employment/*
+Allow: /work/*
+Allow: /vacancy/*
+Allow: /rabota/*
+Allow: /ish/*
 
 # Block admin pages from search engines
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/
+
+# Special crawling for major search engines
+User-agent: Googlebot
+Crawl-delay: 0.5
+
+User-agent: Yandex
+Crawl-delay: 0.5
+
+User-agent: Bingbot
+Crawl-delay: 1
 
 # Sitemaps
 Sitemap: https://career.millatumidi.uz/sitemap.xml
+Sitemap: https://career.millatumidi.uz/jobs-sitemap.xml
 
 # Crawl delay for better server performance
 Crawl-delay: 1
+
+# Host specification for canonical domain
+Host: https://career.millatumidi.uz

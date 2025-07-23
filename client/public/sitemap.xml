@@ -73,5 +73,94 @@
     <xhtml:link rel="alternate" hreflang="uz-UZ" href="https://career.millatumidi.uz/uz/blog" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://career.millatumidi.uz/blog" />
   </url>
+  
+  <!-- Job-related Alternative URLs for Central Asian SEO -->
+  
+  <!-- Jobs Page - English -->
+  <url>
+    <loc>https://career.millatumidi.uz/jobs</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://career.millatumidi.uz/jobs" />
+    <xhtml:link rel="alternate" hreflang="ru-UZ" href="https://career.millatumidi.uz/rabota" />
+    <xhtml:link rel="alternate" hreflang="uz-UZ" href="https://career.millatumidi.uz/ish" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://career.millatumidi.uz/jobs" />
+  </url>
+  
+  <!-- Jobs Page - Russian -->
+  <url>
+    <loc>https://career.millatumidi.uz/rabota</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://career.millatumidi.uz/jobs" />
+    <xhtml:link rel="alternate" hreflang="ru-UZ" href="https://career.millatumidi.uz/rabota" />
+    <xhtml:link rel="alternate" hreflang="uz-UZ" href="https://career.millatumidi.uz/ish" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://career.millatumidi.uz/jobs" />
+  </url>
+  
+  <!-- Jobs Page - Uzbek -->
+  <url>
+    <loc>https://career.millatumidi.uz/ish</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://career.millatumidi.uz/jobs" />
+    <xhtml:link rel="alternate" hreflang="ru-UZ" href="https://career.millatumidi.uz/rabota" />
+    <xhtml:link rel="alternate" hreflang="uz-UZ" href="https://career.millatumidi.uz/ish" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://career.millatumidi.uz/jobs" />
+  </url>
+  
+  <!-- Careers Category Pages -->
+  <url>
+    <loc>https://career.millatumidi.uz/careers/education</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://career.millatumidi.uz/careers/it</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://career.millatumidi.uz/careers/finance</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://career.millatumidi.uz/careers/hr</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Location-based job pages -->
+  <url>
+    <loc>https://career.millatumidi.uz/jobs/tashkent</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://career.millatumidi.uz/jobs/samarkand</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://career.millatumidi.uz/jobs/uzbekistan</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
 
 </urlset>

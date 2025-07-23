@@ -16,6 +16,7 @@ import VoiceSearchOptimization from "@/components/VoiceSearchOptimization";
 import { SEOResourcePrefetch, useWebVitals } from "@/components/PerformanceOptimizations";
 import { AdvancedSEO, getHomepageStructuredData } from "@/components/AdvancedSEO";
 import { TopSearchRankingOptimization } from "@/components/TopSearchRankingOptimization";
+import AdvancedJobSEO from "@/components/AdvancedJobSEO";
 
 const Index = () => {
   const { i18n } = useTranslation();
@@ -23,11 +24,46 @@ const Index = () => {
   const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
   const [selectedPositions, setSelectedPositions] = useState<number[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [positions, setPositions] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [departments, setDepartments] = useState([]);
   
   const seoData = getPageSEO('home', i18n.language);
   
   // Initialize performance optimizations
   useWebVitals();
+  
+  // Fetch data for SEO optimization
+  useEffect(() => {
+    const fetchSEOData = async () => {
+      try {
+        const [positionsRes, companiesRes, departmentsRes] = await Promise.all([
+          fetch(`/api/positions?language=${i18n.language}`),
+          fetch(`/api/companies?language=${i18n.language}`),
+          fetch(`/api/departments?language=${i18n.language}`)
+        ]);
+        
+        if (positionsRes.ok) {
+          const posData = await positionsRes.json();
+          setPositions(posData.data || []);
+        }
+        
+        if (companiesRes.ok) {
+          const compData = await companiesRes.json();
+          setCompanies(compData.data || []);
+        }
+        
+        if (departmentsRes.ok) {
+          const deptData = await departmentsRes.json();
+          setDepartments(deptData.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching SEO data:', error);
+      }
+    };
+    
+    fetchSEOData();
+  }, [i18n.language]);
   
   // Handle company selection changes
   const handleCompanyChange = (companies: number[]) => {
@@ -103,6 +139,11 @@ const Index = () => {
       <Footer />
       
       {/* SEO and Performance Components */}
+      <AdvancedJobSEO 
+        positions={positions}
+        companies={companies}
+        departments={departments}
+      />
       <VoiceSearchOptimization />
       <SEOResourcePrefetch />
     </div>
