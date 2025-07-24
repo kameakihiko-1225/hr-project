@@ -1,0 +1,82 @@
+**Prompt for Coding Agent**
+
+Create a single-page, SEO-optimized job portal webpage for Uzbekistan, focusing on Tashkent, using HTML, JavaScript, and Tailwind CSS (via CDN). The page must incorporate the following job- and career-related search keywords and phrases ("chunks") in **Uzbek**, **English**, and **Russian**, targeting Tashkent and Uzbekistan geo-locations. Integrate these keywords naturally into the page title, meta description, headings, content, and alt text to optimize for SEO. Ensure the page is mobile-responsive and includes a language toggle for English, Uzbek, and Russian content.
+
+**Keywords and Phrases to Include**:
+
+- **English**:
+  - jobs in Tashkent
+  - jobs in Uzbekistan
+  - careers in Tashkent
+  - Tashkent job vacancies
+  - Uzbekistan employment opportunities
+  - remote jobs Uzbekistan
+  - work in Tashkent
+  - Tashkent career opportunities
+  - Uzbekistan job market
+  - freelance jobs Uzbekistan
+  - Tashkent internship opportunities
+  - English-speaking jobs Tashkent
+  - international jobs Uzbekistan
+  - consulting jobs Tashkent
+  - NGO jobs Uzbekistan
+  - translation jobs Uzbekistan
+  - tech jobs Tashkent
+  - education jobs Uzbekistan
+  - finance jobs Tashkent
+  - agriculture jobs Uzbekistan
+  - mining jobs Uzbekistan
+  - government jobs Uzbekistan
+  - graphic design jobs Tashkent
+  - Tashkent employment
+  - Uzbekistan career growth
+  - jobs in Samarkand
+  - Bukhara job opportunities
+  - Karakalpakstan jobs
+
+- **Russian**:
+  - Работа в Ташкенте (Rabota v Tashkente)
+  - Вакансии в Узбекистане (Vakansii v Uzbekistane)
+  - Карьера в Ташкенте (Karyera v Tashkente)
+  - Удаленная работа Узбекистан (Udalennaya rabota Uzbekistan)
+  - Работа для англоговорящих Ташкент (Rabota dlya anglogovoryashchikh Tashkent)
+  - Переводчик Ташкент (Perevodchik Tashkent)
+  - Работа в международных организациях Узбекистан (Rabota v mezhdunarodnykh organizatsiyakh Uzbekistan)
+  - Консультационные услуги Ташкент (Konsultatsionnye uslugi Tashkent)
+  - Стажировка в Ташкенте (Stazhirovka v Tashkente)
+  - Работа в IT Ташкент (Rabota v IT Tashkent)
+  - Образование вакансии Узбекистан (Obrazovanie vakansii Uzbekistan)
+  - Финансовые вакансии Ташкент (Finansovye vakansii Tashkent)
+  - Сельское хозяйство работа Узбекистан (Selskoe khozyaystvo rabota Uzbekistan)
+  - Горнодобывающая промышленность Узбекистан (Gornodobyvayushchaya promyshlennost Uzbekistan)
+  - Работа в Самарканде (Rabota v Samarkande)
+  - Вакансии Бухара (Vakansii Bukhara)
+  - Работа в Каракалпакстане (Rabota v Karakalpakstane)
+
+- **Uzbek**:
+  - Toshkentda ish
+  - O‘zbekistonda ish o‘rinlari
+  - Karyera Toshkent
+  - Masofaviy ish O‘zbekiston
+  - Ingliz tilida ish Toshkent
+  - Tarjimon Toshkent
+  - Xalqaro tashkilotlarda ish O‘zbekiston
+  - Konsultatsiya xizmatlari Toshkent
+  - Toshkentda stajirovka
+  - IT sohasida ish Toshkent
+  - Ta’lim sohasida ish O‘zbekiston
+  - Moliya sohasida ish Toshkent
+  - Qishloq xo‘jaligi ishi O‘zbekiston
+  - Konchilik sohasi O‘zbekiston
+  - Samarqandda ish
+  - Buxoroda ish o‘rinlari
+  - Qoraqalpog‘istonda ish
+
+**Requirements**:
+1. Use **semantic HTML** and **Tailwind CSS** (via CDN: https://cdn.tailwindcss.com) for a mobile-responsive design.
+2. Include a **language toggle** (JavaScript) to switch between English, Uzbek, and Russian content.
+3. Add **JobPosting schema markup** (JSON-LD) for at least one job listing.
+4. Create sample job listings (e.g., IT Developer in Tashkent, Translator in Samarkand) using the keywords.
+5. Include a **footer** with links to hypothetical pages (e.g., "/samarkand-jobs") and external platforms (e.g., UzJobs, LinkedIn).
+6. Use **Noto Serif** fonts (via Google Fonts CDN) for Uzbek and Russian text.
+7. Deliver a single `index.html` file with embedded JavaScript and Tailwind CSS, wrapped in an appropriate artifact tag.
