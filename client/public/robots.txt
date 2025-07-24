@@ -14,6 +14,13 @@ Allow: /work/*
 Allow: /vacancy/*
 Allow: /rabota/*
 Allow: /ish/*
+Allow: /remote-jobs*
+Allow: /english-speaking-jobs*
+Allow: /freelance-jobs*
+Allow: /internship-opportunities*
+Allow: /consulting-jobs*
+Allow: /tech-jobs*
+Allow: /government-jobs*
 
 # Block admin pages from search engines
 Disallow: /admin/
