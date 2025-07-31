@@ -194,6 +194,10 @@ Preferred communication style: Simple, everyday language.
   - **Zero Expired Files**: All legacy expired URLs successfully marked with clear re-upload instructions
   - **Permanent URLs Active**: New webhook submissions generating permanent file URLs automatically
   - **HR Team Ready**: Clear visibility of which contacts need file re-upload via Telegram bot
+- **Targeted Contact Updates**: Successfully executed targeted update script for specific contacts 71227 (Zilola Ergasheva) and 71115 (Davlatova Malika)
+  - **File Conversion Results**: Contact 71227 - 1/2 files converted (resume successful, diploma expired), Contact 71115 - 4/5 files converted (resume, diploma, voice Q1&Q2 successful, voice Q3 expired)
+  - **Permanent URLs Generated**: All converted files now use UUID-based naming pattern `contact-{ID}_{type}_{date}_{uuid}.{extension}`
+  - **Bitrix24 Updates**: Both contacts successfully updated in Bitrix24 with permanent file URLs that never expire
 
 ### July 23, 2025 - COMPREHENSIVE ADVANCED SEO OPTIMIZATION FOR CENTRAL ASIAN JOB SEARCHES - COMPLETED ✅
 - **Enhanced HTML Structured Data**: Implemented comprehensive job-specific structured data including advanced JobBoard schema, enhanced Organization schema with service areas, and multilingual FAQ schema for voice search optimization

@@ -99,6 +99,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update specific contacts endpoint
+  app.post('/api/update-specific-contacts', async (req, res) => {
+    try {
+      console.log('🔧 [UPDATE-API] Starting specific contact updates...');
+      
+      const { contactIds } = req.body;
+      
+      if (!contactIds || !Array.isArray(contactIds) || contactIds.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'contactIds array is required',
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Import update function dynamically
+      const { updateSpecificContacts } = await import('./scripts/updateSpecificContacts.js');
+      
+      // Run updates
+      await updateSpecificContacts(contactIds);
+      
+      res.json({
+        success: true,
+        message: `Successfully updated ${contactIds.length} contacts with permanent file URLs`,
+        contactIds: contactIds,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('❌ [UPDATE-API] Contact update failed:', error.message);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   // Telegram webhook endpoint - direct implementation
   app.post('/webhook', async (req, res) => {
     try {
