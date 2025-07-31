@@ -47,6 +47,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   
+  // Migration endpoint for Bitrix24 file URLs
+  app.post('/api/migrate-bitrix-files', async (req, res) => {
+    try {
+      console.log('🔧 [MIGRATION-API] Starting Bitrix24 file migration via API...');
+      
+      // Import migration function dynamically
+      const { migrateAllBitrixFiles } = await import('./scripts/migrateBitrixFiles.js');
+      
+      // Run migration
+      await migrateAllBitrixFiles();
+      
+      res.json({
+        success: true,
+        message: 'Bitrix24 file URL migration completed successfully',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('❌ [MIGRATION-API] Migration failed:', error.message);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Cleanup endpoint for expired Bitrix24 file URLs
+  app.post('/api/cleanup-expired-files', async (req, res) => {
+    try {
+      console.log('🧹 [CLEANUP-API] Starting expired file URL cleanup...');
+      
+      // Import cleanup function dynamically
+      const { markExpiredFileUrls } = await import('./scripts/bitrixFileCleanup.js');
+      
+      // Run cleanup
+      await markExpiredFileUrls();
+      
+      res.json({
+        success: true,
+        message: 'Expired file URL cleanup completed successfully',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('❌ [CLEANUP-API] Cleanup failed:', error.message);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   // Telegram webhook endpoint - direct implementation
   app.post('/webhook', async (req, res) => {
     try {

@@ -185,6 +185,11 @@ Preferred communication style: Simple, everyday language.
   - **No File Expiration**: Local storage eliminates Telegram file URL expiration issues
   - **Scalable Architecture**: UUID naming prevents filename conflicts and enables unlimited file storage
   - **Performance Optimized**: Efficient file download with proper timeout handling and background processing
+- **Legacy Data Migration**: Created comprehensive migration scripts to handle older leads with expired file URLs
+  - **Bitrix24 Integration**: Migration script fetches all 50 existing contacts and processes file fields
+  - **Expired URL Detection**: Identifies and marks expired Telegram file URLs with clear user instructions
+  - **API Endpoints**: Added `/api/migrate-bitrix-files` and `/api/cleanup-expired-files` for easy execution
+  - **Future-Proof**: All new webhook submissions now use permanent file storage automatically
 
 ### July 23, 2025 - COMPREHENSIVE ADVANCED SEO OPTIMIZATION FOR CENTRAL ASIAN JOB SEARCHES - COMPLETED ✅
 - **Enhanced HTML Structured Data**: Implemented comprehensive job-specific structured data including advanced JobBoard schema, enhanced Organization schema with service areas, and multilingual FAQ schema for voice search optimization
