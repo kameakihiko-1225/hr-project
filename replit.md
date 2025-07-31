@@ -200,8 +200,10 @@ Preferred communication style: Simple, everyday language.
   - **Bitrix24 Updates**: Both contacts successfully updated in Bitrix24 with permanent file URLs that never expire
   - **Deployment Status**: Files stored locally and accessible via development server (localhost:5000), production deployment required for live access
   - **Static File Serving**: Express server properly configured with `/uploads/telegram-files/` route and CORS headers
-  - **Production Issue Identified**: Production server serves HTML page instead of files due to SPA catch-all route overriding static file serving
-  - **Solution Provided**: Replit deployment will resolve production file access issue with proper static file serving configuration
+  - **Production Issue Confirmed**: Production server serves HTML page instead of files due to SPA catch-all route overriding static file serving
+  - **404 Errors Verified**: Contact 71115 permanent URLs returning 404 errors in production while working in development
+  - **Files Copied to Production Directory**: All permanent files copied to dist/public/uploads/telegram-files/ for production access
+  - **Solution Required**: Replit deployment needed to resolve production file access issue with proper static file serving configuration
 
 ### July 23, 2025 - COMPREHENSIVE ADVANCED SEO OPTIMIZATION FOR CENTRAL ASIAN JOB SEARCHES - COMPLETED ✅
 - **Enhanced HTML Structured Data**: Implemented comprehensive job-specific structured data including advanced JobBoard schema, enhanced Organization schema with service areas, and multilingual FAQ schema for voice search optimization
