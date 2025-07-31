@@ -3,6 +3,7 @@ import axiosDefault from 'axios';
 import FormDataClass from 'form-data';
 import fs from 'fs';
 import path from 'path';
+import { TelegramFileStorage } from './services/fileStorage.js';
 
 const axios = axiosDefault;
 const FormData = FormDataClass;
@@ -16,6 +17,11 @@ const TELEGRAM_BOT_TOKEN = '7191717059:AAHIlA-fAxxzlwYEnse3vSBlQLH_4ozhPTY';
 function getBotToken() {
   return TELEGRAM_BOT_TOKEN;
 }
+
+// Initialize Telegram File Storage with bot token
+TelegramFileStorage.setBotToken(TELEGRAM_BOT_TOKEN);
+
+console.log('🔧 [WEBHOOK-INIT] Permanent file storage system initialized');
 
 function normalizePhone(phone: string): string {
   if (!phone) return '';
@@ -128,52 +134,27 @@ async function downloadTelegramFile(fileId: string, fileName: string): Promise<s
   }
 }
 
-async function convertTelegramFileIdToUrl(fileId: string, fieldName: string): Promise<string> {
-  if (!fileId || !isTelegramFileId(fileId)) {
+async function convertTelegramFileIdToPermanentUrl(fileId: string, fieldName: string, contactId?: string): Promise<string> {
+  if (!fileId || !TelegramFileStorage.isTelegramFileId(fileId)) {
     return fileId; // Return as-is if not a valid file ID
   }
 
-  const botToken = getBotToken();
-  if (!botToken) {
-    return fileId;
-  }
-
+  console.log(`🔄 [PERMANENT-FILE] Processing ${fieldName}: ${fileId}`);
+  
   try {
-    // Fire-and-forget pattern: try to get file info but don't wait if it times out
-    const fileInfoPromise = getTelegramFileInfo(fileId);
+    // Use the new permanent file storage system
+    const permanentUrl = await TelegramFileStorage.processFileField(fileId, fieldName, contactId);
     
-    // Use Promise.race to timeout, but continue processing in background
-    const fileInfo = await Promise.race([
-      fileInfoPromise,
-      new Promise<null>((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 3000)
-      )
-    ]).catch(async () => {
-      // If timeout occurs, log but let operation continue in background
-      console.log(`⏱️ [TELEGRAM-FILE] ${fieldName} timed out but continuing in background`);
-      
-      // Continue file processing in background (fire-and-forget)
-      fileInfoPromise.then(result => {
-        if (result) {
-          const bgUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${result.file_path}`;
-          console.log(`🔥 [TELEGRAM-FILE] Background ${fieldName} completed: ${bgUrl}`);
-        }
-      }).catch(() => {
-        console.log(`🔥 [TELEGRAM-FILE] Background ${fieldName} failed but operation completed`);
-      });
-      
-      return null;
-    });
-    
-    if (!fileInfo) {
+    if (permanentUrl !== fileId) {
+      console.log(`✅ [PERMANENT-FILE] ${fieldName} converted to permanent URL: ${permanentUrl}`);
+      return permanentUrl;
+    } else {
+      console.log(`⚠️ [PERMANENT-FILE] ${fieldName} conversion failed, using original: ${fileId}`);
       return fileId;
     }
 
-    // Create direct Telegram download URL
-    const telegramUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${fileInfo.file_path}`;
-    return telegramUrl;
-
   } catch (error: any) {
+    console.error(`❌ [PERMANENT-FILE] Error converting ${fieldName}:`, error.message);
     return fileId; // Fallback to original ID if conversion fails
   }
 }
@@ -317,23 +298,23 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log(`  - Resume field: ${JSON.stringify(resumeFileId)}`);
   console.log(`  - Diploma field: ${JSON.stringify(diplomaFileId)}`);
   
-  // Process resume file directly
-  if (resumeFileId && isTelegramFileId(resumeFileId)) {
-    console.log(`  🔄 Converting resume file ID...`);
-    const resumeUrl = await convertTelegramFileIdToUrl(resumeFileId, 'resume');
+  // Process resume file directly - USING PERMANENT STORAGE
+  if (resumeFileId && TelegramFileStorage.isTelegramFileId(resumeFileId)) {
+    console.log(`  🔄 Converting resume file ID to PERMANENT URL...`);
+    const resumeUrl = await convertTelegramFileIdToPermanentUrl(resumeFileId, 'resume', 'pending');
     contactFields.UF_CRM_1752621810 = resumeUrl;
-    console.log(`  ✅ Resume URL set: ${resumeUrl}`);
+    console.log(`  ✅ Resume PERMANENT URL set: ${resumeUrl}`);
   } else {
     contactFields.UF_CRM_1752621810 = resumeFileId || '';
     console.log(`  ⚪ Resume kept as-is: ${resumeFileId}`);
   }
   
-  // Process diploma file directly  
-  if (diplomaFileId && isTelegramFileId(diplomaFileId)) {
-    console.log(`  🔄 Converting diploma file ID...`);
-    const diplomaUrl = await convertTelegramFileIdToUrl(diplomaFileId, 'diploma');
+  // Process diploma file directly - USING PERMANENT STORAGE
+  if (diplomaFileId && TelegramFileStorage.isTelegramFileId(diplomaFileId)) {
+    console.log(`  🔄 Converting diploma file ID to PERMANENT URL...`);
+    const diplomaUrl = await convertTelegramFileIdToPermanentUrl(diplomaFileId, 'diploma', 'pending');
     contactFields.UF_CRM_1752621831 = diplomaUrl;
-    console.log(`  ✅ Diploma URL set: ${diplomaUrl}`);
+    console.log(`  ✅ Diploma PERMANENT URL set: ${diplomaUrl}`);
   } else {
     contactFields.UF_CRM_1752621831 = diplomaFileId || '';
     console.log(`  ⚪ Diploma kept as-is: ${diplomaFileId}`);
@@ -350,52 +331,52 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log(`  - Q2: ${JSON.stringify(phase2_q2)} (${phase2_q2 ? 'HAS VALUE' : 'EMPTY'})`);
   console.log(`  - Q3: ${JSON.stringify(phase2_q3)} (${phase2_q3 ? 'HAS VALUE' : 'EMPTY'})`);
 
-  // Process Q1 - check if it's a file ID or text
+  // Process Q1 - check if it's a file ID or text - USING PERMANENT STORAGE
   if (phase2_q1) {
-    if (isTelegramFileId(phase2_q1)) {
-      console.log(`  🎧 Q1 is file ID, converting to URL...`);
-      const q1Url = await convertTelegramFileIdToUrl(phase2_q1, 'phase2_q1');
+    if (TelegramFileStorage.isTelegramFileId(phase2_q1)) {
+      console.log(`  🎧 Q1 is file ID, converting to PERMANENT URL...`);
+      const q1Url = await convertTelegramFileIdToPermanentUrl(phase2_q1, 'phase2_q1', 'pending');
       contactFields.UF_CRM_1752621857 = q1Url; // Voice field
-      contactFields.UF_CRM_1752241370 = `Voice answer: ${q1Url}`; // Text field with URL
-      console.log(`  ✅ Q1 voice URL: ${q1Url}`);
+      contactFields.UF_CRM_1752241370 = `Voice answer: ${q1Url}`; // Text field with PERMANENT URL
+      console.log(`  ✅ Q1 voice PERMANENT URL: ${q1Url}`);
     } else {
       contactFields.UF_CRM_1752241370 = phase2_q1; // Text field
       console.log(`  ✅ Q1 text: ${phase2_q1}`);
     }
   }
 
-  // Process Q2 - check if it's a file ID or text
+  // Process Q2 - check if it's a file ID or text - USING PERMANENT STORAGE
   if (phase2_q2) {
-    if (isTelegramFileId(phase2_q2)) {
-      console.log(`  🎧 Q2 is file ID, converting to URL...`);
-      const q2Url = await convertTelegramFileIdToUrl(phase2_q2, 'phase2_q2');
+    if (TelegramFileStorage.isTelegramFileId(phase2_q2)) {
+      console.log(`  🎧 Q2 is file ID, converting to PERMANENT URL...`);
+      const q2Url = await convertTelegramFileIdToPermanentUrl(phase2_q2, 'phase2_q2', 'pending');
       contactFields.UF_CRM_1752621874 = q2Url; // Voice field
-      contactFields.UF_CRM_1752241378 = `Voice answer: ${q2Url}`; // Text field with URL
-      console.log(`  ✅ Q2 voice URL: ${q2Url}`);
+      contactFields.UF_CRM_1752241378 = `Voice answer: ${q2Url}`; // Text field with PERMANENT URL
+      console.log(`  ✅ Q2 voice PERMANENT URL: ${q2Url}`);
     } else {
       contactFields.UF_CRM_1752241378 = phase2_q2; // Text field
       console.log(`  ✅ Q2 text: ${phase2_q2}`);
     }
   }
 
-  // Process Q3 - check if it's a file ID or text
+  // Process Q3 - check if it's a file ID or text - USING PERMANENT STORAGE
   if (phase2_q3) {
-    if (isTelegramFileId(phase2_q3)) {
-      console.log(`  🎧 Q3 is file ID, converting to URL...`);
-      const q3Url = await convertTelegramFileIdToUrl(phase2_q3, 'phase2_q3');
+    if (TelegramFileStorage.isTelegramFileId(phase2_q3)) {
+      console.log(`  🎧 Q3 is file ID, converting to PERMANENT URL...`);
+      const q3Url = await convertTelegramFileIdToPermanentUrl(phase2_q3, 'phase2_q3', 'pending');
       contactFields.UF_CRM_1752621887 = q3Url; // Voice field
-      contactFields.UF_CRM_1752241386 = `Voice answer: ${q3Url}`; // Text field with URL
-      console.log(`  ✅ Q3 voice URL: ${q3Url}`);
+      contactFields.UF_CRM_1752241386 = `Voice answer: ${q3Url}`; // Text field with PERMANENT URL
+      console.log(`  ✅ Q3 voice PERMANENT URL: ${q3Url}`);
     } else {
       contactFields.UF_CRM_1752241386 = phase2_q3; // Text field
       console.log(`  ✅ Q3 text: ${phase2_q3}`);
     }
   }
 
-  // Add comments with file URLs
+  // Add comments with PERMANENT file URLs
   const comments = [];
-  if (contactFields.UF_CRM_1752621810) comments.push(`Resume URL: ${contactFields.UF_CRM_1752621810}`);
-  if (contactFields.UF_CRM_1752621831) comments.push(`Diploma URL: ${contactFields.UF_CRM_1752621831}`);
+  if (contactFields.UF_CRM_1752621810) comments.push(`Resume PERMANENT URL: ${contactFields.UF_CRM_1752621810}`);
+  if (contactFields.UF_CRM_1752621831) comments.push(`Diploma PERMANENT URL: ${contactFields.UF_CRM_1752621831}`);
   if (age) comments.push(`The Age is ${age}`);
   if (comments.length > 0) {
     contactFields.COMMENTS = comments.join('\\n');

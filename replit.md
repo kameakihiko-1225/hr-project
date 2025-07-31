@@ -167,6 +167,25 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes: Latest modifications with dates
 
+### July 31, 2025 - PERMANENT TELEGRAM FILE STORAGE SYSTEM IMPLEMENTATION - COMPLETED ✅
+- **Critical Issue Resolved**: Implemented permanent file storage solution to prevent Telegram file URL expiration in Bitrix24 fields
+- **TelegramFileStorage Service**: Created comprehensive file storage service with UUID-based naming and automatic download functionality
+  - **Permanent URL Generation**: Files downloaded from Telegram API and stored locally with unique UUID identifiers  
+  - **File Type Support**: Resume files (UF_CRM_1752621810), diploma files (UF_CRM_1752621831), and voice answer files (UF_CRM_1752621857/874/887)
+  - **Local Storage Directory**: `/uploads/telegram-files/` with proper file serving routes and cache headers
+  - **Error Handling**: Graceful fallback to original file ID if download fails, comprehensive logging system
+- **Webhook System Enhancement**: Updated webhook.ts to use permanent file storage instead of expiring Telegram file URLs
+  - **Resume/Diploma Processing**: All file IDs now converted to permanent URLs before sending to Bitrix24
+  - **Voice Files Support**: Phase2 question voice answers converted to permanent URLs for long-term accessibility
+  - **Contact ID Integration**: File naming includes contact reference for better organization and tracking
+- **Static File Serving**: Added `/uploads/telegram-files/` endpoint with proper cache headers and CORS support
+  - **24-hour Browser Cache**: Optimized file delivery with appropriate cache control headers  
+  - **Cross-Origin Access**: CORS headers enabled for external access from Bitrix24 system
+- **Production Ready**: Complete file permanency solution ensuring Bitrix24 fields maintain valid file links indefinitely
+  - **No File Expiration**: Local storage eliminates Telegram file URL expiration issues
+  - **Scalable Architecture**: UUID naming prevents filename conflicts and enables unlimited file storage
+  - **Performance Optimized**: Efficient file download with proper timeout handling and background processing
+
 ### July 23, 2025 - COMPREHENSIVE ADVANCED SEO OPTIMIZATION FOR CENTRAL ASIAN JOB SEARCHES - COMPLETED ✅
 - **Enhanced HTML Structured Data**: Implemented comprehensive job-specific structured data including advanced JobBoard schema, enhanced Organization schema with service areas, and multilingual FAQ schema for voice search optimization
   - **JobBoard Schema**: Added complete job board structured data with occupational categories, area served (Uzbekistan, Kazakhstan, Kyrgyzstan), and multilingual support

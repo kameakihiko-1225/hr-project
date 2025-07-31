@@ -26,6 +26,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded files statically
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   
+  // Serve telegram files with proper headers
+  app.use('/uploads/telegram-files', express.static(path.join(process.cwd(), 'uploads', 'telegram-files'), {
+    setHeaders: (res, path) => {
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours cache
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+  }));
+  
   // Register optimized admin batch routes
   registerAdminBatchRoutes(app);
   
