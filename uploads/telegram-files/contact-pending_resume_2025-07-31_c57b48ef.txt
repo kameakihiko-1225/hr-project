@@ -1,0 +1,21 @@
+This file reference (contact-pending_resume_2025-07-31_c57b48ef.docx) appears to be 
+an orphaned URL that doesn't correspond to any existing contact in Bitrix24.
+
+This is likely caused by:
+1. An old reference that wasn't properly updated during the permanent file migration
+2. A contact that was deleted or modified after the file was referenced
+3. A temporary "pending" reference that was never resolved
+
+Available permanent files from July 31st:
+- contact-62375_resume_2025-07-31_27372eee.pdf
+- contact-62377_resume_2025-07-31_cd96fddc.pdf
+- contact-62385_resume_2025-07-31_90eca0c9.pdf
+- contact-71115_resume_2025-07-31_tjfxsimf.docx
+- contact-71227_resume_2025-07-31_0sqroyns.docx
+
+If you need to fix this reference, please:
+1. Identify which contact should have this file
+2. Update the contact with the correct permanent file URL from the list above
+3. Or clear the field if the file is no longer needed
+
+Contact the developer for assistance in resolving this orphaned reference.
