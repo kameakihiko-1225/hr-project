@@ -136,7 +136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Telegram webhook endpoint - direct implementation
+  // Telegram webhook endpoint - direct implementation with JSON sanitization
   app.post('/webhook', async (req, res) => {
     try {
       console.log('='.repeat(100));
@@ -175,17 +175,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log('');
-      console.log('[WEBHOOK-DEBUG] 🔄 STARTING WEBHOOK PROCESSING...');
+      console.log('[WEBHOOK-DEBUG] 🧹 SANITIZING WEBHOOK DATA...');
+      
+      // Import and apply JSON sanitization
+      const { sanitizeWebhookData, createSafeJsonResponse } = await import('./utils/jsonSanitizer.js');
+      const sanitizedData = sanitizeWebhookData(req.body);
+      
+      console.log('[WEBHOOK-DEBUG] 🔄 STARTING WEBHOOK PROCESSING WITH SANITIZED DATA...');
       console.log('='.repeat(100));
       
-      const result = await processWebhookData(req.body);
+      const result = await processWebhookData(sanitizedData);
       
       console.log('');
       console.log('[WEBHOOK-DEBUG] ✅ WEBHOOK PROCESSING COMPLETED');
       console.log('[WEBHOOK-DEBUG] Result:', JSON.stringify(result, null, 2));
       console.log('='.repeat(100));
       
-      res.status(200).json(result);
+      // Create safe JSON response to prevent future parsing issues
+      const safeResponse = createSafeJsonResponse(result);
+      res.status(200).json(safeResponse);
 
     } catch (error: any) {
       console.log('');
@@ -196,11 +204,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('[WEBHOOK-DEBUG] Full error:', error);
       console.log('='.repeat(100));
       
-      res.status(500).json({
+      // Create safe error response
+      const safeErrorResponse = {
         message: 'Error processing webhook',
         error: error?.response?.data || error.message,
-        requestBody: req.body, // Include request body for debugging
-      });
+        timestamp: new Date().toISOString(),
+        // Don't include raw request body in error response for security
+      };
+      
+      res.status(500).json(safeErrorResponse);
     }
   });
 
