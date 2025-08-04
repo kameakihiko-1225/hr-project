@@ -67,12 +67,12 @@ export class TelegramFileStorage {
         timeout: 30000 // 30 seconds timeout for file download
       });
 
-      // Step 3: Generate unique filename and save locally
+      // Step 3: Generate unique filename and save locally (WITHOUT contact prefix to avoid "contact-pending")
       const originalExtension = path.extname(fileInfo.file_path) || '.pdf';
       const timestamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
       const uniqueId = uuidv4().substring(0, 8);
-      const contactPrefix = contactId ? `contact-${contactId}_` : '';
-      const filename = `${contactPrefix}${fieldName}_${timestamp}_${uniqueId}${originalExtension}`;
+      // Remove contact prefix to prevent "contact-pending" URLs - use pure UUID-based naming
+      const filename = `${fieldName}_${timestamp}_${uniqueId}${originalExtension}`;
       const filePath = path.join(UPLOADS_DIR, filename);
 
       // Step 4: Write file to disk

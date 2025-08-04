@@ -298,10 +298,10 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log(`  - Resume field: ${JSON.stringify(resumeFileId)}`);
   console.log(`  - Diploma field: ${JSON.stringify(diplomaFileId)}`);
   
-  // Process resume file directly - USING PERMANENT STORAGE
+  // Process resume file directly - USING PERMANENT STORAGE WITHOUT CONTACT PREFIX
   if (resumeFileId && TelegramFileStorage.isTelegramFileId(resumeFileId)) {
     console.log(`  🔄 Converting resume file ID to PERMANENT URL...`);
-    const resumeUrl = await convertTelegramFileIdToPermanentUrl(resumeFileId, 'resume', 'pending');
+    const resumeUrl = await convertTelegramFileIdToPermanentUrl(resumeFileId, 'resume');
     contactFields.UF_CRM_1752621810 = resumeUrl;
     console.log(`  ✅ Resume PERMANENT URL set: ${resumeUrl}`);
   } else {
@@ -309,10 +309,10 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  ⚪ Resume kept as-is: ${resumeFileId}`);
   }
   
-  // Process diploma file directly - USING PERMANENT STORAGE
+  // Process diploma file directly - USING PERMANENT STORAGE WITHOUT CONTACT PREFIX
   if (diplomaFileId && TelegramFileStorage.isTelegramFileId(diplomaFileId)) {
     console.log(`  🔄 Converting diploma file ID to PERMANENT URL...`);
-    const diplomaUrl = await convertTelegramFileIdToPermanentUrl(diplomaFileId, 'diploma', 'pending');
+    const diplomaUrl = await convertTelegramFileIdToPermanentUrl(diplomaFileId, 'diploma');
     contactFields.UF_CRM_1752621831 = diplomaUrl;
     console.log(`  ✅ Diploma PERMANENT URL set: ${diplomaUrl}`);
   } else {
@@ -331,11 +331,11 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log(`  - Q2: ${JSON.stringify(phase2_q2)} (${phase2_q2 ? 'HAS VALUE' : 'EMPTY'})`);
   console.log(`  - Q3: ${JSON.stringify(phase2_q3)} (${phase2_q3 ? 'HAS VALUE' : 'EMPTY'})`);
 
-  // Process Q1 - check if it's a file ID or text - USING PERMANENT STORAGE
+  // Process Q1 - check if it's a file ID or text - USING PERMANENT STORAGE WITHOUT CONTACT PREFIX
   if (phase2_q1) {
     if (TelegramFileStorage.isTelegramFileId(phase2_q1)) {
       console.log(`  🎧 Q1 is file ID, converting to PERMANENT URL...`);
-      const q1Url = await convertTelegramFileIdToPermanentUrl(phase2_q1, 'phase2_q1', 'pending');
+      const q1Url = await convertTelegramFileIdToPermanentUrl(phase2_q1, 'phase2_q1');
       contactFields.UF_CRM_1752621857 = q1Url; // Voice field
       contactFields.UF_CRM_1752241370 = `Voice answer: ${q1Url}`; // Text field with PERMANENT URL
       console.log(`  ✅ Q1 voice PERMANENT URL: ${q1Url}`);
@@ -345,11 +345,11 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     }
   }
 
-  // Process Q2 - check if it's a file ID or text - USING PERMANENT STORAGE
+  // Process Q2 - check if it's a file ID or text - USING PERMANENT STORAGE WITHOUT CONTACT PREFIX
   if (phase2_q2) {
     if (TelegramFileStorage.isTelegramFileId(phase2_q2)) {
       console.log(`  🎧 Q2 is file ID, converting to PERMANENT URL...`);
-      const q2Url = await convertTelegramFileIdToPermanentUrl(phase2_q2, 'phase2_q2', 'pending');
+      const q2Url = await convertTelegramFileIdToPermanentUrl(phase2_q2, 'phase2_q2');
       contactFields.UF_CRM_1752621874 = q2Url; // Voice field
       contactFields.UF_CRM_1752241378 = `Voice answer: ${q2Url}`; // Text field with PERMANENT URL
       console.log(`  ✅ Q2 voice PERMANENT URL: ${q2Url}`);
@@ -359,11 +359,11 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     }
   }
 
-  // Process Q3 - check if it's a file ID or text - USING PERMANENT STORAGE
+  // Process Q3 - check if it's a file ID or text - USING PERMANENT STORAGE WITHOUT CONTACT PREFIX
   if (phase2_q3) {
     if (TelegramFileStorage.isTelegramFileId(phase2_q3)) {
       console.log(`  🎧 Q3 is file ID, converting to PERMANENT URL...`);
-      const q3Url = await convertTelegramFileIdToPermanentUrl(phase2_q3, 'phase2_q3', 'pending');
+      const q3Url = await convertTelegramFileIdToPermanentUrl(phase2_q3, 'phase2_q3');
       contactFields.UF_CRM_1752621887 = q3Url; // Voice field
       contactFields.UF_CRM_1752241386 = `Voice answer: ${q3Url}`; // Text field with PERMANENT URL
       console.log(`  ✅ Q3 voice PERMANENT URL: ${q3Url}`);
