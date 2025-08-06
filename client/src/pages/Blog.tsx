@@ -65,11 +65,11 @@ export default function Blog() {
 
 
   const categories = [
-    { key: 'all', label: 'All', icon: Target },
-    { key: 'teamwork', label: 'Teamwork', icon: Users },
-    { key: 'culture', label: 'Culture', icon: Heart },
-    { key: 'workspace', label: 'Workspace', icon: Coffee },
-    { key: 'events', label: 'Events', icon: Award }
+    { key: 'all', label: t('blog.categories.all'), icon: Target },
+    { key: 'teamwork', label: t('blog.categories.teamwork'), icon: Users },
+    { key: 'culture', label: t('blog.categories.culture'), icon: Heart },
+    { key: 'workspace', label: t('blog.categories.workspace'), icon: Coffee },
+    { key: 'events', label: t('blog.categories.events'), icon: Award }
   ];
 
   const filteredItems = selectedCategory === 'all' 
@@ -93,7 +93,7 @@ export default function Blog() {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-            <p className="text-gray-600">Loading blog...</p>
+            <p className="text-gray-600">{t('blog.loading')}</p>
           </div>
         </div>
         <Footer />
@@ -122,11 +122,10 @@ export default function Blog() {
               </div>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Our Blog
+              {t('blog.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover the heart of Millat Umidi Group through our stories and insights. Read about how our team collaborates, 
-              innovates, and creates exceptional educational experiences together.
+              {t('blog.description')}
             </p>
           </div>
         </div>
@@ -159,11 +158,11 @@ export default function Blog() {
                 {filteredItems.length === 0 ? (
                   <div className="text-center py-16">
                     <Images className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-600 mb-2">No blog posts found</h3>
+                    <h3 className="text-xl font-semibold text-gray-600 mb-2">{t('blog.noPostsFound')}</h3>
                     <p className="text-gray-500">
                       {selectedCategory === 'all' 
-                        ? 'No blog posts are currently available. Check back soon for updates!' 
-                        : `No blog posts found in the ${selectedCategory} category.`}
+                        ? t('blog.noPostsAvailable')
+                        : t('blog.noPostsInCategory', { category: selectedCategory })}
                     </p>
                     <div className="mt-4">
                       <p className="text-sm text-gray-400">
@@ -226,7 +225,7 @@ export default function Blog() {
                           className="flex items-center space-x-1"
                         >
                           <ChevronLeft className="h-4 w-4" />
-                          <span>Previous</span>
+                          <span>{t('blog.pagination.previous')}</span>
                         </Button>
                         
                         <div className="flex items-center space-x-1">
@@ -250,7 +249,7 @@ export default function Blog() {
                           disabled={currentPage === totalPages}
                           className="flex items-center space-x-1"
                         >
-                          <span>Next</span>
+                          <span>{t('blog.pagination.next')}</span>
                           <ChevronRight className="h-4 w-4" />
                         </Button>
                       </div>

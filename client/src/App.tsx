@@ -17,6 +17,7 @@ import AdminCompanies from "./pages/admin/companies/index";
 import AdminDepartments from "./pages/admin/departments/index";
 import AdminPositions from "./pages/admin/positions/index";
 import AdminBlog from "./pages/AdminBlog";
+import AdminAdmins from "./pages/admin/admins/index";
 
 // Import authentication
 import { AuthProvider } from "./contexts/AuthContext";
@@ -104,6 +105,11 @@ const App = () => (
             <Route path="/admin/blog">
               <ProtectedRoute>
                 <AdminBlog />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin/admins">
+              <ProtectedRoute requiredRole="super_admin">
+                <AdminAdmins />
               </ProtectedRoute>
             </Route>
 

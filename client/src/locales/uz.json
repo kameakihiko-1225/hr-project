@@ -97,6 +97,26 @@
 
   "footer_copyright": "Barcha huquqlar himoyalangan.",
 
+  "blog": {
+    "title": "Bizning blog",
+    "description": "Bizning hikoyalar va g'oyalarimiz orqali Millat Umidi Group qalbini kashf eting. Jamoa qanday hamkorlik qilayotgani, innovatsiyalar kiritayotgani va ajoyib ta'lim tajribasini yaratayotgani haqida o'qing.",
+    "loading": "Blog yuklanmoqda...",
+    "categories": {
+      "all": "Hammasi",
+      "teamwork": "Jamoa ishi",
+      "culture": "Madaniyat",
+      "workspace": "Ish joyi",
+      "events": "Tadbirlar"
+    },
+    "noPostsFound": "Blog postlari topilmadi",
+    "noPostsAvailable": "Hozirda blog postlari mavjud emas. Yangilanishlar uchun keyinroq qarang!",
+    "noPostsInCategory": "{{category}} toifasida blog postlari topilmadi.",
+    "pagination": {
+      "previous": "Oldingi",
+      "next": "Keyingi"
+    }
+  },
+
   "filter": {
     "title": "Mukammal rolingizni toping",
     "subtitle": "Ko'nikmalaringiz va intilishlaringizga mos keladigan imkoniyatlarni topish uchun aqlli filtrlarimizdan foydalaning",

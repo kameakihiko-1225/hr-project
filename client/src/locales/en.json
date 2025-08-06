@@ -110,6 +110,26 @@
     }
   },
 
+  "blog": {
+    "title": "Our Blog",
+    "description": "Discover the heart of Millat Umidi Group through our stories and insights. Read about how our team collaborates, innovates, and creates exceptional educational experiences together.",
+    "loading": "Loading blog...",
+    "categories": {
+      "all": "All",
+      "teamwork": "Teamwork",
+      "culture": "Culture",
+      "workspace": "Workspace",
+      "events": "Events"
+    },
+    "noPostsFound": "No blog posts found",
+    "noPostsAvailable": "No blog posts are currently available. Check back soon for updates!",
+    "noPostsInCategory": "No blog posts found in the {{category}} category.",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+
   "filter": {
     "title": "Find Your Perfect Role",
     "subtitle": "Use our intelligent filters to discover opportunities that match your skills and aspirations",
