@@ -81,7 +81,7 @@ interface ApiResponse {
 }
 
 export default function Dashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [systemStatus, setSystemStatus] = useState<SystemStatus>({
     api: { status: 'online', lastChecked: new Date().toISOString() },
     database: { status: 'disconnected', lastChecked: new Date().toISOString() },
@@ -127,7 +127,7 @@ export default function Dashboard() {
   // Fetch positions with department and company information for title mapping
   const { data: positionsData } = useQuery<{ success: boolean; data: Array<{ 
     id: number; 
-    title: string; 
+    title: string | { en: string; ru: string; uz: string }; 
     departmentId: number;
   }> }>({
     queryKey: ['positions'],
@@ -142,7 +142,7 @@ export default function Dashboard() {
   // Fetch departments for department names
   const { data: departmentsData } = useQuery<{ success: boolean; data: Array<{ 
     id: number; 
-    name: string; 
+    name: string | { en: string; ru: string; uz: string }; 
     companyId: number;
   }> }>({
     queryKey: ['departments'],
@@ -157,7 +157,7 @@ export default function Dashboard() {
   // Fetch companies for company names
   const { data: companiesData } = useQuery<{ success: boolean; data: Array<{ 
     id: number; 
-    name: string; 
+    name: string | { en: string; ru: string; uz: string }; 
   }> }>({
     queryKey: ['companies'],
     queryFn: async () => {
@@ -226,6 +226,12 @@ export default function Dashboard() {
     return ((applies / views) * 100).toFixed(1);
   };
 
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | { en: string; ru: string; uz: string }): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as 'en' | 'ru' | 'uz'] || content.en || '';
+  };
+
   // Helper function to get position title with department and company
   const getPositionInfo = (positionId: number) => {
     const position = positions.find(p => p.id === positionId);
@@ -242,9 +248,9 @@ export default function Dashboard() {
     const company = department ? companies.find(c => c.id === department.companyId) : null;
     
     return {
-      title: position.title || `Position #${positionId}`,
-      department: department?.name || '',
-      company: company?.name || ''
+      title: getLocalizedContent(position.title) || `Position #${positionId}`,
+      department: department ? getLocalizedContent(department.name) : '',
+      company: company ? getLocalizedContent(company.name) : ''
     };
   };
 
