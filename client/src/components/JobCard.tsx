@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
+import { useTranslation } from "react-i18next";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,16 +17,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Job {
   id: number;
-  title: string;
-  company: string;
+  title: string | { en: string; ru: string; uz: string };
+  company: string | { en: string; ru: string; uz: string };
   companyLogoUrl?: string | null;
-  department: string;
-  location: string;
+  department: string | { en: string; ru: string; uz: string };
+  location: string | { en: string; ru: string; uz: string };
   type: string;
-  salary: string;
+  salary: string | { en: string; ru: string; uz: string };
   experience: string;
   skills: string[];
-  description: string;
+  description: string | { en: string; ru: string; uz: string };
   postedDate: string;
   applicants: number;
   remote: boolean;
@@ -38,9 +39,17 @@ interface JobCardProps {
 }
 
 export const JobCard = ({ job, index = 0, orientation = "vertical" }: JobCardProps) => {
+  const { i18n } = useTranslation();
+
+  // Helper function to get localized content
+  const getLocalizedContent = (content: string | { en: string; ru: string; uz: string }): string => {
+    if (typeof content === 'string') return content;
+    return content[i18n.language as 'en' | 'ru' | 'uz'] || content.en || '';
+  };
+
   const handleApplyClick = () => {
     // TODO: Replace with router push or deep-link invocation
-    alert(`You\'ll be redirected to Telegram to chat with ${job.company}\'s AI recruiter!`);
+    alert(`You\'ll be redirected to Telegram to chat with ${getLocalizedContent(job.company)}\'s AI recruiter!`);
   };
 
   const DelayWrapper = (children: React.ReactNode) => (
@@ -52,10 +61,10 @@ export const JobCard = ({ job, index = 0, orientation = "vertical" }: JobCardPro
   const CompanyAvatar = () => (
     <Avatar className="h-12 w-12 ring-2 ring-offset-2 ring-offset-background ring-blue-500/40 group-hover:ring-blue-500/70 transition-shadow duration-300 shadow-lg group-hover:shadow-xl">
       {job.companyLogoUrl ? (
-        <AvatarImage src={job.companyLogoUrl} alt={job.company} decoding="async" loading="lazy" />
+        <AvatarImage src={job.companyLogoUrl} alt={getLocalizedContent(job.company)} decoding="async" loading="lazy" />
       ) : (
         <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold">
-          {job.company.charAt(0)}
+          {getLocalizedContent(job.company).charAt(0)}
         </AvatarFallback>
       )}
     </Avatar>
@@ -75,7 +84,7 @@ export const JobCard = ({ job, index = 0, orientation = "vertical" }: JobCardPro
           {/* company + remote tag */}
           <div className="flex items-center gap-2 mb-0.5">
             <span className="text-sm font-medium text-gray-900 line-clamp-1">
-              {job.company}
+              {getLocalizedContent(job.company)}
             </span>
             {job.remote && (
               <Badge variant="outline" className="border-green-300 text-green-600 bg-green-50">
@@ -84,17 +93,17 @@ export const JobCard = ({ job, index = 0, orientation = "vertical" }: JobCardPro
             )}
           </div>
           <CardTitle className="text-base font-bold leading-snug text-gray-900 group-hover:text-blue-600 line-clamp-1">
-            {job.title}
+            {getLocalizedContent(job.title)}
           </CardTitle>
           <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {job.location}</span>
+            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {getLocalizedContent(job.location)}</span>
             <span className="flex items-center gap-1"><GraduationCap className="h-3 w-3" /> {job.experience}</span>
-            <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" /> {job.salary}</span>
+            <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" /> {getLocalizedContent(job.salary)}</span>
           </div>
         </CardContent>
         <CardFooter className="pr-4 pb-4 flex-none">
           <button
-            aria-label={`Apply Now for ${job.title} at ${job.company}`}
+            aria-label={`Apply Now for ${getLocalizedContent(job.title)} at ${getLocalizedContent(job.company)}`}
             onClick={handleApplyClick}
             className="px-3 py-1.5 text-xs rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow hover:from-blue-700 hover:to-indigo-700 flex items-center gap-1"
           >
@@ -124,13 +133,13 @@ export const JobCard = ({ job, index = 0, orientation = "vertical" }: JobCardPro
         <CompanyAvatar />
         <div className="flex-1">
           <h3 className="font-semibold text-sm leading-tight text-foreground flex items-center gap-2">
-            {job.company}
+            {getLocalizedContent(job.company)}
           </h3>
-          <p className="text-xs text-muted-foreground line-clamp-1">{job.department}</p>
+          <p className="text-xs text-muted-foreground line-clamp-1">{getLocalizedContent(job.department)}</p>
         </div>
         {/* salary ribbon */}
         <span className="absolute -top-4 -right-6 rotate-45 bg-gradient-to-r from-indigo-600 to-primary text-white shadow px-10 py-0.5 text-[10px] font-medium">
-          {job.salary}
+          {getLocalizedContent(job.salary)}
         </span>
         {job.remote && (
           <Badge variant="secondary" className="absolute top-2 right-2 text-[10px] bg-green-600 text-white border-0 shadow">
@@ -141,16 +150,16 @@ export const JobCard = ({ job, index = 0, orientation = "vertical" }: JobCardPro
 
       <CardContent className="space-y-3 pb-4 relative z-10">
         <CardTitle className="text-base font-semibold tracking-tight leading-snug text-foreground group-hover:text-primary line-clamp-2">
-          {job.title}
+          {getLocalizedContent(job.title)}
         </CardTitle>
 
         <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {job.location}</span>
+          <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {getLocalizedContent(job.location)}</span>
           <span className="flex items-center gap-1"><GraduationCap className="h-3 w-3" /> {job.experience}</span>
-          <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" /> {job.salary}</span>
+          <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" /> {getLocalizedContent(job.salary)}</span>
         </div>
 
-        <p className="text-xs text-muted-foreground line-clamp-3">{job.description}</p>
+        <p className="text-xs text-muted-foreground line-clamp-3">{getLocalizedContent(job.description)}</p>
 
         {/* skills */}
         {job.skills.length > 0 && (
@@ -172,7 +181,7 @@ export const JobCard = ({ job, index = 0, orientation = "vertical" }: JobCardPro
           <User2 className="h-3 w-3" /> {job.applicants} • <Award className="h-3 w-3" /> {postedAgo}
         </span>
         <button
-          aria-label={`Apply Now for ${job.title} at ${job.company}`}
+          aria-label={`Apply Now for ${getLocalizedContent(job.title)} at ${getLocalizedContent(job.company)}`}
           onClick={handleApplyClick}
           className="px-6 py-1.5 text-xs font-medium rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-600/90 hover:to-indigo-600/90 transition-all flex items-center gap-1"
         >
