@@ -30,6 +30,7 @@ interface Job {
   postedDate: string;
   applicants: number;
   remote: boolean;
+  applyLink?: string | { en: string; ru: string; uz: string };
 }
 
 interface JobCardProps {
@@ -48,8 +49,21 @@ export const JobCard = ({ job, index = 0, orientation = "vertical" }: JobCardPro
   };
 
   const handleApplyClick = () => {
-    // TODO: Replace with router push or deep-link invocation
-    alert(`You\'ll be redirected to Telegram to chat with ${getLocalizedContent(job.company)}\'s AI recruiter!`);
+    if (job.applyLink) {
+      // Track application click
+      fetch(`/api/positions/${job.id}/track-click`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clickType: 'apply' })
+      });
+      
+      // Open the apply link
+      const applyUrl = getLocalizedContent(job.applyLink);
+      window.open(applyUrl, '_blank');
+    } else {
+      // Fallback for jobs without apply links
+      alert(`You'll be redirected to Telegram to chat with ${getLocalizedContent(job.company)}'s AI recruiter!`);
+    }
   };
 
   const DelayWrapper = (children: React.ReactNode) => (

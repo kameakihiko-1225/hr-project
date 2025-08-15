@@ -33,6 +33,13 @@ export default function Blog() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   
+  // Helper function to get localized content
+  const getLocalizedContent = (content: any): string => {
+    if (typeof content === 'string') return content;
+    if (!content) return '';
+    return content[i18n.language as 'en' | 'ru' | 'uz'] || content.en || '';
+  };
+  
   const seoData = getPageSEO('blog', i18n.language);
 
   // Fetch blog items from API
@@ -275,7 +282,7 @@ export default function Blog() {
             <div className="relative">
               <img 
                 src={selectedImage.imageUrl} 
-                alt={selectedImage.title}
+                alt={getLocalizedContent(selectedImage.title)}
                 className="w-full h-auto max-h-[60vh] object-contain"
               />
               <button 
@@ -296,8 +303,8 @@ export default function Blog() {
                   <span className="capitalize">{selectedImage.category}</span>
                 </Badge>
               </div>
-              <h2 className="text-2xl font-bold mb-3">{selectedImage.title}</h2>
-              <p className="text-gray-600 mb-4">{selectedImage.description}</p>
+              <h2 className="text-2xl font-bold mb-3">{getLocalizedContent(selectedImage.title)}</h2>
+              <p className="text-gray-600 mb-4">{getLocalizedContent(selectedImage.description)}</p>
             </div>
           </div>
         </div>
