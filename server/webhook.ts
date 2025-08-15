@@ -97,11 +97,11 @@ async function downloadTelegramFile(fileId: string, fileName: string): Promise<s
     const downloadUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${fileInfo.file_path}`;
     const response = await axios.get(downloadUrl, { responseType: 'stream' });
 
-    // Ensure uploads directory exists
-    const uploadsDir = path.join(process.cwd(), 'uploads');
+    // Ensure telegram-files directory exists
+    const uploadsDir = path.join(process.cwd(), 'uploads', 'telegram-files');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
-      console.log(`📁 [TELEGRAM-FILE] Created uploads directory: ${uploadsDir}`);
+      console.log(`📁 [TELEGRAM-FILE] Created telegram-files directory: ${uploadsDir}`);
     }
 
     // Generate unique filename
@@ -118,7 +118,7 @@ async function downloadTelegramFile(fileId: string, fileName: string): Promise<s
       writer.on('finish', () => {
         console.log(`✅ [TELEGRAM-FILE] File downloaded successfully: ${localFilePath}`);
         // Return the public URL that Bitrix24 can access
-        const publicUrl = `/uploads/${uniqueFileName}`;
+        const publicUrl = `/uploads/telegram-files/${uniqueFileName}`;
         console.log(`🌐 [TELEGRAM-FILE] Public URL: ${publicUrl}`);
         resolve(publicUrl);
       });
@@ -298,23 +298,23 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log(`  - Resume field: ${JSON.stringify(resumeFileId)}`);
   console.log(`  - Diploma field: ${JSON.stringify(diplomaFileId)}`);
   
-  // Process resume file directly - USING PERMANENT STORAGE WITHOUT CONTACT PREFIX
-  if (resumeFileId && TelegramFileStorage.isTelegramFileId(resumeFileId)) {
-    console.log(`  🔄 Converting resume file ID to PERMANENT URL...`);
-    const resumeUrl = await convertTelegramFileIdToPermanentUrl(resumeFileId, 'resume');
-    contactFields.UF_CRM_1752621810 = resumeUrl;
-    console.log(`  ✅ Resume PERMANENT URL set: ${resumeUrl}`);
+  // Process resume file directly - DOWNLOAD AND SAVE TO SERVER
+  if (resumeFileId && isTelegramFileId(resumeFileId)) {
+    console.log(`  📥 Downloading resume file to server...`);
+    const resumeUrl = await downloadTelegramFile(resumeFileId, 'resume');
+    contactFields.UF_CRM_1752621810 = resumeUrl || '';
+    console.log(`  ✅ Resume downloaded and saved: ${resumeUrl}`);
   } else {
     contactFields.UF_CRM_1752621810 = resumeFileId || '';
     console.log(`  ⚪ Resume kept as-is: ${resumeFileId}`);
   }
   
-  // Process diploma file directly - USING PERMANENT STORAGE WITHOUT CONTACT PREFIX
-  if (diplomaFileId && TelegramFileStorage.isTelegramFileId(diplomaFileId)) {
-    console.log(`  🔄 Converting diploma file ID to PERMANENT URL...`);
-    const diplomaUrl = await convertTelegramFileIdToPermanentUrl(diplomaFileId, 'diploma');
-    contactFields.UF_CRM_1752621831 = diplomaUrl;
-    console.log(`  ✅ Diploma PERMANENT URL set: ${diplomaUrl}`);
+  // Process diploma file directly - DOWNLOAD AND SAVE TO SERVER
+  if (diplomaFileId && isTelegramFileId(diplomaFileId)) {
+    console.log(`  📥 Downloading diploma file to server...`);
+    const diplomaUrl = await downloadTelegramFile(diplomaFileId, 'diploma');
+    contactFields.UF_CRM_1752621831 = diplomaUrl || '';
+    console.log(`  ✅ Diploma downloaded and saved: ${diplomaUrl}`);
   } else {
     contactFields.UF_CRM_1752621831 = diplomaFileId || '';
     console.log(`  ⚪ Diploma kept as-is: ${diplomaFileId}`);
@@ -331,52 +331,52 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log(`  - Q2: ${JSON.stringify(phase2_q2)} (${phase2_q2 ? 'HAS VALUE' : 'EMPTY'})`);
   console.log(`  - Q3: ${JSON.stringify(phase2_q3)} (${phase2_q3 ? 'HAS VALUE' : 'EMPTY'})`);
 
-  // Process Q1 - check if it's a file ID or text - USING PERMANENT STORAGE WITHOUT CONTACT PREFIX
+  // Process Q1 - check if it's a file ID or text - DOWNLOAD AND SAVE TO SERVER
   if (phase2_q1) {
-    if (TelegramFileStorage.isTelegramFileId(phase2_q1)) {
-      console.log(`  🎧 Q1 is file ID, converting to PERMANENT URL...`);
-      const q1Url = await convertTelegramFileIdToPermanentUrl(phase2_q1, 'phase2_q1');
-      contactFields.UF_CRM_1752621857 = q1Url; // Voice field
-      contactFields.UF_CRM_1752241370 = `Voice answer: ${q1Url}`; // Text field with PERMANENT URL
-      console.log(`  ✅ Q1 voice PERMANENT URL: ${q1Url}`);
+    if (isTelegramFileId(phase2_q1)) {
+      console.log(`  🎧 Q1 is file ID, downloading to server...`);
+      const q1Url = await downloadTelegramFile(phase2_q1, 'phase2_q1');
+      contactFields.UF_CRM_1752621857 = q1Url || ''; // Voice field
+      contactFields.UF_CRM_1752241370 = `Voice answer: ${q1Url || phase2_q1}`; // Text field with local URL
+      console.log(`  ✅ Q1 voice downloaded: ${q1Url}`);
     } else {
       contactFields.UF_CRM_1752241370 = phase2_q1; // Text field
       console.log(`  ✅ Q1 text: ${phase2_q1}`);
     }
   }
 
-  // Process Q2 - check if it's a file ID or text - USING PERMANENT STORAGE WITHOUT CONTACT PREFIX
+  // Process Q2 - check if it's a file ID or text - DOWNLOAD AND SAVE TO SERVER
   if (phase2_q2) {
-    if (TelegramFileStorage.isTelegramFileId(phase2_q2)) {
-      console.log(`  🎧 Q2 is file ID, converting to PERMANENT URL...`);
-      const q2Url = await convertTelegramFileIdToPermanentUrl(phase2_q2, 'phase2_q2');
-      contactFields.UF_CRM_1752621874 = q2Url; // Voice field
-      contactFields.UF_CRM_1752241378 = `Voice answer: ${q2Url}`; // Text field with PERMANENT URL
-      console.log(`  ✅ Q2 voice PERMANENT URL: ${q2Url}`);
+    if (isTelegramFileId(phase2_q2)) {
+      console.log(`  🎧 Q2 is file ID, downloading to server...`);
+      const q2Url = await downloadTelegramFile(phase2_q2, 'phase2_q2');
+      contactFields.UF_CRM_1752621874 = q2Url || ''; // Voice field
+      contactFields.UF_CRM_1752241378 = `Voice answer: ${q2Url || phase2_q2}`; // Text field with local URL
+      console.log(`  ✅ Q2 voice downloaded: ${q2Url}`);
     } else {
       contactFields.UF_CRM_1752241378 = phase2_q2; // Text field
       console.log(`  ✅ Q2 text: ${phase2_q2}`);
     }
   }
 
-  // Process Q3 - check if it's a file ID or text - USING PERMANENT STORAGE WITHOUT CONTACT PREFIX
+  // Process Q3 - check if it's a file ID or text - DOWNLOAD AND SAVE TO SERVER
   if (phase2_q3) {
-    if (TelegramFileStorage.isTelegramFileId(phase2_q3)) {
-      console.log(`  🎧 Q3 is file ID, converting to PERMANENT URL...`);
-      const q3Url = await convertTelegramFileIdToPermanentUrl(phase2_q3, 'phase2_q3');
-      contactFields.UF_CRM_1752621887 = q3Url; // Voice field
-      contactFields.UF_CRM_1752241386 = `Voice answer: ${q3Url}`; // Text field with PERMANENT URL
-      console.log(`  ✅ Q3 voice PERMANENT URL: ${q3Url}`);
+    if (isTelegramFileId(phase2_q3)) {
+      console.log(`  🎧 Q3 is file ID, downloading to server...`);
+      const q3Url = await downloadTelegramFile(phase2_q3, 'phase2_q3');
+      contactFields.UF_CRM_1752621887 = q3Url || ''; // Voice field
+      contactFields.UF_CRM_1752241386 = `Voice answer: ${q3Url || phase2_q3}`; // Text field with local URL
+      console.log(`  ✅ Q3 voice downloaded: ${q3Url}`);
     } else {
       contactFields.UF_CRM_1752241386 = phase2_q3; // Text field
       console.log(`  ✅ Q3 text: ${phase2_q3}`);
     }
   }
 
-  // Add comments with PERMANENT file URLs
+  // Add comments with local file URLs
   const comments = [];
-  if (contactFields.UF_CRM_1752621810) comments.push(`Resume PERMANENT URL: ${contactFields.UF_CRM_1752621810}`);
-  if (contactFields.UF_CRM_1752621831) comments.push(`Diploma PERMANENT URL: ${contactFields.UF_CRM_1752621831}`);
+  if (contactFields.UF_CRM_1752621810) comments.push(`Resume file: ${contactFields.UF_CRM_1752621810}`);
+  if (contactFields.UF_CRM_1752621831) comments.push(`Diploma file: ${contactFields.UF_CRM_1752621831}`);
   if (age) comments.push(`The Age is ${age}`);
   if (comments.length > 0) {
     contactFields.COMMENTS = comments.join('\\n');
