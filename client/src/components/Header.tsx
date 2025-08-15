@@ -59,7 +59,7 @@ export const Header = () => {
   // Filter menu items based on current location
   const allMenuItems = [
     { key: 'home', href: '/', action: null, icon: Home },
-    { key: 'blog', href: '/blog', action: null, icon: Images },
+    { key: 'nav_blog', href: '/blog', action: null, icon: Images },
     { key: 'contact', href: null, action: () => scrollToSection('contact'), icon: Phone },
   ];
 
