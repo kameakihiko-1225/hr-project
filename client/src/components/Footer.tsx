@@ -112,7 +112,7 @@ export const Footer = () => {
                 href="/blog"
                 className="block text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors"
               >
-                {t('blog')}
+                {t('nav_blog')}
               </a>
               <a
                 href="#contact"
