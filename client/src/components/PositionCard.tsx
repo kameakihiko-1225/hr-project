@@ -192,97 +192,29 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
     }
   };
 
-<<<<<<< HEAD
-  // Data inheritance logic: position -> department -> company (same as AdminPositionCard)
-  const getInheritedData = () => {
-    const basePosition = position;
-    const department = departmentFromAPI;
-    const company = companyFromAPI;
-
-    // Helper to safely get localized content with fallback
-    const safeGetLocalized = (content: string | LocalizedContent | undefined, fallback: string = '') => {
-      return content ? getLocalizedContent(content) : fallback;
-    };
-
-    return {
-      // Logo: use company logo
-      logoUrl: company?.logoUrl || null,
-      
-      // Location: use position location -> department location -> company location
-      city: safeGetLocalized(
-        basePosition.city || 
-        (department?.city as string | LocalizedContent | undefined) || 
-        (company?.city as string | LocalizedContent | undefined)
-      ),
-      
-      country: safeGetLocalized(
-        basePosition.country || 
-        (department?.country as string | LocalizedContent | undefined) || 
-        (company?.country as string | LocalizedContent | undefined)
-      ),
-      
-      // Company info
-      companyName: safeGetLocalized(company?.name as string | LocalizedContent | undefined, 'Company'),
-      companyColor: company?.color || '#b69b83',
-      
-      // Department info
-      departmentName: safeGetLocalized(department?.name as string | LocalizedContent | undefined, 'Department'),
-      
-      // Description inheritance
-      description: safeGetLocalized(
-        basePosition.description || 
-        (department?.description as string | LocalizedContent | undefined) || 
-        (company?.description as string | LocalizedContent | undefined)
-      ),
-    };
-  };
-
-  const inheritedData = getInheritedData();
-  const companyName = inheritedData.companyName;
-  const companyLogoUrl = inheritedData.logoUrl;
-  const postedAgo = position.createdAt 
+  // Simplified company data and logo rendering
+  const companyName = (companyFromAPI?.name as string | LocalizedContent | undefined)
+    ? getLocalizedContent(companyFromAPI!.name as any)
+    : 'Company';
+  const postedAgo = position.createdAt
     ? formatDistanceToNow(
-        typeof position.createdAt === 'string' 
-          ? new Date(position.createdAt) 
-          : position.createdAt, 
+        typeof position.createdAt === 'string' ? new Date(position.createdAt) : position.createdAt,
         { addSuffix: true }
       )
     : '';
 
-  const CompanyAvatar = () => (
-    <Avatar className="h-16 w-16 border-2 border-white/30 shadow-2xl group-hover:shadow-3xl group-hover:scale-105 transition-all duration-300">
-      {companyLogoUrl && !logoError ? (
-        <AvatarImage 
-          src={companyLogoUrl} 
-          alt={companyName} 
-          className="object-contain object-center w-full h-full p-2"
-          loading="lazy"
-          decoding="async"
-          onError={handleLogoError} 
-        />
-      ) : (
-        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-semibold text-lg shadow-inner">
-          {companyName?.charAt(0) || 'C'}
-        </AvatarFallback>
-      )}
-    </Avatar>
-  );
-=======
-  // Simplified data extraction
-  const companyName = companyFromAPI?.name || 'Company';
-  const postedAgo = position.createdAt ? formatDistanceToNow(new Date(position.createdAt), { addSuffix: true }) : '';
-
-  // Simplified logo rendering
   const renderLogo = () => {
     const logoUrl = companyFromAPI?.logoUrl;
-    const fallbackLetter = companyFromAPI?.name?.charAt(0) || 'C';
+    const fallbackLetter = typeof companyFromAPI?.name === 'string'
+      ? companyFromAPI?.name?.charAt(0)
+      : (companyFromAPI?.name?.en || companyFromAPI?.name?.ru || companyFromAPI?.name?.uz || 'C').charAt(0);
     
     return (
       <Avatar className="w-full h-full border-2 border-white/30 shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
         {logoUrl && !logoError ? (
           <AvatarImage 
             src={encodeURI(logoUrl)} 
-            alt={companyFromAPI?.name || 'Company'} 
+            alt={companyName} 
             className="object-contain object-center w-full h-full p-1 sm:p-2"
             onError={() => setLogoError(true)}
           />
@@ -294,7 +226,6 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
       </Avatar>
     );
   };
->>>>>>> 4efca1018c292eed4d8f6c434cb429e49a1e7955
 
   return (
     <Card
@@ -306,11 +237,7 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           handleCardClick(e as unknown as React.MouseEvent);
         }
       }}
-<<<<<<< HEAD
-      className="animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 h-[440px] w-full max-w-[460px] flex flex-col cursor-pointer"
-=======
-      className={`animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 ${compactMobile ? 'h-[420px] sm:h-[480px]' : 'h-[440px] sm:h-[480px]'} w-full flex flex-col`}
->>>>>>> 4efca1018c292eed4d8f6c434cb429e49a1e7955
+      className={`animate-fade-in group relative overflow-hidden border border-gray-100 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 hover:-translate-y-1 focus:-translate-y-1 transition-all duration-300 ${compactMobile ? 'h-[420px] sm:h-[480px]' : 'h-[440px] sm:h-[480px]'} w-full flex flex-col cursor-pointer`}
     >
       {/* Hover effect overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -390,13 +317,8 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
               <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
               {position.departments.map((dp, idx) => (
                 <span key={dp.department.id} className="flex items-center">
-<<<<<<< HEAD
-                  {getLocalizedContent(dp.department.name as string | LocalizedContent)}
-                  {idx < position.departments!.length - 1 && <span className="mx-1">|</span>}
-=======
-                  {getLocalizedContent(dp.department.name, i18n.language as any)}
+                  {getLocalizedContent(dp.department.name as any)}
                   {idx < position.departments.length - 1 && <span className="mx-1">|</span>}
->>>>>>> 4efca1018c292eed4d8f6c434cb429e49a1e7955
                 </span>
               ))}
             </p>
@@ -473,16 +395,12 @@ export const PositionCard = React.memo(function PositionCard({ position, onEdit,
           </Button>
           <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
             <DialogTrigger asChild>
-<<<<<<< HEAD
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="flex items-center justify-center gap-1 flex-1 h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-100 transition-all duration-300 min-w-0"
+                className="flex items-center justify-center gap-1 flex-1 h-7 sm:h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 min-w-0"
                 onClick={(e) => e.stopPropagation()}
               >
-=======
-              <Button variant="outline" size="sm" className="flex items-center justify-center gap-1 flex-1 h-7 sm:h-8 text-xs font-medium hover:bg-blue-50 hover:border-blue-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 min-w-0">
->>>>>>> 4efca1018c292eed4d8f6c434cb429e49a1e7955
                 <ExternalLink className="h-3 w-3 flex-shrink-0" />
                 <span className="hidden sm:inline truncate">{t('position_card.view_details')}</span>
               </Button>
