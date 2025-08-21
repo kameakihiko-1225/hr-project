@@ -140,6 +140,16 @@ export const fileAttachments = pgTable("file_attachments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Permanent file storage table (binary data stored in Postgres)
+export const storedFiles = pgTable("stored_files", {
+  id: serial("id").primaryKey(),
+  filename: text("filename").notNull(),
+  mimetype: text("mimetype").notNull(),
+  size: integer("size").notNull(),
+  data: text("data").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const industryTags = pgTable("industry_tags", {
   id: serial("id").primaryKey(),
   name: json("name").$type<LocalizedContent>().notNull(), // Localized industry tag name

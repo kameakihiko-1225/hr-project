@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { pool } from "./db";
 import { insertCompanySchema, insertDepartmentSchema, insertPositionSchema, insertGalleryItemSchema, insertIndustryTagSchema, fileAttachments, departments, companies, adminLoginSchema } from "@shared/schema";
 import { z } from 'zod';
 
@@ -15,6 +16,24 @@ import { AuthService, authenticateAdmin, requireRole, requireSuperAdmin, AuthReq
 import { performanceMiddleware, performanceMonitor } from './middleware/performance';
 import { registerAdminBatchRoutes } from './routes/admin-batch';
 
+async function ensureStoredFilesTable(): Promise<void> {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS stored_files (
+        id SERIAL PRIMARY KEY,
+        filename TEXT NOT NULL,
+        mimetype TEXT NOT NULL,
+        size INTEGER NOT NULL,
+        data BYTEA NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+    console.log('[Files] ensured stored_files table exists');
+  } catch (e) {
+    console.warn('[Files] failed to ensure stored_files table exists:', (e as any).message);
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply performance middleware
   app.use(performanceMiddleware.compression);
@@ -25,6 +44,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Serve uploaded files statically
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+  // Ensure DB-stored files table exists and add serving route
+  await ensureStoredFilesTable();
+  app.get('/files/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).send('Invalid file id');
+      const result = await pool.query('SELECT filename, mimetype, size, data FROM stored_files WHERE id=$1', [id]);
+      if (result.rows.length === 0) return res.status(404).send('File not found');
+      const row = result.rows[0];
+      res.setHeader('Content-Type', row.mimetype || 'application/octet-stream');
+      res.setHeader('Content-Length', row.size);
+      res.setHeader('Content-Disposition', `inline; filename="${row.filename}"`);
+      return res.end(row.data);
+    } catch (e: any) {
+      console.error('[Files] error serving file:', e.message);
+      return res.status(500).send('Failed to serve file');
+    }
+  });
   
   // Serve telegram files with proper headers
   app.use('/uploads/telegram-files', express.static(path.join(process.cwd(), 'uploads', 'telegram-files'), {
@@ -240,34 +278,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         res.json({ success: true, data: companies });
         return;
-        
-        // Create a simple test response with just essential data
-        const simplifiedCompanies = companies.map(company => ({
-          id: company.id,
-          name: company.name,
-          description: company.description,
-          logoUrl: company.logoUrl,
-          color: company.color,
-          address: company.address,
-          phone: company.phone,
-          email: company.email,
-          city: company.city,
-          country: company.country,
-          adminId: company.adminId,
-          createdAt: company.createdAt,
-          industries: company.industries.map(industry => ({
-            id: industry.id,
-            name: industry.name,
-            description: industry.description,
-            createdAt: industry.createdAt
-          }))
-        }));
-        
-        const responseData = { success: true, data: simplifiedCompanies };
-        const responseJson = JSON.stringify(responseData);
-        console.log(`[Companies API] Response size: ${responseJson.length} characters`);
-        
-        res.json(responseData);
       } else {
         // Return localized content for public use
         const companies = await storage.getAllCompanies(language);

@@ -136,13 +136,11 @@ export function PositionCard({
       // Location: use position location -> department location -> company location
       city: safeGetLocalized(
         basePosition.city || 
-        (department?.city as string | LocalizedContent | undefined) || 
         (company?.city as string | LocalizedContent | undefined)
       ),
       
       country: safeGetLocalized(
         basePosition.country || 
-        (department?.country as string | LocalizedContent | undefined) || 
         (company?.country as string | LocalizedContent | undefined)
       ),
       
@@ -165,7 +163,7 @@ export function PositionCard({
   const inheritedData = getInheritedData();
 
   const formattedDate = formatDistanceToNow(
-    typeof position.createdAt === 'string' ? new Date(position.createdAt) : position.createdAt,
+    typeof position.createdAt === 'string' ? new Date(position.createdAt) : position.createdAt || new Date(),
     { addSuffix: true }
   );
 
@@ -271,10 +269,10 @@ export function PositionCard({
             <span>{formattedDate}</span>
           </div>
           
-          {position.workType && (
+          {position.employmentType && (
             <div className="flex items-center gap-1">
               <Briefcase className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate">{getLocalizedContent(position.workType, i18n.language as 'en' | 'ru' | 'uz')}</span>
+              <span className="truncate">{getLocalizedContent(position.employmentType, i18n.language as 'en' | 'ru' | 'uz')}</span>
             </div>
           )}
         </div>
