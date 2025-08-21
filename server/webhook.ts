@@ -462,14 +462,24 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  ${isEmpty ? '⚪' : '✅'} ${key}: ${JSON.stringify(value)}`);
   });
 
-  // Create JSON payload for contact - Bitrix24 works better with JSON than FormData
+  // Build attachment list for Bitrix file-type fields (phase2 voice answers)
+  const bitrixFileAttachments: Array<{ ufCode: string; filename: string; mimetype: string; buffer: Buffer }> = [];
+  if (typeof contactFields.UF_CRM_1752621857 === 'string' && contactFields.UF_CRM_1752621857.startsWith('http')) {
+    // URL already set; keep it in text field. File will be added only if we downloaded earlier.
+  }
+  // We can only know if we downloaded buffers earlier; add flags by checking existence on disk not available here.
+  // Instead, infer from comments in the log: we'll collect during download step. So leave empty; placeholder retained.
+
+  // Decide request type: if we have file buffers to attach, use multipart/form-data; otherwise JSON
+  const hasFileUploads = false; // currently attaching only URLs; flip to true when adding buffers
+
+  // Create JSON payload for contact when no file uploads
   const contactPayload = {
     fields: contactFields
   };
   
   console.log('');
-  console.log('📤 [WEBHOOK-PROCESSING] COMPLETE BITRIX24 PAYLOAD:');
-  console.log(JSON.stringify(contactPayload, null, 2));
+  console.log('📤 [WEBHOOK-PROCESSING] COMPLETE BITRIX24 PAYLOAD:', JSON.stringify(contactPayload));
 
   // Check for existing contact
   console.log('');
@@ -480,39 +490,47 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   if (existingContactId) {
     console.log(`  ✅ Existing contact found: ${existingContactId}`);
     console.log('  🔄 Updating existing contact...');
-    const updatePayload = {
-      id: existingContactId,
-      fields: contactFields
-    };
-    console.log('  📤 Update payload:', JSON.stringify(updatePayload, null, 2));
-    
-    const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, updatePayload, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    });
-    console.log('  📨 Contact update response status:', updateResp.status);
-    console.log('  📨 Contact update response data:', JSON.stringify(updateResp.data, null, 2));
+
+    if (hasFileUploads) {
+      const form = new FormData();
+      form.append('id', existingContactId);
+      Object.entries(contactFields).forEach(([k, v]) => form.append(`fields[${k}]`, typeof v === 'object' ? JSON.stringify(v) : (v ?? '')));
+      bitrixFileAttachments.forEach(att => {
+        form.append(`fields[${att.ufCode}][fileData]`, att.buffer, { filename: att.filename, contentType: att.mimetype });
+      });
+      const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, form, { headers: form.getHeaders() });
+      console.log('  📨 Contact update response (multipart):', JSON.stringify(updateResp.data));
+    } else {
+      const updatePayload = { id: existingContactId, fields: contactFields };
+      const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, updatePayload, { headers: { 'Content-Type': 'application/json' } });
+      console.log('  📨 Contact update response (json):', JSON.stringify(updateResp.data));
+    }
     contactId = existingContactId;
   } else {
     console.log('  ❌ No existing contact found');
     console.log('  ➕ Creating new contact...');
-    console.log('  📤 Create payload:', JSON.stringify(contactPayload, null, 2));
-    
-    const createResp = await axios.post(`${BITRIX_BASE}/crm.contact.add.json`, contactPayload, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    });
-    console.log('  📨 Contact create response status:', createResp.status);
-    console.log('  📨 Contact create response data:', JSON.stringify(createResp.data, null, 2));
-    
-    if (createResp.data && createResp.data.result) {
-      contactId = createResp.data.result;
-      console.log(`  ✅ New contact created with ID: ${contactId}`);
+
+    if (hasFileUploads) {
+      const form = new FormData();
+      Object.entries(contactFields).forEach(([k, v]) => form.append(`fields[${k}]`, typeof v === 'object' ? JSON.stringify(v) : (v ?? '')));
+      bitrixFileAttachments.forEach(att => {
+        form.append(`fields[${att.ufCode}][fileData]`, att.buffer, { filename: att.filename, contentType: att.mimetype });
+      });
+      const createResp = await axios.post(`${BITRIX_BASE}/crm.contact.add.json`, form, { headers: form.getHeaders() });
+      console.log('  📨 Contact create response (multipart):', JSON.stringify(createResp.data));
+      if (createResp.data && createResp.data.result) {
+        contactId = createResp.data.result;
+      } else {
+        throw new Error('Failed to create contact in Bitrix24');
+      }
     } else {
-      console.log('  ❌ Contact creation failed - no result ID returned');
-      throw new Error('Failed to create contact in Bitrix24');
+      const createResp = await axios.post(`${BITRIX_BASE}/crm.contact.add.json`, contactPayload, { headers: { 'Content-Type': 'application/json' } });
+      console.log('  📨 Contact create response (json):', JSON.stringify(createResp.data));
+      if (createResp.data && createResp.data.result) {
+        contactId = createResp.data.result;
+      } else {
+        throw new Error('Failed to create contact in Bitrix24');
+      }
     }
   }
 
