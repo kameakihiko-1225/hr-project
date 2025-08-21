@@ -317,6 +317,9 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  ❌ No valid phone number found. Raw: ${JSON.stringify(cleanedData.phone_number_uzbek)}`);
   }
 
+  // Prepare collection for Bitrix file attachments (buffers)
+  const bitrixFileAttachments: Array<{ ufCode: string; filename: string; mimetype: string; buffer: Buffer }> = [];
+
   // Handle file fields with Telegram download - INLINE PROCESSING
   console.log('');
   console.log('📎 [WEBHOOK-PROCESSING] FILE FIELDS PROCESSING WITH TELEGRAM DOWNLOAD:');
@@ -334,7 +337,9 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
       const storedId = await saveBufferAsStoredFile(resBuf.filename, resBuf.mimetype, resBuf.buffer);
       const permanentUrl = buildPublicFileUrl(storedId);
       contactFields.UF_CRM_1752621810 = permanentUrl;
-      console.log(`  ✅ Resume stored with id ${storedId}, URL: ${permanentUrl}`);
+      // Also attach as FILE-type UF in Bitrix
+      bitrixFileAttachments.push({ ufCode: 'UF_CRM_1752244177', filename: resBuf.filename, mimetype: resBuf.mimetype, buffer: resBuf.buffer });
+      console.log(`  ✅ Resume stored with id ${storedId}, URL: ${permanentUrl} and queued for Bitrix file attach`);
     } else {
       const fallbackUrl = await convertTelegramFileIdToUrl(resumeFileId, 'resume');
       contactFields.UF_CRM_1752621810 = fallbackUrl;
@@ -353,7 +358,9 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
       const storedId = await saveBufferAsStoredFile(dipBuf.filename, dipBuf.mimetype, dipBuf.buffer);
       const permanentUrl = buildPublicFileUrl(storedId);
       contactFields.UF_CRM_1752621831 = permanentUrl;
-      console.log(`  ✅ Diploma stored with id ${storedId}, URL: ${permanentUrl}`);
+      // Also attach as FILE-type UF in Bitrix
+      bitrixFileAttachments.push({ ufCode: 'UF_CRM_1752244192', filename: dipBuf.filename, mimetype: dipBuf.mimetype, buffer: dipBuf.buffer });
+      console.log(`  ✅ Diploma stored with id ${storedId}, URL: ${permanentUrl} and queued for Bitrix file attach`);
     } else {
       const fallbackUrl = await convertTelegramFileIdToUrl(diplomaFileId, 'diploma');
       contactFields.UF_CRM_1752621831 = fallbackUrl;
@@ -385,7 +392,9 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
         const url = buildPublicFileUrl(storedId);
         contactFields.UF_CRM_1752621857 = url; // Voice field permanent URL
         contactFields.UF_CRM_1752241370 = `Voice answer: ${url}`; // Text field with URL
-        console.log(`  ✅ Q1 stored with id ${storedId}, URL: ${url}`);
+        // Also attach to Bitrix as FILE-type UF
+        bitrixFileAttachments.push({ ufCode: 'UF_CRM_1752621857', filename: q1Buf.filename, mimetype: q1Buf.mimetype, buffer: q1Buf.buffer });
+        console.log(`  ✅ Q1 stored with id ${storedId}, URL: ${url} and queued for Bitrix file attach`);
       } else {
         const q1Url = await convertTelegramFileIdToUrl(phase2_q1, 'phase2_q1');
         contactFields.UF_CRM_1752621857 = q1Url;
@@ -408,7 +417,9 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
         const url = buildPublicFileUrl(storedId);
         contactFields.UF_CRM_1752621874 = url; // Voice field permanent URL
         contactFields.UF_CRM_1752241378 = `Voice answer: ${url}`; // Text field with URL
-        console.log(`  ✅ Q2 stored with id ${storedId}, URL: ${url}`);
+        // Also attach to Bitrix as FILE-type UF
+        bitrixFileAttachments.push({ ufCode: 'UF_CRM_1752621874', filename: q2Buf.filename, mimetype: q2Buf.mimetype, buffer: q2Buf.buffer });
+        console.log(`  ✅ Q2 stored with id ${storedId}, URL: ${url} and queued for Bitrix file attach`);
       } else {
         const q2Url = await convertTelegramFileIdToUrl(phase2_q2, 'phase2_q2');
         contactFields.UF_CRM_1752621874 = q2Url;
@@ -431,7 +442,9 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
         const url = buildPublicFileUrl(storedId);
         contactFields.UF_CRM_1752621887 = url; // Voice field permanent URL
         contactFields.UF_CRM_1752241386 = `Voice answer: ${url}`; // Text field with URL
-        console.log(`  ✅ Q3 stored with id ${storedId}, URL: ${url}`);
+        // Also attach to Bitrix as FILE-type UF
+        bitrixFileAttachments.push({ ufCode: 'UF_CRM_1752621887', filename: q3Buf.filename, mimetype: q3Buf.mimetype, buffer: q3Buf.buffer });
+        console.log(`  ✅ Q3 stored with id ${storedId}, URL: ${url} and queued for Bitrix file attach`);
       } else {
         const q3Url = await convertTelegramFileIdToUrl(phase2_q3, 'phase2_q3');
         contactFields.UF_CRM_1752621887 = q3Url;
@@ -462,8 +475,10 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  ${isEmpty ? '⚪' : '✅'} ${key}: ${JSON.stringify(value)}`);
   });
 
-  // Build attachment list for Bitrix file-type fields (phase2 voice answers)
-  const bitrixFileAttachments: Array<{ ufCode: string; filename: string; mimetype: string; buffer: Buffer }> = [];
+  // Compute whether we will use multipart for Bitrix (if any attachments queued)
+  const hasFileUploads = bitrixFileAttachments.length > 0;
+
+  // Create JSON payload for contact when no file uploads
   if (typeof contactFields.UF_CRM_1752621857 === 'string' && contactFields.UF_CRM_1752621857.startsWith('http')) {
     // URL already set; keep it in text field. File will be added only if we downloaded earlier.
   }
