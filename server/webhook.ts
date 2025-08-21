@@ -3,7 +3,6 @@ import axiosDefault from 'axios';
 import FormDataClass from 'form-data';
 import fs from 'fs';
 import path from 'path';
-import { TelegramFileStorage } from './services/fileStorage.js';
 
 const axios = axiosDefault;
 const FormData = FormDataClass;
@@ -17,11 +16,6 @@ const TELEGRAM_BOT_TOKEN = '7191717059:AAHIlA-fAxxzlwYEnse3vSBlQLH_4ozhPTY';
 function getBotToken() {
   return TELEGRAM_BOT_TOKEN;
 }
-
-// Initialize Telegram File Storage with bot token
-TelegramFileStorage.setBotToken(TELEGRAM_BOT_TOKEN);
-
-console.log('🔧 [WEBHOOK-INIT] Permanent file storage system initialized');
 
 function normalizePhone(phone: string): string {
   if (!phone) return '';
@@ -185,6 +179,34 @@ async function findDealIdByContact(contactId: string): Promise<string | null> {
   }
 }
 
+async function downloadTelegramFileToBuffer(fileId: string): Promise<{ buffer: Buffer; filename: string; mimetype: string } | null> {
+  const botToken = getBotToken();
+  if (!botToken) return null;
+  const info = await getTelegramFileInfo(fileId);
+  if (!info) return null;
+  const downloadUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${info.file_path}`;
+  const resp = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
+  const guessedExt = path.extname(info.file_path) || '';
+  // naive mime guess by extension
+  const ext = guessedExt.toLowerCase();
+  const mime = ext === '.ogg' ? 'audio/ogg' : ext === '.pdf' ? 'application/pdf' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : ext === '.png' ? 'image/png' : 'application/octet-stream';
+  const baseName = path.basename(info.file_path);
+  return { buffer: Buffer.from(resp.data), filename: baseName, mimetype: mime };
+}
+
+async function saveBufferAsStoredFile(filename: string, mimetype: string, buffer: Buffer): Promise<number> {
+  const result = await pool.query(
+    'INSERT INTO stored_files (filename, mimetype, size, data) VALUES ($1, $2, $3, $4) RETURNING id',
+    [filename, mimetype, buffer.length, buffer]
+  );
+  return result.rows[0].id as number;
+}
+
+function buildPublicFileUrl(id: number): string {
+  const baseUrl = process.env.PUBLIC_BASE_URL || 'https://career.millatumidi.uz';
+  return `${baseUrl}/files/${id}`;
+}
+
 export async function processWebhookData(data: any): Promise<{ message: string; contactId: string; dealId: string }> {
   console.log('🔄 [WEBHOOK-PROCESSING] STARTING DATA PROCESSING');
   console.log('='.repeat(80));
@@ -289,6 +311,9 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  ❌ No valid phone number found. Raw: ${JSON.stringify(cleanedData.phone_number_uzbek)}`);
   }
 
+  // Prepare collection for Bitrix file attachments (buffers)
+  const bitrixFileAttachments: Array<{ ufCode: string; filename: string; mimetype: string; buffer: Buffer }> = [];
+
   // Handle file fields with Telegram download - INLINE PROCESSING
   console.log('');
   console.log('📎 [WEBHOOK-PROCESSING] FILE FIELDS PROCESSING WITH TELEGRAM DOWNLOAD:');
@@ -297,7 +322,6 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   
   console.log(`  - Resume field: ${JSON.stringify(resumeFileId)}`);
   console.log(`  - Diploma field: ${JSON.stringify(diplomaFileId)}`);
-  
   // Process resume file directly - DOWNLOAD AND SAVE TO SERVER
   if (resumeFileId && isTelegramFileId(resumeFileId)) {
     console.log(`  📥 Downloading resume file to server...`);
@@ -308,7 +332,6 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     contactFields.UF_CRM_1752621810 = resumeFileId || '';
     console.log(`  ⚪ Resume kept as-is: ${resumeFileId}`);
   }
-  
   // Process diploma file directly - DOWNLOAD AND SAVE TO SERVER
   if (diplomaFileId && isTelegramFileId(diplomaFileId)) {
     console.log(`  📥 Downloading diploma file to server...`);
@@ -391,14 +414,16 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  ${isEmpty ? '⚪' : '✅'} ${key}: ${JSON.stringify(value)}`);
   });
 
-  // Create JSON payload for contact - Bitrix24 works better with JSON than FormData
+  // We're using file URLs now, not buffer attachments
+  const hasFileUploads = false;
+
+  // Create JSON payload for contact when no file uploads
   const contactPayload = {
     fields: contactFields
   };
   
   console.log('');
-  console.log('📤 [WEBHOOK-PROCESSING] COMPLETE BITRIX24 PAYLOAD:');
-  console.log(JSON.stringify(contactPayload, null, 2));
+  console.log('📤 [WEBHOOK-PROCESSING] COMPLETE BITRIX24 PAYLOAD:', JSON.stringify(contactPayload));
 
   // Check for existing contact
   console.log('');
@@ -442,7 +467,6 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
       contactId = createResp.data.result;
       console.log(`  ✅ New contact created with ID: ${contactId}`);
     } else {
-      console.log('  ❌ Contact creation failed - no result ID returned');
       throw new Error('Failed to create contact in Bitrix24');
     }
   }
