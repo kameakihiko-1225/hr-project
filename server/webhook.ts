@@ -3,6 +3,7 @@ import axiosDefault from 'axios';
 import FormDataClass from 'form-data';
 import fs from 'fs';
 import path from 'path';
+import { pool } from './db';
 
 const axios = axiosDefault;
 const FormData = FormDataClass;
@@ -184,6 +185,34 @@ async function findDealIdByContact(contactId: string): Promise<string | null> {
   }
 }
 
+async function downloadTelegramFileToBuffer(fileId: string): Promise<{ buffer: Buffer; filename: string; mimetype: string } | null> {
+  const botToken = getBotToken();
+  if (!botToken) return null;
+  const info = await getTelegramFileInfo(fileId);
+  if (!info) return null;
+  const downloadUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${info.file_path}`;
+  const resp = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
+  const guessedExt = path.extname(info.file_path) || '';
+  // naive mime guess by extension
+  const ext = guessedExt.toLowerCase();
+  const mime = ext === '.ogg' ? 'audio/ogg' : ext === '.pdf' ? 'application/pdf' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : ext === '.png' ? 'image/png' : 'application/octet-stream';
+  const baseName = path.basename(info.file_path);
+  return { buffer: Buffer.from(resp.data), filename: baseName, mimetype: mime };
+}
+
+async function saveBufferAsStoredFile(filename: string, mimetype: string, buffer: Buffer): Promise<number> {
+  const result = await pool.query(
+    'INSERT INTO stored_files (filename, mimetype, size, data) VALUES ($1, $2, $3, $4) RETURNING id',
+    [filename, mimetype, buffer.length, buffer]
+  );
+  return result.rows[0].id as number;
+}
+
+function buildPublicFileUrl(id: number): string {
+  const baseUrl = process.env.PUBLIC_BASE_URL || 'https://career.millatumidi.uz';
+  return `${baseUrl}/files/${id}`;
+}
+
 export async function processWebhookData(data: any): Promise<{ message: string; contactId: string; dealId: string }> {
   console.log('🔄 [WEBHOOK-PROCESSING] STARTING DATA PROCESSING');
   console.log('='.repeat(80));
@@ -297,23 +326,39 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   console.log(`  - Resume field: ${JSON.stringify(resumeFileId)}`);
   console.log(`  - Diploma field: ${JSON.stringify(diplomaFileId)}`);
   
-  // Process resume file directly
+  // Process resume file: download from Telegram, store in Postgres, use permanent URL
   if (resumeFileId && isTelegramFileId(resumeFileId)) {
-    console.log(`  🔄 Converting resume file ID...`);
-    const resumeUrl = await convertTelegramFileIdToUrl(resumeFileId, 'resume');
-    contactFields.UF_CRM_1752621810 = resumeUrl;
-    console.log(`  ✅ Resume URL set: ${resumeUrl}`);
+    console.log(`  🔄 Downloading & storing resume file...`);
+    const resBuf = await downloadTelegramFileToBuffer(resumeFileId);
+    if (resBuf) {
+      const storedId = await saveBufferAsStoredFile(resBuf.filename, resBuf.mimetype, resBuf.buffer);
+      const permanentUrl = buildPublicFileUrl(storedId);
+      contactFields.UF_CRM_1752621810 = permanentUrl;
+      console.log(`  ✅ Resume stored with id ${storedId}, URL: ${permanentUrl}`);
+    } else {
+      const fallbackUrl = await convertTelegramFileIdToUrl(resumeFileId, 'resume');
+      contactFields.UF_CRM_1752621810 = fallbackUrl;
+      console.log(`  ⚠️ Resume fallback to Telegram URL: ${fallbackUrl}`);
+    }
   } else {
     contactFields.UF_CRM_1752621810 = resumeFileId || '';
     console.log(`  ⚪ Resume kept as-is: ${resumeFileId}`);
   }
   
-  // Process diploma file directly  
+  // Process diploma file similarly
   if (diplomaFileId && isTelegramFileId(diplomaFileId)) {
-    console.log(`  🔄 Converting diploma file ID...`);
-    const diplomaUrl = await convertTelegramFileIdToUrl(diplomaFileId, 'diploma');
-    contactFields.UF_CRM_1752621831 = diplomaUrl;
-    console.log(`  ✅ Diploma URL set: ${diplomaUrl}`);
+    console.log(`  🔄 Downloading & storing diploma file...`);
+    const dipBuf = await downloadTelegramFileToBuffer(diplomaFileId);
+    if (dipBuf) {
+      const storedId = await saveBufferAsStoredFile(dipBuf.filename, dipBuf.mimetype, dipBuf.buffer);
+      const permanentUrl = buildPublicFileUrl(storedId);
+      contactFields.UF_CRM_1752621831 = permanentUrl;
+      console.log(`  ✅ Diploma stored with id ${storedId}, URL: ${permanentUrl}`);
+    } else {
+      const fallbackUrl = await convertTelegramFileIdToUrl(diplomaFileId, 'diploma');
+      contactFields.UF_CRM_1752621831 = fallbackUrl;
+      console.log(`  ⚠️ Diploma fallback to Telegram URL: ${fallbackUrl}`);
+    }
   } else {
     contactFields.UF_CRM_1752621831 = diplomaFileId || '';
     console.log(`  ⚪ Diploma kept as-is: ${diplomaFileId}`);
@@ -333,11 +378,20 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   // Process Q1 - check if it's a file ID or text
   if (phase2_q1) {
     if (isTelegramFileId(phase2_q1)) {
-      console.log(`  🎧 Q1 is file ID, converting to URL...`);
-      const q1Url = await convertTelegramFileIdToUrl(phase2_q1, 'phase2_q1');
-      contactFields.UF_CRM_1752621857 = q1Url; // Voice field
-      contactFields.UF_CRM_1752241370 = `Voice answer: ${q1Url}`; // Text field with URL
-      console.log(`  ✅ Q1 voice URL: ${q1Url}`);
+      console.log(`  🎧 Q1 is file ID, downloading & storing...`);
+      const q1Buf = await downloadTelegramFileToBuffer(phase2_q1);
+      if (q1Buf) {
+        const storedId = await saveBufferAsStoredFile(q1Buf.filename, q1Buf.mimetype, q1Buf.buffer);
+        const url = buildPublicFileUrl(storedId);
+        contactFields.UF_CRM_1752621857 = url; // Voice field permanent URL
+        contactFields.UF_CRM_1752241370 = `Voice answer: ${url}`; // Text field with URL
+        console.log(`  ✅ Q1 stored with id ${storedId}, URL: ${url}`);
+      } else {
+        const q1Url = await convertTelegramFileIdToUrl(phase2_q1, 'phase2_q1');
+        contactFields.UF_CRM_1752621857 = q1Url;
+        contactFields.UF_CRM_1752241370 = `Voice answer: ${q1Url}`;
+        console.log(`  ⚠️ Q1 fallback to Telegram URL: ${q1Url}`);
+      }
     } else {
       contactFields.UF_CRM_1752241370 = phase2_q1; // Text field
       console.log(`  ✅ Q1 text: ${phase2_q1}`);
@@ -347,11 +401,20 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   // Process Q2 - check if it's a file ID or text
   if (phase2_q2) {
     if (isTelegramFileId(phase2_q2)) {
-      console.log(`  🎧 Q2 is file ID, converting to URL...`);
-      const q2Url = await convertTelegramFileIdToUrl(phase2_q2, 'phase2_q2');
-      contactFields.UF_CRM_1752621874 = q2Url; // Voice field
-      contactFields.UF_CRM_1752241378 = `Voice answer: ${q2Url}`; // Text field with URL
-      console.log(`  ✅ Q2 voice URL: ${q2Url}`);
+      console.log(`  🎧 Q2 is file ID, downloading & storing...`);
+      const q2Buf = await downloadTelegramFileToBuffer(phase2_q2);
+      if (q2Buf) {
+        const storedId = await saveBufferAsStoredFile(q2Buf.filename, q2Buf.mimetype, q2Buf.buffer);
+        const url = buildPublicFileUrl(storedId);
+        contactFields.UF_CRM_1752621874 = url; // Voice field permanent URL
+        contactFields.UF_CRM_1752241378 = `Voice answer: ${url}`; // Text field with URL
+        console.log(`  ✅ Q2 stored with id ${storedId}, URL: ${url}`);
+      } else {
+        const q2Url = await convertTelegramFileIdToUrl(phase2_q2, 'phase2_q2');
+        contactFields.UF_CRM_1752621874 = q2Url;
+        contactFields.UF_CRM_1752241378 = `Voice answer: ${q2Url}`;
+        console.log(`  ⚠️ Q2 fallback to Telegram URL: ${q2Url}`);
+      }
     } else {
       contactFields.UF_CRM_1752241378 = phase2_q2; // Text field
       console.log(`  ✅ Q2 text: ${phase2_q2}`);
@@ -361,11 +424,20 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   // Process Q3 - check if it's a file ID or text
   if (phase2_q3) {
     if (isTelegramFileId(phase2_q3)) {
-      console.log(`  🎧 Q3 is file ID, converting to URL...`);
-      const q3Url = await convertTelegramFileIdToUrl(phase2_q3, 'phase2_q3');
-      contactFields.UF_CRM_1752621887 = q3Url; // Voice field
-      contactFields.UF_CRM_1752241386 = `Voice answer: ${q3Url}`; // Text field with URL
-      console.log(`  ✅ Q3 voice URL: ${q3Url}`);
+      console.log(`  🎧 Q3 is file ID, downloading & storing...`);
+      const q3Buf = await downloadTelegramFileToBuffer(phase2_q3);
+      if (q3Buf) {
+        const storedId = await saveBufferAsStoredFile(q3Buf.filename, q3Buf.mimetype, q3Buf.buffer);
+        const url = buildPublicFileUrl(storedId);
+        contactFields.UF_CRM_1752621887 = url; // Voice field permanent URL
+        contactFields.UF_CRM_1752241386 = `Voice answer: ${url}`; // Text field with URL
+        console.log(`  ✅ Q3 stored with id ${storedId}, URL: ${url}`);
+      } else {
+        const q3Url = await convertTelegramFileIdToUrl(phase2_q3, 'phase2_q3');
+        contactFields.UF_CRM_1752621887 = q3Url;
+        contactFields.UF_CRM_1752241386 = `Voice answer: ${q3Url}`;
+        console.log(`  ⚠️ Q3 fallback to Telegram URL: ${q3Url}`);
+      }
     } else {
       contactFields.UF_CRM_1752241386 = phase2_q3; // Text field
       console.log(`  ✅ Q3 text: ${phase2_q3}`);

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, json, bytea } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -137,6 +137,16 @@ export const fileAttachments = pgTable("file_attachments", {
   filepath: text("filepath").notNull(),
   mimetype: text("mimetype").notNull(),
   size: integer("size").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Permanent file storage table (binary data stored in Postgres)
+export const storedFiles = pgTable("stored_files", {
+  id: serial("id").primaryKey(),
+  filename: text("filename").notNull(),
+  mimetype: text("mimetype").notNull(),
+  size: integer("size").notNull(),
+  data: bytea("data").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

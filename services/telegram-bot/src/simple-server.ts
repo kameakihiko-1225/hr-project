@@ -6,7 +6,8 @@ import * as FormData from 'form-data';
 const app = express();
 app.use(express.json());
 
-const BITRIX_BASE = 'https://millatumidi.bitrix24.kz/rest/21/wx0c9lt1mxcwkhz9';
+// Prefer env-provided Bitrix REST base, fallback to existing value for local dev
+const BITRIX_BASE = process.env.BITRIX_BASE || process.env.BITRIX_WEBHOOK_URL || 'https://millatumidi.bitrix24.kz/rest/21/wx0c9lt1mxcwkhz9';
 
 // Telegram file_id patterns vary by file type. Accept any file_id that starts with
 // an uppercase letter/number and is reasonably long ( > 20 chars)
@@ -173,7 +174,7 @@ app.post('/webhook', async (req, res) => {
     const resumeLink = data.resume ? (resumeResult.url || (isTelegramFileId(data.resume) ? await getTelegramFileUrl(data.resume) : null) || data.resume) : null;
     const diplomaLink = data.diploma ? (diplomaResult.url || (isTelegramFileId(data.diploma) ? await getTelegramFileUrl(data.diploma) : null) || data.diploma) : null;
 
-    // Add link fields required by Bitrix24
+    // Add link fields required by Bitrix24 (these are link-type custom fields)
     if (resumeLink) {
       contactFields['UF_CRM_1752239677'] = resumeLink; // resume link field
     }
@@ -192,23 +193,34 @@ app.post('/webhook', async (req, res) => {
       contactFields.COMMENTS = commentsParts.join('\n');
     }
 
-    // Handle Phase2 text or voice answers (store as text/link)
+    // Handle Phase2 text or voice answers
+    // If value is a Telegram file_id and we successfully downloaded a buffer, attach the file to FILE-type UF fields.
+    // Otherwise, store link or plain text in the TEXT-type fields.
     const phase2 = [
       { val: data.phase2_q_1, textField: 'UF_CRM_1752241370', fileField: 'UF_CRM_1752245274', filename: 'q1.ogg', label: 'phase2_q_1' },
       { val: data.phase2_q_2, textField: 'UF_CRM_1752241378', fileField: 'UF_CRM_1752245286', filename: 'q2.ogg', label: 'phase2_q_2' },
       { val: data.phase2_q_3, textField: 'UF_CRM_1752241386', fileField: 'UF_CRM_1752245298', filename: 'q3.ogg', label: 'phase2_q_3' },
     ];
+    const phase2Uploads: Array<{ field: string; filename: string; buffer: Buffer } > = [];
     const phase2Log: string[] = [];
+
     for (const q of phase2) {
       if (!q.val) continue;
       if (isTelegramFileId(q.val)) {
-        const link = await getTelegramFileUrl(q.val);
-        if (link) {
-          contactFields[q.textField] = link;
-          commentsParts.push(`${q.label}: ${link}`);
-          phase2Log.push(`${q.label} (file link): ${link}`);
+        const fileResult = await getFileBufferFromTelegram(q.val, q.label);
+        if (fileResult.buffer) {
+          // Queue file upload to FILE-type UF field
+          phase2Uploads.push({ field: q.fileField, filename: q.filename, buffer: fileResult.buffer });
+          phase2Log.push(`${q.label} (file buffer ready): ${q.filename}`);
         } else {
-          phase2Log.push(`${q.label} file_id unresolved`);
+          // Fallback to link text field
+          const link = fileResult.url || (await getTelegramFileUrl(q.val));
+          if (link) {
+            contactFields[q.textField] = link;
+            phase2Log.push(`${q.label} (file link): ${link}`);
+          } else {
+            phase2Log.push(`${q.label} file_id unresolved`);
+          }
         }
       } else {
         contactFields[q.textField] = q.val;
@@ -217,21 +229,26 @@ app.post('/webhook', async (req, res) => {
     }
     console.log('[TELEGRAM-BOT] Phase2 answers log:', phase2Log.join(' | '));
     
-    // Prepare FormData for contact (no file buffers for resume/diploma/phase2)
+    // Prepare FormData for contact and include any phase2 file uploads
     const contactForm = new FormData();
     
     Object.entries(contactFields).forEach(([key, value]) => {
       // Stringify arrays/objects for Bitrix24
       if (Array.isArray(value) || typeof value === 'object') {
         contactForm.append(`fields[${key}]`, JSON.stringify(value));
-      } else {
-        contactForm.append(`fields[${key}]`, value || '');
+      } else if (typeof value !== 'undefined' && value !== null) {
+        contactForm.append(`fields[${key}]`, value as any);
       }
     });
+
+    // Append files for FILE-type UFs using Bitrix "fileData" convention
+    for (const f of phase2Uploads) {
+      contactForm.append(`fields[${f.field}][fileData]`, f.buffer, { filename: f.filename, contentType: 'audio/ogg' });
+    }
     
     contactForm.append('params[REGISTER_SONET_EVENT]', 'Y');
     // Log outgoing FormData fields
-    console.log('[TELEGRAM-BOT] Contact FormData fields:', Object.keys(contactFields));
+    console.log('[TELEGRAM-BOT] Contact FormData fields:', Object.keys(contactFields), 'and', phase2Uploads.length, 'file(s)');
     
     // Check duplicate by phone and update if exists
     let contactId: number;
