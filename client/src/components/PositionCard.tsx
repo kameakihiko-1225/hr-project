@@ -50,6 +50,9 @@ export function PositionCard({
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
   const [isApplying, setIsApplying] = useState(false);
+  
+  // Debug logging
+  console.log('PositionCard language:', i18n.language, 'company_info translation:', t('company_info'));
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
