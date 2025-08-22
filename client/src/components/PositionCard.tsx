@@ -176,73 +176,78 @@ export function PositionCard({
 
   return (
     <>
-    <Card className="group relative h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-      {/* Top tier badge */}
-      {topTierBadge > 0 && (
-        <div className="absolute top-3 left-3 z-10">
-          <Badge className="bg-orange-500 text-white text-xs px-2 py-1 rounded-md font-medium">
-            #{topTierBadge}
-          </Badge>
-        </div>
-      )}
+    <Card 
+      className="relative w-full max-w-sm mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200"
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={showCardInteraction ? 0 : -1}
+    >
+      {/* Header with badges */}
+      <div className="relative p-4 pb-2">
+        {/* Top tier badge */}
+        {topTierBadge > 0 && (
+          <div className="absolute top-3 left-3 z-10">
+            <Badge className="bg-gradient-to-r from-orange-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-medium shadow-sm">
+              ⭐ #{topTierBadge}
+            </Badge>
+          </div>
+        )}
 
-      {/* Applicant count badge */}
-      {applicantCount > 0 && (
-        <div className="absolute top-3 right-3 z-10">
-          <Badge variant="secondary" className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 text-xs px-2 py-1 rounded-md">
-            <Users className="w-3 h-3 mr-1" />
-            {applicantCount} applicants
-          </Badge>
-        </div>
-      )}
+        {/* Applicant count badge */}
+        {applicantCount > 0 && (
+          <div className="absolute top-3 right-3 z-10">
+            <Badge className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium">
+              <Users className="w-3 h-3 mr-1" />
+              {applicantCount} applicants
+            </Badge>
+          </div>
+        )}
 
-      <div className="p-6 space-y-4">
         {/* Company Logo */}
-        <div className="flex justify-center">
-          <Avatar className="w-16 h-16 border border-gray-200 dark:border-gray-700">
+        <div className="flex justify-start mt-8">
+          <Avatar className="w-12 h-12 border border-gray-200">
             <AvatarImage 
               src={inheritedData.logoUrl || undefined} 
               alt={`${inheritedData.companyName} logo`}
-              className="object-cover"
+              className="object-contain p-1"
             />
             <AvatarFallback 
-              className="text-lg font-medium bg-gray-100 dark:bg-gray-800"
+              className="text-sm font-medium bg-gray-100"
               style={{ backgroundColor: inheritedData.companyColor + '20', color: inheritedData.companyColor }}
             >
               {logoFallback}
             </AvatarFallback>
           </Avatar>
         </div>
+      </div>
 
+      {/* Content */}
+      <div className="px-4 pb-4 space-y-3">
         {/* Company Name */}
-        <div className="text-center">
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{inheritedData.companyName}</h4>
-        </div>
+        <h4 className="text-lg font-semibold text-gray-900 leading-tight">
+          {inheritedData.companyName}
+        </h4>
 
         {/* Position Title */}
-        <div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            {getLocalizedContent(position.title, i18n.language as 'en' | 'ru' | 'uz')}
-          </h3>
-        </div>
+        <h3 className="text-xl font-bold text-gray-900 leading-tight">
+          {getLocalizedContent(position.title, i18n.language as 'en' | 'ru' | 'uz')}
+        </h3>
 
         {/* Description */}
-        {inheritedData.description && (
-          <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 leading-relaxed">
-            {inheritedData.description}
-          </p>
-        )}
+        <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">
+          {inheritedData.description || getLocalizedContent(position.description, i18n.language as 'en' | 'ru' | 'uz')}
+        </p>
 
         {/* Salary */}
         {position.salaryRange && (
-          <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-1 text-sm text-gray-700">
             <DollarSign className="w-4 h-4" />
-            <span>{getLocalizedContent(position.salaryRange, i18n.language as 'en' | 'ru' | 'uz')}</span>
+            <span className="font-medium">{getLocalizedContent(position.salaryRange, i18n.language as 'en' | 'ru' | 'uz')}</span>
           </div>
         )}
 
         {/* Location and Employment Type */}
-        <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-4 text-sm text-gray-500">
           {(inheritedData.city || inheritedData.country) && (
             <div className="flex items-center gap-1">
               <MapPin className="w-4 h-4" />
@@ -259,17 +264,17 @@ export function PositionCard({
         </div>
 
         {/* Time posted */}
-        <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-center text-xs text-gray-500 pt-2 border-t border-gray-100">
           <Calendar className="w-3 h-3 mr-1" />
-          <span>{formattedDate}</span>
+          <span>about {formattedDate}</span>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex space-x-2 pt-2">
+        <div className="flex gap-2 pt-2">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 text-xs h-8"
+            className="flex-1 text-xs h-8 border-gray-300"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
@@ -281,7 +286,7 @@ export function PositionCard({
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 text-xs h-8"
+            className="flex-1 text-xs h-8 border-gray-300"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
@@ -293,7 +298,7 @@ export function PositionCard({
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 text-xs h-8"
+            className="flex-1 text-xs h-8 border-gray-300"
             onClick={(e) => {
               e.stopPropagation();
               if (onClick) onClick();
@@ -308,7 +313,7 @@ export function PositionCard({
           <Button
             onClick={handleApplyClick}
             disabled={isApplying}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md transition-colors duration-200 font-medium"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium mt-3"
           >
             {isApplying ? (
               <>
