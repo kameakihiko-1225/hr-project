@@ -175,8 +175,8 @@ export function PositionCard({
       {/* Top tier badge */}
       {topTierBadge > 0 && (
         <div className="absolute top-3 left-3 z-10">
-          <Badge className="bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
-            🏆 #{topTierBadge}
+          <Badge className="bg-orange-500 text-white text-xs px-2 py-1 rounded-md font-medium">
+            #{topTierBadge}
           </Badge>
         </div>
       )}
@@ -184,7 +184,7 @@ export function PositionCard({
       {/* Applicant count badge */}
       {applicantCount > 0 && (
         <div className="absolute top-3 right-3 z-10">
-          <Badge variant="secondary" className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 text-xs px-2 py-1 rounded-full">
+          <Badge variant="secondary" className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 text-xs px-2 py-1 rounded-md">
             <Users className="w-3 h-3 mr-1" />
             {applicantCount} applicants
           </Badge>
@@ -192,24 +192,26 @@ export function PositionCard({
       )}
 
       <div className="p-6 space-y-4">
-        {/* Company Logo and Name */}
-        <div className="flex items-center space-x-3">
-          <Avatar className="w-12 h-12 border border-gray-200 dark:border-gray-700">
+        {/* Company Logo */}
+        <div className="flex justify-center">
+          <Avatar className="w-16 h-16 border border-gray-200 dark:border-gray-700">
             <AvatarImage 
               src={inheritedData.logoUrl || undefined} 
               alt={`${inheritedData.companyName} logo`}
               className="object-cover"
             />
             <AvatarFallback 
-              className="text-sm font-medium bg-gray-100 dark:bg-gray-800"
+              className="text-lg font-medium bg-gray-100 dark:bg-gray-800"
               style={{ backgroundColor: inheritedData.companyColor + '20', color: inheritedData.companyColor }}
             >
               {logoFallback}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <h4 className="font-medium text-gray-900 dark:text-gray-100">{inheritedData.companyName}</h4>
-          </div>
+        </div>
+
+        {/* Company Name */}
+        <div className="text-center">
+          <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{inheritedData.companyName}</h4>
         </div>
 
         {/* Position Title */}
@@ -277,6 +279,7 @@ export function PositionCard({
               // Handle department info click
             }}
           >
+            <Building2 className="w-3 h-3 mr-1" />
             Bo'lim haq...
           </Button>
           <Button
