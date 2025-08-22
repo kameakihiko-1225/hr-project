@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { getLocalizedContent, type LocalizedContent } from "@shared/schema";
 import { CompanyInfoModal } from "@/components/CompanyInfoModal";
 import { DepartmentInfoModal } from "@/components/DepartmentInfoModal";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { 
   positions,
   companies,
@@ -51,6 +52,7 @@ export function PositionCard({
   const [isApplying, setIsApplying] = useState(false);
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   // Helper to get company data - prioritize passed companyFromAPI over position.company
   const getCompanyData = () => companyFromAPI || position.company;
@@ -301,7 +303,7 @@ export function PositionCard({
             className="flex-1 text-xs h-8 border-gray-300"
             onClick={(e) => {
               e.stopPropagation();
-              if (onClick) onClick();
+              setIsDetailsModalOpen(true);
             }}
           >
             Batafsil
@@ -330,18 +332,119 @@ export function PositionCard({
 
     {/* Company Modal */}
     <CompanyInfoModal
-      company={getCompanyData()}
+      company={getCompanyData() || null}
       isOpen={isCompanyModalOpen}
       onClose={() => setIsCompanyModalOpen(false)}
     />
 
     {/* Department Modal */}
     <DepartmentInfoModal
-      department={getDepartmentData()}
-      company={getCompanyData()}
+      department={getDepartmentData() || null}
+      company={getCompanyData() || null}
       isOpen={isDepartmentModalOpen}
       onClose={() => setIsDepartmentModalOpen(false)}
     />
+
+    {/* Position Details Modal */}
+    <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
+      <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-3">
+            {inheritedData.logoUrl && (
+              <Avatar className="w-12 h-12">
+                <AvatarImage 
+                  src={inheritedData.logoUrl} 
+                  alt={`${inheritedData.companyName} logo`}
+                  className="object-contain p-1"
+                />
+                <AvatarFallback>{logoFallback}</AvatarFallback>
+              </Avatar>
+            )}
+            <div>
+              <h2 className="text-xl font-bold">
+                {getLocalizedContent(position.title, i18n.language as 'en' | 'ru' | 'uz')}
+              </h2>
+              <p className="text-sm text-muted-foreground">{inheritedData.companyName}</p>
+            </div>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6 mt-4">
+          {/* Position Description */}
+          <div>
+            <h3 className="font-semibold mb-2">Job Description</h3>
+            <p className="text-sm text-muted-foreground whitespace-pre-line">
+              {inheritedData.description || getLocalizedContent(position.description, i18n.language as 'en' | 'ru' | 'uz')}
+            </p>
+          </div>
+
+          {/* Job Details */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {position.salaryRange && (
+              <div>
+                <h4 className="font-medium flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  Salary
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  {getLocalizedContent(position.salaryRange, i18n.language as 'en' | 'ru' | 'uz')}
+                </p>
+              </div>
+            )}
+
+            {position.employmentType && (
+              <div>
+                <h4 className="font-medium flex items-center gap-2">
+                  <Briefcase className="w-4 h-4" />
+                  Employment Type
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  {getLocalizedContent(position.employmentType, i18n.language as 'en' | 'ru' | 'uz')}
+                </p>
+              </div>
+            )}
+
+            {(inheritedData.city || inheritedData.country) && (
+              <div>
+                <h4 className="font-medium flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  Location
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  {[inheritedData.city, inheritedData.country].filter(Boolean).join(', ')}
+                </p>
+              </div>
+            )}
+
+            <div>
+              <h4 className="font-medium flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Posted
+              </h4>
+              <p className="text-sm text-muted-foreground">{formattedDate}</p>
+            </div>
+          </div>
+
+          {/* Apply Button */}
+          <div className="pt-4 border-t">
+            <Button
+              onClick={handleApplyClick}
+              disabled={isApplying}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium"
+            >
+              {isApplying ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t('applying')}
+                </>
+              ) : (
+                'Hozir ariza topshirish'
+              )}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   </>
   );
 }
