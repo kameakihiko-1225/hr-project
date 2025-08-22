@@ -174,116 +174,87 @@ export function PositionCard({
     <Card 
       className={`group relative h-full transition-all duration-300 hover:shadow-lg hover:border-primary/20 ${
         showCardInteraction ? 'cursor-pointer' : ''
-      } bg-gradient-to-br from-background to-background/80 border-border/50`}
+      } bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg`}
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       tabIndex={showCardInteraction ? 0 : -1}
       role={showCardInteraction ? "button" : undefined}
       aria-label={showCardInteraction ? `View details for ${getLocalizedContent(position.title, i18n.language as 'en' | 'ru' | 'uz')} position` : undefined}
     >
-      {/* Top tier badge */}
-      {topTierBadge > 0 && (
-        <div className="absolute -top-2 -right-2 z-10">
-          <Badge 
-            variant="secondary" 
-            className={`
-              ${topTierBadge === 1 
-                ? 'bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-100' 
-                : topTierBadge === 2 
-                ? 'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900 dark:text-orange-100'
-                : 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900 dark:text-red-100'
-              } 
-              px-2 py-1 text-xs font-medium shadow-sm
-            `}
-          >
-            {topTierBadge === 1 ? '🥉' : topTierBadge === 2 ? '🥈' : '🥇'} Top Tier
-          </Badge>
-        </div>
-      )}
-
       {/* Applicant count badge */}
       {applicantCount > 0 && (
         <div className="absolute top-3 left-3 z-10">
-          <Badge variant="outline" className="bg-background/80 backdrop-blur-sm text-xs">
+          <Badge variant="outline" className="bg-gray-50 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600">
             <Users className="w-3 h-3 mr-1" />
             {applicantCount} {applicantCount === 1 ? 'applicant' : 'applicants'}
           </Badge>
         </div>
       )}
 
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
-              {getLocalizedContent(position.title, i18n.language as 'en' | 'ru' | 'uz')}
-            </h3>
-            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Building2 className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{inheritedData.companyName}</span>
-              </div>
-              {inheritedData.departmentName && (
-                <>
-                  <span>•</span>
-                  <span className="truncate">{inheritedData.departmentName}</span>
-                </>
-              )}
-            </div>
-          </div>
-          
-          <Avatar className="w-12 h-12 border-2 border-background shadow-sm flex-shrink-0">
-            <AvatarImage 
-              src={inheritedData.logoUrl || undefined} 
-              alt={`${inheritedData.companyName} logo`}
-              className="object-cover"
-            />
-            <AvatarFallback 
-              className="text-sm font-medium"
-              style={{ backgroundColor: inheritedData.companyColor + '20', color: inheritedData.companyColor }}
-            >
-              {logoFallback}
-            </AvatarFallback>
-          </Avatar>
+      {/* Top tier badge */}
+      {topTierBadge > 0 && (
+        <div className="absolute top-3 right-3 z-10">
+          <Badge 
+            className="bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-100 px-2 py-1 text-xs font-medium shadow-sm"
+          >
+            🏆 Top Tier
+          </Badge>
         </div>
-      </CardHeader>
+      )}
 
-      <CardContent className="pb-4">
+      <CardContent className="p-4">
+        {/* Position Title */}
+        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">
+          {getLocalizedContent(position.title, i18n.language as 'en' | 'ru' | 'uz')}
+        </h3>
+
+        {/* Company and Department Info */}
+        <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mb-3">
+          <Building2 className="w-4 h-4" />
+          <span>{inheritedData.companyName}</span>
+          {inheritedData.departmentName && (
+            <>
+              <span>•</span>
+              <span>{inheritedData.departmentName}</span>
+            </>
+          )}
+        </div>
+
+        {/* Description */}
         {inheritedData.description && (
-          <p className="text-sm text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
             {inheritedData.description}
           </p>
         )}
-        
-        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+
+        {/* Location and other details */}
+        <div className="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
           {(inheritedData.city || inheritedData.country) && (
             <div className="flex items-center gap-1">
-              <MapPin className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate">
-                {[inheritedData.city, inheritedData.country].filter(Boolean).join(', ')}
-              </span>
+              <MapPin className="w-3 h-3" />
+              <span>{[inheritedData.city, inheritedData.country].filter(Boolean).join(', ')}</span>
             </div>
           )}
           
           <div className="flex items-center gap-1">
-            <Calendar className="w-3 h-3 flex-shrink-0" />
+            <Calendar className="w-3 h-3" />
             <span>{formattedDate}</span>
           </div>
           
           {position.employmentType && (
             <div className="flex items-center gap-1">
-              <Briefcase className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate">{getLocalizedContent(position.employmentType, i18n.language as 'en' | 'ru' | 'uz')}</span>
+              <Briefcase className="w-3 h-3" />
+              <span>{getLocalizedContent(position.employmentType, i18n.language as 'en' | 'ru' | 'uz')}</span>
             </div>
           )}
         </div>
-      </CardContent>
 
-      {showApplyButton && (
-        <CardFooter className="pt-0">
+        {/* Apply Button */}
+        {showApplyButton && (
           <Button
             onClick={handleApplyClick}
             disabled={isApplying}
-            className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300"
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded-md transition-colors duration-200"
             size="sm"
           >
             {isApplying ? (
@@ -293,13 +264,23 @@ export function PositionCard({
               </>
             ) : (
               <>
-                {t('apply')}
-                <ArrowUpRight className="w-4 h-4 ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                apply
+                <ArrowUpRight className="w-4 h-4 ml-2" />
               </>
             )}
           </Button>
-        </CardFooter>
-      )}
+        )}
+
+        {/* Company Avatar in bottom right corner */}
+        <div className="absolute bottom-4 right-4">
+          <div 
+            className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white"
+            style={{ backgroundColor: inheritedData.companyColor || '#b69b83' }}
+          >
+            {logoFallback}
+          </div>
+        </div>
+      </CardContent>
     </Card>
   );
 }
