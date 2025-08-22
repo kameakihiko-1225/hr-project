@@ -171,82 +171,125 @@ export function PositionCard({
   const logoFallback = inheritedData.companyName ? inheritedData.companyName.charAt(0).toUpperCase() : 'C';
 
   return (
-    <Card 
-      className={`group relative h-full transition-all duration-300 hover:shadow-lg hover:border-primary/20 ${
-        showCardInteraction ? 'cursor-pointer' : ''
-      } bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg`}
-      onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
-      tabIndex={showCardInteraction ? 0 : -1}
-      role={showCardInteraction ? "button" : undefined}
-      aria-label={showCardInteraction ? `View details for ${getLocalizedContent(position.title, i18n.language as 'en' | 'ru' | 'uz')} position` : undefined}
-    >
-      {/* Applicant count badge */}
-      {applicantCount > 0 && (
-        <div className="absolute top-3 left-3 z-10">
-          <Badge variant="outline" className="bg-gray-50 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600">
-            <Users className="w-3 h-3 mr-1" />
-            {applicantCount} {applicantCount === 1 ? 'applicant' : 'applicants'}
-          </Badge>
-        </div>
-      )}
-
+    <Card className="group relative h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
       {/* Top tier badge */}
       {topTierBadge > 0 && (
-        <div className="absolute top-3 right-3 z-10">
-          <Badge 
-            className="bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-100 px-2 py-1 text-xs font-medium shadow-sm"
-          >
-            🏆 Top Tier
+        <div className="absolute top-3 left-3 z-10">
+          <Badge className="bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+            🏆 #{topTierBadge}
           </Badge>
         </div>
       )}
 
-      <CardContent className="p-4">
-        {/* Position Title */}
-        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">
-          {getLocalizedContent(position.title, i18n.language as 'en' | 'ru' | 'uz')}
-        </h3>
+      {/* Applicant count badge */}
+      {applicantCount > 0 && (
+        <div className="absolute top-3 right-3 z-10">
+          <Badge variant="secondary" className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 text-xs px-2 py-1 rounded-full">
+            <Users className="w-3 h-3 mr-1" />
+            {applicantCount} applicants
+          </Badge>
+        </div>
+      )}
 
-        {/* Company and Department Info */}
-        <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mb-3">
-          <Building2 className="w-4 h-4" />
-          <span>{inheritedData.companyName}</span>
-          {inheritedData.departmentName && (
-            <>
-              <span>•</span>
-              <span>{inheritedData.departmentName}</span>
-            </>
-          )}
+      <div className="p-6 space-y-4">
+        {/* Company Logo and Name */}
+        <div className="flex items-center space-x-3">
+          <Avatar className="w-12 h-12 border border-gray-200 dark:border-gray-700">
+            <AvatarImage 
+              src={inheritedData.logoUrl || undefined} 
+              alt={`${inheritedData.companyName} logo`}
+              className="object-cover"
+            />
+            <AvatarFallback 
+              className="text-sm font-medium bg-gray-100 dark:bg-gray-800"
+              style={{ backgroundColor: inheritedData.companyColor + '20', color: inheritedData.companyColor }}
+            >
+              {logoFallback}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h4 className="font-medium text-gray-900 dark:text-gray-100">{inheritedData.companyName}</h4>
+          </div>
+        </div>
+
+        {/* Position Title */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            {getLocalizedContent(position.title, i18n.language as 'en' | 'ru' | 'uz')}
+          </h3>
         </div>
 
         {/* Description */}
         {inheritedData.description && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+          <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 leading-relaxed">
             {inheritedData.description}
           </p>
         )}
 
-        {/* Location and other details */}
-        <div className="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
+        {/* Salary */}
+        <div className="flex items-center text-gray-700 dark:text-gray-300">
+          <span className="font-medium">💰 Kelishuv asosida</span>
+        </div>
+
+        {/* Location and Employment Type */}
+        <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
           {(inheritedData.city || inheritedData.country) && (
             <div className="flex items-center gap-1">
-              <MapPin className="w-3 h-3" />
+              <MapPin className="w-4 h-4" />
               <span>{[inheritedData.city, inheritedData.country].filter(Boolean).join(', ')}</span>
             </div>
           )}
           
-          <div className="flex items-center gap-1">
-            <Calendar className="w-3 h-3" />
-            <span>{formattedDate}</span>
-          </div>
-          
           {position.employmentType && (
             <div className="flex items-center gap-1">
-              <Briefcase className="w-3 h-3" />
+              <Briefcase className="w-4 h-4" />
               <span>{getLocalizedContent(position.employmentType, i18n.language as 'en' | 'ru' | 'uz')}</span>
             </div>
           )}
+        </div>
+
+        {/* Time posted */}
+        <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
+          <Calendar className="w-3 h-3 mr-1" />
+          <span>{formattedDate}</span>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex space-x-2 pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 text-xs h-8"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Handle company info click
+            }}
+          >
+            <Building2 className="w-3 h-3 mr-1" />
+            Kompaniya...
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 text-xs h-8"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Handle department info click
+            }}
+          >
+            Bo'lim haq...
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 text-xs h-8"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onClick) onClick();
+            }}
+          >
+            Batafsil
+          </Button>
         </div>
 
         {/* Apply Button */}
@@ -254,8 +297,7 @@ export function PositionCard({
           <Button
             onClick={handleApplyClick}
             disabled={isApplying}
-            className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded-md transition-colors duration-200"
-            size="sm"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md transition-colors duration-200 font-medium"
           >
             {isApplying ? (
               <>
@@ -263,24 +305,11 @@ export function PositionCard({
                 {t('applying')}
               </>
             ) : (
-              <>
-                apply
-                <ArrowUpRight className="w-4 h-4 ml-2" />
-              </>
+              'Hozir ariza topshirish'
             )}
           </Button>
         )}
-
-        {/* Company Avatar in bottom right corner */}
-        <div className="absolute bottom-4 right-4">
-          <div 
-            className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white"
-            style={{ backgroundColor: inheritedData.companyColor || '#b69b83' }}
-          >
-            {logoFallback}
-          </div>
-        </div>
-      </CardContent>
+      </div>
     </Card>
   );
 }
