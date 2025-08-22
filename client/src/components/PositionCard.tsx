@@ -182,6 +182,7 @@ export function PositionCard({
   return (
     <>
     <Card 
+      key={`position-card-${position.id}-${i18n.language}`}
       className="relative w-full max-w-sm mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200"
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
@@ -326,7 +327,7 @@ export function PositionCard({
                 {t('applying')}
               </>
             ) : (
-              'Hozir ariza topshirish'
+              t('apply_now')
             )}
           </Button>
         )}
