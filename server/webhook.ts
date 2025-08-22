@@ -128,6 +128,30 @@ async function downloadTelegramFile(fileId: string, fileName: string): Promise<s
   }
 }
 
+async function convertTelegramFileIdToPermanentUrl(fileId: string, fieldName: string, contactId?: string): Promise<string> {
+  if (!fileId || !TelegramFileStorage.isTelegramFileId(fileId)) {
+    return fileId; // Return as-is if not a valid file ID
+  }
+
+  console.log(`🔄 [PERMANENT-FILE] Processing ${fieldName}: ${fileId}`);
+  
+  try {
+    // Use the new permanent file storage system
+    const permanentUrl = await TelegramFileStorage.processFileField(fileId, fieldName, contactId);
+    
+    if (permanentUrl !== fileId) {
+      console.log(`✅ [PERMANENT-FILE] ${fieldName} converted to permanent URL: ${permanentUrl}`);
+      return permanentUrl;
+    } else {
+      console.log(`⚠️ [PERMANENT-FILE] ${fieldName} conversion failed, using original: ${fileId}`);
+      return fileId;
+    }
+
+  } catch (error: any) {
+    console.error(`❌ [PERMANENT-FILE] Error converting ${fieldName}:`, error.message);
+    return fileId; // Fallback to original ID if conversion fails
+  }
+}
 
 async function findExistingContact(phone: string): Promise<string | null> {
   if (!phone) return null;
@@ -155,6 +179,33 @@ async function findDealIdByContact(contactId: string): Promise<string | null> {
   }
 }
 
+async function downloadTelegramFileToBuffer(fileId: string): Promise<{ buffer: Buffer; filename: string; mimetype: string } | null> {
+  const botToken = getBotToken();
+  if (!botToken) return null;
+  const info = await getTelegramFileInfo(fileId);
+  if (!info) return null;
+  const downloadUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${info.file_path}`;
+  const resp = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
+  const guessedExt = path.extname(info.file_path) || '';
+  // naive mime guess by extension
+  const ext = guessedExt.toLowerCase();
+  const mime = ext === '.ogg' ? 'audio/ogg' : ext === '.pdf' ? 'application/pdf' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : ext === '.png' ? 'image/png' : 'application/octet-stream';
+  const baseName = path.basename(info.file_path);
+  return { buffer: Buffer.from(resp.data), filename: baseName, mimetype: mime };
+}
+
+async function saveBufferAsStoredFile(filename: string, mimetype: string, buffer: Buffer): Promise<number> {
+  const result = await pool.query(
+    'INSERT INTO stored_files (filename, mimetype, size, data) VALUES ($1, $2, $3, $4) RETURNING id',
+    [filename, mimetype, buffer.length, buffer]
+  );
+  return result.rows[0].id as number;
+}
+
+function buildPublicFileUrl(id: number): string {
+  const baseUrl = process.env.PUBLIC_BASE_URL || 'https://career.millatumidi.uz';
+  return `${baseUrl}/files/${id}`;
+}
 
 export async function processWebhookData(data: any): Promise<{ message: string; contactId: string; dealId: string }> {
   console.log('🔄 [WEBHOOK-PROCESSING] STARTING DATA PROCESSING');
