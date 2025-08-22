@@ -184,17 +184,23 @@ export function PositionCard({
     <>
     <Card 
       key={`position-card-${position.id}-${i18n.language}`}
-      className="group relative overflow-hidden w-full max-w-full sm:max-w-sm mx-auto bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300"
-      onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
-      tabIndex={showCardInteraction ? 0 : -1}
+      className="relative overflow-hidden w-full max-w-full sm:max-w-sm mx-auto bg-white rounded-xl border border-gray-200 shadow-sm"
     >
-      {/* glass reflection */}
-      <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      {/* gradient ring on hover */}
-      <span className="absolute inset-0 rounded-[inherit] bg-gradient-to-br from-blue-600/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-      {/* Header with badges */}
-      <div className="relative p-4 pb-2">
+      {/* Clickable Top Section */}
+      <div
+        className="relative p-4 pb-2 cursor-pointer group"
+        onClick={handleCardClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={showCardInteraction ? 0 : -1}
+        role={showCardInteraction ? 'button' : undefined}
+        aria-label={showCardInteraction ? `View details for ${getLocalizedContent(position.title, i18n.language as 'en' | 'ru' | 'uz')}` : undefined}
+      >
+        {/* glass reflection on hover (top only) */}
+        <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-t-[inherit]" />
+        {/* gradient ring on hover (top only) */}
+        <span className="absolute inset-0 rounded-[inherit] bg-gradient-to-br from-blue-600/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+        {/* Header with badges */}
+        <div className="relative">
         {/* Top tier badge */}
         {topTierBadge > 0 && (
           <div className="absolute top-3 left-3 z-10">
@@ -229,6 +235,7 @@ export function PositionCard({
               {logoFallback}
             </AvatarFallback>
           </Avatar>
+        </div>
         </div>
       </div>
 
@@ -286,7 +293,7 @@ export function PositionCard({
             variant="outline"
             size="sm"
             aria-label="Open company details"
-            className="basis-[48%] sm:basis-auto flex-1 text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all"
+            className="flex-1 sm:flex-none text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all whitespace-nowrap px-3"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
@@ -300,7 +307,7 @@ export function PositionCard({
             variant="outline"
             size="sm"
             aria-label="Open department details"
-            className="basis-[48%] sm:basis-auto flex-1 text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all"
+            className="flex-1 sm:flex-none text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all whitespace-nowrap px-3"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
@@ -314,7 +321,7 @@ export function PositionCard({
             variant="outline"
             size="sm"
             aria-label="Open position details"
-            className="basis-full sm:basis-auto flex-1 text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all"
+            className="flex-1 sm:flex-none text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all whitespace-nowrap px-3"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
