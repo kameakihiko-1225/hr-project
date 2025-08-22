@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Building2, Calendar, Users, Briefcase, ArrowUpRight, Loader2 } from "lucide-react";
+import { MapPin, Building2, Calendar, Users, Briefcase, ArrowUpRight, Loader2, DollarSign } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
@@ -234,9 +234,12 @@ export function PositionCard({
         )}
 
         {/* Salary */}
-        <div className="flex items-center text-gray-700 dark:text-gray-300">
-          <span className="font-medium">💰 Kelishuv asosida</span>
-        </div>
+        {position.salaryRange && (
+          <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+            <DollarSign className="w-4 h-4" />
+            <span>{getLocalizedContent(position.salaryRange, i18n.language as 'en' | 'ru' | 'uz')}</span>
+          </div>
+        )}
 
         {/* Location and Employment Type */}
         <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
