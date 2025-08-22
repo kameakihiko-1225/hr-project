@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogDescription, DialogFooter as ModalFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MapPin, Building2, Calendar, Users, Briefcase, ArrowUpRight, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
@@ -49,8 +50,11 @@ export function PositionCard({
   const [isApplying, setIsApplying] = useState(false);
 
   // Helper to get company data - prioritize passed companyFromAPI over position.company
-  const getCompanyData = () => companyFromAPI || position.company;
-  const getDepartmentData = () => departmentFromAPI || position.department;
+  const [apiCompany, setApiCompany] = useState<SelectCompany | null>(companyFromAPI || null);
+  const [apiDepartment, setApiDepartment] = useState<SelectDepartment | null>(departmentFromAPI || null);
+
+  const getCompanyData = () => apiCompany || position.company || companyFromAPI || null;
+  const getDepartmentData = () => apiDepartment || position.department || departmentFromAPI || null;
 
   const handleCardClick = (e: React.MouseEvent) => {
     if (!showCardInteraction) return;
@@ -81,6 +85,38 @@ export function PositionCard({
       }
     }
   };
+
+  // Fetch department/company if not provided
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // If department is missing but position has departmentId, fetch it
+        // @ts-ignore - position may have departmentId depending on select
+        const deptId = (position as any).departmentId || position?.department?.id;
+        if (!apiDepartment && deptId) {
+          const deptRes = await fetch(`/api/departments/${deptId}`);
+          if (deptRes.ok) {
+            const deptJson = await deptRes.json();
+            setApiDepartment(deptJson.data || null);
+            if (deptJson.data?.companyId && !apiCompany) {
+              const compRes = await fetch(`/api/companies/${deptJson.data.companyId}`);
+              if (compRes.ok) {
+                const compJson = await compRes.json();
+                setApiCompany(compJson.data || null);
+              }
+            }
+          }
+        } else if (!apiCompany && position?.company) {
+          setApiCompany(position.company);
+        }
+      } catch (e) {
+        // Non-blocking
+        console.warn('PositionCard fetch fallback failed', e);
+      }
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [position?.id]);
 
   const handleApplyClick = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
@@ -190,7 +226,7 @@ export function PositionCard({
           {applicantCount > 0 && (
             <Badge variant="outline" className="bg-white/90 text-foreground border-gray-300 shadow-sm text-xs">
               <Users className="w-3 h-3 mr-1" />
-              {applicantCount} {applicantCount === 1 ? 'applicant' : 'applicants'}
+              {applicantCount} {t('job_positions.applicants_label')}
             </Badge>
           )}
         </div>
@@ -262,24 +298,70 @@ export function PositionCard({
 
       {showApplyButton && (
         <CardFooter className="pt-0">
-          <Button
-            onClick={handleApplyClick}
-            disabled={isApplying}
-            className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300"
-            size="sm"
-          >
-            {isApplying ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {t('applying')}
-              </>
-            ) : (
-              <>
-                {t('apply')}
-                <ArrowUpRight className="w-4 h-4 ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
-              </>
-            )}
-          </Button>
+          <div className="flex w-full gap-2">
+            {/* Company info */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="flex-1" onClick={(e)=>e.stopPropagation()}>
+                  {t('position_card.company_info')}
+                </Button>
+              </DialogTrigger>
+              <DialogContent onClick={(e)=>e.stopPropagation()}>
+                <DialogHeader>
+                  <DialogTitle>{t('modals.company_info.title')}</DialogTitle>
+                  <DialogDescription>{t('modals.company_info.about')}</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-2 text-sm">
+                  <div><strong>{t('job_positions.applicants_label')}:</strong> {applicantCount}</div>
+                  <div><strong>{t('position_card.location') || 'Location'}:</strong> {[inheritedData.city, inheritedData.country].filter(Boolean).join(', ')}</div>
+                </div>
+                <ModalFooter>
+                  <Button variant="outline" onClick={(e)=>e.stopPropagation()}>{t('modals.company_info.close')}</Button>
+                </ModalFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Department info */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="flex-1" onClick={(e)=>e.stopPropagation()}>
+                  {t('position_card.department_info')}
+                </Button>
+              </DialogTrigger>
+              <DialogContent onClick={(e)=>e.stopPropagation()}>
+                <DialogHeader>
+                  <DialogTitle>{t('modals.department_info.title')}</DialogTitle>
+                  <DialogDescription>{t('modals.department_info.about_department')}</DialogDescription>
+                </DialogHeader>
+                <div className="text-sm">
+                  {inheritedData.departmentName || t('common.not_available')}
+                </div>
+                <ModalFooter>
+                  <Button variant="outline" onClick={(e)=>e.stopPropagation()}>{t('modals.department_info.close')}</Button>
+                </ModalFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Apply */}
+            <Button
+              onClick={handleApplyClick}
+              disabled={isApplying}
+              className="flex-1 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300"
+              size="sm"
+            >
+              {isApplying ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t('applying')}
+                </>
+              ) : (
+                <>
+                  {t('position_card.apply')}
+                  <ArrowUpRight className="w-4 h-4 ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                </>
+              )}
+            </Button>
+          </div>
         </CardFooter>
       )}
     </Card>

@@ -211,6 +211,8 @@
     "always_available": "Always available"
   },
 
+  "applying": "Applying…",
+
   "positions": {
     "available_positions": "Available Positions",
     "apply_instantly": "Apply instantly and get interviewed with Telegram and go to the main interviews!",
