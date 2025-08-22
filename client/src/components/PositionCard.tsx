@@ -10,6 +10,8 @@ import { formatDistanceToNow } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { getLocalizedContent, type LocalizedContent } from "@shared/schema";
+import { CompanyInfoModal } from "@/components/CompanyInfoModal";
+import { DepartmentInfoModal } from "@/components/DepartmentInfoModal";
 import type { 
   positions,
   companies,
@@ -47,6 +49,8 @@ export function PositionCard({
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
   const [isApplying, setIsApplying] = useState(false);
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+  const [isDepartmentModalOpen, setIsDepartmentModalOpen] = useState(false);
 
   // Helper to get company data - prioritize passed companyFromAPI over position.company
   const getCompanyData = () => companyFromAPI || position.company;
@@ -171,6 +175,7 @@ export function PositionCard({
   const logoFallback = inheritedData.companyName ? inheritedData.companyName.charAt(0).toUpperCase() : 'C';
 
   return (
+    <>
     <Card className="group relative h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
       {/* Top tier badge */}
       {topTierBadge > 0 && (
@@ -264,7 +269,7 @@ export function PositionCard({
             className="flex-1 text-xs h-8"
             onClick={(e) => {
               e.stopPropagation();
-              // Handle company info click
+              setIsCompanyModalOpen(true);
             }}
           >
             <Building2 className="w-3 h-3 mr-1" />
@@ -276,7 +281,7 @@ export function PositionCard({
             className="flex-1 text-xs h-8"
             onClick={(e) => {
               e.stopPropagation();
-              // Handle department info click
+              setIsDepartmentModalOpen(true);
             }}
           >
             <Building2 className="w-3 h-3 mr-1" />
@@ -314,5 +319,21 @@ export function PositionCard({
         )}
       </div>
     </Card>
+
+    {/* Company Modal */}
+    <CompanyInfoModal
+      company={getCompanyData()}
+      isOpen={isCompanyModalOpen}
+      onClose={() => setIsCompanyModalOpen(false)}
+    />
+
+    {/* Department Modal */}
+    <DepartmentInfoModal
+      department={getDepartmentData()}
+      company={getCompanyData()}
+      isOpen={isDepartmentModalOpen}
+      onClose={() => setIsDepartmentModalOpen(false)}
+    />
+  </>
   );
 }
