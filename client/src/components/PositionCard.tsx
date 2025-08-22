@@ -285,7 +285,9 @@ export function PositionCard({
           <Button
             variant="outline"
             size="sm"
+            aria-label="Open company details"
             className="basis-[48%] sm:basis-auto flex-1 text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all"
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
@@ -297,7 +299,9 @@ export function PositionCard({
           <Button
             variant="outline"
             size="sm"
+            aria-label="Open department details"
             className="basis-[48%] sm:basis-auto flex-1 text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all"
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
@@ -309,7 +313,9 @@ export function PositionCard({
           <Button
             variant="outline"
             size="sm"
+            aria-label="Open position details"
             className="basis-full sm:basis-auto flex-1 text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all"
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               setIsDetailsModalOpen(true);
@@ -322,6 +328,8 @@ export function PositionCard({
         {/* Apply Button */}
         {showApplyButton && (
           <Button
+            aria-label="Apply for position"
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={handleApplyClick}
             disabled={isApplying}
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-600/90 hover:to-indigo-600/90 text-white py-3 px-4 rounded-lg transition-all duration-200 font-medium mt-3 shadow-lg hover:shadow-[0_0_22px_rgba(79,70,229,0.45)]"
