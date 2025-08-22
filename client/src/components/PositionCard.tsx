@@ -283,7 +283,7 @@ export function PositionCard({
             }}
           >
             <Building2 className="w-3 h-3 mr-1" />
-            Kompaniya...
+            {t('company_info')}
           </Button>
           <Button
             variant="outline"
@@ -295,7 +295,7 @@ export function PositionCard({
             }}
           >
             <Building2 className="w-3 h-3 mr-1" />
-            Bo'lim haq...
+            {t('department_info')}
           </Button>
           <Button
             variant="outline"
@@ -306,7 +306,7 @@ export function PositionCard({
               setIsDetailsModalOpen(true);
             }}
           >
-            Batafsil
+            {t('position_details')}
           </Button>
         </div>
 
@@ -372,7 +372,7 @@ export function PositionCard({
         <div className="space-y-6 mt-4">
           {/* Position Description */}
           <div>
-            <h3 className="font-semibold mb-2">Job Description</h3>
+            <h3 className="font-semibold mb-2">{t('job_description')}</h3>
             <p className="text-sm text-muted-foreground whitespace-pre-line">
               {inheritedData.description || getLocalizedContent(position.description, i18n.language as 'en' | 'ru' | 'uz')}
             </p>
@@ -384,7 +384,7 @@ export function PositionCard({
               <div>
                 <h4 className="font-medium flex items-center gap-2">
                   <DollarSign className="w-4 h-4" />
-                  Salary
+                  {t('salary')}
                 </h4>
                 <p className="text-sm text-muted-foreground">
                   {getLocalizedContent(position.salaryRange, i18n.language as 'en' | 'ru' | 'uz')}
@@ -396,7 +396,7 @@ export function PositionCard({
               <div>
                 <h4 className="font-medium flex items-center gap-2">
                   <Briefcase className="w-4 h-4" />
-                  Employment Type
+                  {t('employment_type')}
                 </h4>
                 <p className="text-sm text-muted-foreground">
                   {getLocalizedContent(position.employmentType, i18n.language as 'en' | 'ru' | 'uz')}
@@ -408,7 +408,7 @@ export function PositionCard({
               <div>
                 <h4 className="font-medium flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
-                  Location
+                  {t('location')}
                 </h4>
                 <p className="text-sm text-muted-foreground">
                   {[inheritedData.city, inheritedData.country].filter(Boolean).join(', ')}
@@ -419,7 +419,7 @@ export function PositionCard({
             <div>
               <h4 className="font-medium flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                Posted
+                {t('posted')}
               </h4>
               <p className="text-sm text-muted-foreground">{formattedDate}</p>
             </div>
@@ -438,7 +438,7 @@ export function PositionCard({
                   {t('applying')}
                 </>
               ) : (
-                'Hozir ariza topshirish'
+                t('apply_now')
               )}
             </Button>
           </div>
