@@ -72,6 +72,9 @@ export function PositionCard({
       return;
     }
     
+    // Open details modal on card click
+    setIsDetailsModalOpen(true);
+
     if (onClick) {
       onClick();
     }
@@ -82,6 +85,7 @@ export function PositionCard({
     
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      setIsDetailsModalOpen(true);
       if (onClick) {
         onClick();
       }
@@ -180,11 +184,15 @@ export function PositionCard({
     <>
     <Card 
       key={`position-card-${position.id}-${i18n.language}`}
-      className="relative w-full max-w-sm mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200"
+      className="group relative overflow-hidden w-full max-w-full sm:max-w-sm mx-auto bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300"
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       tabIndex={showCardInteraction ? 0 : -1}
     >
+      {/* glass reflection */}
+      <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      {/* gradient ring on hover */}
+      <span className="absolute inset-0 rounded-[inherit] bg-gradient-to-br from-blue-600/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
       {/* Header with badges */}
       <div className="relative p-4 pb-2">
         {/* Top tier badge */}
@@ -199,7 +207,7 @@ export function PositionCard({
         {/* Applicant count badge */}
         {applicantCount > 0 && (
           <div className="absolute top-3 right-3 z-10">
-            <Badge className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium">
+            <Badge className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium shadow hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-shadow">
               <Users className="w-3 h-3 mr-1" />
               {applicantCount} {t('applicants')}
             </Badge>
@@ -208,14 +216,14 @@ export function PositionCard({
 
         {/* Company Logo */}
         <div className="flex justify-start mt-8">
-          <Avatar className="w-12 h-12 border border-gray-200">
+          <Avatar className="w-14 h-14 sm:w-16 sm:h-16 border border-gray-200 ring-2 ring-offset-2 ring-offset-background ring-blue-500/40 group-hover:ring-blue-500/70 transition-all duration-300 shadow-lg hover:shadow-[0_0_24px_rgba(59,130,246,0.35)]">
             <AvatarImage 
               src={inheritedData.logoUrl || undefined} 
               alt={`${inheritedData.companyName} logo`}
               className="object-contain p-1"
             />
             <AvatarFallback 
-              className="text-sm font-medium bg-gray-100"
+              className="text-base font-medium bg-gray-100"
               style={{ backgroundColor: inheritedData.companyColor + '20', color: inheritedData.companyColor }}
             >
               {logoFallback}
@@ -250,18 +258,18 @@ export function PositionCard({
         )}
 
         {/* Location and Employment Type */}
-        <div className="flex items-center gap-4 text-sm text-gray-500">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
           {(inheritedData.city || inheritedData.country) && (
-            <div className="flex items-center gap-1">
-              <MapPin className="w-4 h-4" />
-              <span>{[inheritedData.city, inheritedData.country].filter(Boolean).join(', ')}</span>
+            <div className="flex items-center gap-1 min-w-0">
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{[inheritedData.city, inheritedData.country].filter(Boolean).join(', ')}</span>
             </div>
           )}
           
           {position.employmentType && (
-            <div className="flex items-center gap-1">
-              <Briefcase className="w-4 h-4" />
-              <span>{getLocalizedContent(position.employmentType, i18n.language as 'en' | 'ru' | 'uz')}</span>
+            <div className="flex items-center gap-1 min-w-0">
+              <Briefcase className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{getLocalizedContent(position.employmentType, i18n.language as 'en' | 'ru' | 'uz')}</span>
             </div>
           )}
         </div>
@@ -273,11 +281,11 @@ export function PositionCard({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2 pt-2">
+        <div className="flex flex-wrap gap-2 pt-2">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 text-xs h-8 border-gray-300"
+            className="basis-[48%] sm:basis-auto flex-1 text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all"
             onClick={(e) => {
               e.stopPropagation();
               setIsCompanyModalOpen(true);
@@ -289,7 +297,7 @@ export function PositionCard({
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 text-xs h-8 border-gray-300"
+            className="basis-[48%] sm:basis-auto flex-1 text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all"
             onClick={(e) => {
               e.stopPropagation();
               setIsDepartmentModalOpen(true);
@@ -301,7 +309,7 @@ export function PositionCard({
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 text-xs h-8 border-gray-300"
+            className="basis-full sm:basis-auto flex-1 text-xs h-9 border-gray-300 hover:border-blue-300 hover:shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all"
             onClick={(e) => {
               e.stopPropagation();
               setIsDetailsModalOpen(true);
@@ -316,7 +324,7 @@ export function PositionCard({
           <Button
             onClick={handleApplyClick}
             disabled={isApplying}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors duration-200 font-medium mt-3"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-600/90 hover:to-indigo-600/90 text-white py-3 px-4 rounded-lg transition-all duration-200 font-medium mt-3 shadow-lg hover:shadow-[0_0_22px_rgba(79,70,229,0.45)]"
           >
             {isApplying ? (
               <>
@@ -352,13 +360,13 @@ export function PositionCard({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             {inheritedData.logoUrl && (
-              <Avatar className="w-12 h-12">
+              <Avatar className="w-16 h-16 ring-2 ring-offset-2 ring-offset-background ring-blue-500/40">
                 <AvatarImage 
                   src={inheritedData.logoUrl} 
                   alt={`${inheritedData.companyName} logo`}
                   className="object-contain p-1"
                 />
-                <AvatarFallback>{logoFallback}</AvatarFallback>
+                <AvatarFallback className="text-base">{logoFallback}</AvatarFallback>
               </Avatar>
             )}
             <div>
