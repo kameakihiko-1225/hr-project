@@ -357,6 +357,10 @@ export const OpenPositions = ({
                   <div className="flex gap-2 px-2 sm:gap-3 sm:px-3" style={{ width: 'max-content' }}>
                     {currentPositions.map((pos: any, index: number) => {
                       const applicantData = applicantCountMap.get(pos.id);
+                      // Find matching department and company for this position
+                      const department = departments.find((dept: any) => dept.id === pos.departmentId);
+                      const company = companies.find((comp: any) => comp.id === department?.companyId);
+                      
                       return (
                         <div 
                           key={pos.id} 
@@ -365,9 +369,10 @@ export const OpenPositions = ({
                         >
                           <PositionCard 
                             position={pos} 
+                            companyFromAPI={company}
+                            departmentFromAPI={department}
                             applicantCount={applicantData?.count}
                             topTierBadge={applicantData?.topTierBadge}
-            
                           />
                         </div>
                       );
@@ -392,10 +397,16 @@ export const OpenPositions = ({
                 <div className="hidden md:contents">
                   {currentPositions.map((pos: any, index: number) => {
                     const applicantData = applicantCountMap.get(pos.id);
+                    // Find matching department and company for this position
+                    const department = departments.find((dept: any) => dept.id === pos.departmentId);
+                    const company = companies.find((comp: any) => comp.id === department?.companyId);
+                    
                     return (
                       <div key={pos.id} style={{ animationDelay: `${index * 100}ms` }} className="animate-fade-in w-full max-w-[480px]">
                         <PositionCard 
                           position={pos} 
+                          companyFromAPI={company}
+                          departmentFromAPI={department}
                           applicantCount={applicantData?.count}
                           topTierBadge={applicantData?.topTierBadge}
                         />
