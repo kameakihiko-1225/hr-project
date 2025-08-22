@@ -128,6 +128,30 @@ async function downloadTelegramFile(fileId: string, fileName: string): Promise<s
   }
 }
 
+async function convertTelegramFileIdToPermanentUrl(fileId: string, fieldName: string, contactId?: string): Promise<string> {
+  if (!fileId || !TelegramFileStorage.isTelegramFileId(fileId)) {
+    return fileId; // Return as-is if not a valid file ID
+  }
+
+  console.log(`🔄 [PERMANENT-FILE] Processing ${fieldName}: ${fileId}`);
+  
+  try {
+    // Use the new permanent file storage system
+    const permanentUrl = await TelegramFileStorage.processFileField(fileId, fieldName, contactId);
+    
+    if (permanentUrl !== fileId) {
+      console.log(`✅ [PERMANENT-FILE] ${fieldName} converted to permanent URL: ${permanentUrl}`);
+      return permanentUrl;
+    } else {
+      console.log(`⚠️ [PERMANENT-FILE] ${fieldName} conversion failed, using original: ${fileId}`);
+      return fileId;
+    }
+
+  } catch (error: any) {
+    console.error(`❌ [PERMANENT-FILE] Error converting ${fieldName}:`, error.message);
+    return fileId; // Fallback to original ID if conversion fails
+  }
+}
 
 async function findExistingContact(phone: string): Promise<string | null> {
   if (!phone) return null;
@@ -155,6 +179,33 @@ async function findDealIdByContact(contactId: string): Promise<string | null> {
   }
 }
 
+async function downloadTelegramFileToBuffer(fileId: string): Promise<{ buffer: Buffer; filename: string; mimetype: string } | null> {
+  const botToken = getBotToken();
+  if (!botToken) return null;
+  const info = await getTelegramFileInfo(fileId);
+  if (!info) return null;
+  const downloadUrl = `${TELEGRAM_API_BASE}/file/bot${botToken}/${info.file_path}`;
+  const resp = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
+  const guessedExt = path.extname(info.file_path) || '';
+  // naive mime guess by extension
+  const ext = guessedExt.toLowerCase();
+  const mime = ext === '.ogg' ? 'audio/ogg' : ext === '.pdf' ? 'application/pdf' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : ext === '.png' ? 'image/png' : 'application/octet-stream';
+  const baseName = path.basename(info.file_path);
+  return { buffer: Buffer.from(resp.data), filename: baseName, mimetype: mime };
+}
+
+async function saveBufferAsStoredFile(filename: string, mimetype: string, buffer: Buffer): Promise<number> {
+  const result = await pool.query(
+    'INSERT INTO stored_files (filename, mimetype, size, data) VALUES ($1, $2, $3, $4) RETURNING id',
+    [filename, mimetype, buffer.length, buffer]
+  );
+  return result.rows[0].id as number;
+}
+
+function buildPublicFileUrl(id: number): string {
+  const baseUrl = process.env.PUBLIC_BASE_URL || 'https://career.millatumidi.uz';
+  return `${baseUrl}/files/${id}`;
+}
 
 export async function processWebhookData(data: any): Promise<{ message: string; contactId: string; dealId: string }> {
   console.log('🔄 [WEBHOOK-PROCESSING] STARTING DATA PROCESSING');
@@ -260,27 +311,8 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  ❌ No valid phone number found. Raw: ${JSON.stringify(cleanedData.phone_number_uzbek)}`);
   }
 
-  // Prepare collection for Bitrix file attachments (file paths on disk)
-  const bitrixFileAttachments: Array<{ ufCode: string; filePath: string; filename: string; mimetype: string }> = [];
-
-  // Helper to convert our public URL to a local file path and basic mime
-  const urlToLocalFile = (url?: string | null) => {
-    if (!url || typeof url !== 'string') return null;
-    // Only handle our telegram-files path
-    const marker = '/uploads/telegram-files/';
-    const idx = url.indexOf(marker);
-    if (idx === -1) return null;
-    const filename = url.substring(idx + marker.length);
-    const localPath = path.join(process.cwd(), 'uploads', 'telegram-files', filename);
-    const ext = path.extname(filename).toLowerCase();
-    const mimetype = ext === '.ogg' || ext === '.oga' ? 'audio/ogg'
-      : ext === '.pdf' ? 'application/pdf'
-      : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg'
-      : ext === '.png' ? 'image/png'
-      : ext === '.docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      : 'application/octet-stream';
-    return { filePath: localPath, filename, mimetype };
-  };
+  // Prepare collection for Bitrix file attachments (buffers)
+  const bitrixFileAttachments: Array<{ ufCode: string; filename: string; mimetype: string; buffer: Buffer }> = [];
 
   // Handle file fields with Telegram download - INLINE PROCESSING
   console.log('');
@@ -295,10 +327,6 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  📥 Downloading resume file to server...`);
     const resumeUrl = await downloadTelegramFile(resumeFileId, 'resume');
     contactFields.UF_CRM_1752621810 = resumeUrl || '';
-    const resumeLocal = urlToLocalFile(resumeUrl || undefined);
-    if (resumeLocal) {
-      bitrixFileAttachments.push({ ufCode: 'UF_CRM_1752244177', ...resumeLocal });
-    }
     console.log(`  ✅ Resume downloaded and saved: ${resumeUrl}`);
   } else {
     contactFields.UF_CRM_1752621810 = resumeFileId || '';
@@ -309,10 +337,6 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  📥 Downloading diploma file to server...`);
     const diplomaUrl = await downloadTelegramFile(diplomaFileId, 'diploma');
     contactFields.UF_CRM_1752621831 = diplomaUrl || '';
-    const diplomaLocal = urlToLocalFile(diplomaUrl || undefined);
-    if (diplomaLocal) {
-      bitrixFileAttachments.push({ ufCode: 'UF_CRM_1752244192', ...diplomaLocal });
-    }
     console.log(`  ✅ Diploma downloaded and saved: ${diplomaUrl}`);
   } else {
     contactFields.UF_CRM_1752621831 = diplomaFileId || '';
@@ -335,12 +359,8 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     if (isTelegramFileId(phase2_q1)) {
       console.log(`  🎧 Q1 is file ID, downloading to server...`);
       const q1Url = await downloadTelegramFile(phase2_q1, 'phase2_q1');
-      contactFields.UF_CRM_1752621857 = q1Url || ''; // Voice field (permanent URL)
+      contactFields.UF_CRM_1752621857 = q1Url || ''; // Voice field
       contactFields.UF_CRM_1752241370 = `Voice answer: ${q1Url || phase2_q1}`; // Text field with local URL
-      const q1Local = urlToLocalFile(q1Url || undefined);
-      if (q1Local) {
-        bitrixFileAttachments.push({ ufCode: 'UF_CRM_1752621857', ...q1Local });
-      }
       console.log(`  ✅ Q1 voice downloaded: ${q1Url}`);
     } else {
       contactFields.UF_CRM_1752241370 = phase2_q1; // Text field
@@ -353,12 +373,8 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     if (isTelegramFileId(phase2_q2)) {
       console.log(`  🎧 Q2 is file ID, downloading to server...`);
       const q2Url = await downloadTelegramFile(phase2_q2, 'phase2_q2');
-      contactFields.UF_CRM_1752621874 = q2Url || ''; // Voice field (permanent URL)
+      contactFields.UF_CRM_1752621874 = q2Url || ''; // Voice field
       contactFields.UF_CRM_1752241378 = `Voice answer: ${q2Url || phase2_q2}`; // Text field with local URL
-      const q2Local = urlToLocalFile(q2Url || undefined);
-      if (q2Local) {
-        bitrixFileAttachments.push({ ufCode: 'UF_CRM_1752621874', ...q2Local });
-      }
       console.log(`  ✅ Q2 voice downloaded: ${q2Url}`);
     } else {
       contactFields.UF_CRM_1752241378 = phase2_q2; // Text field
@@ -371,12 +387,8 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     if (isTelegramFileId(phase2_q3)) {
       console.log(`  🎧 Q3 is file ID, downloading to server...`);
       const q3Url = await downloadTelegramFile(phase2_q3, 'phase2_q3');
-      contactFields.UF_CRM_1752621887 = q3Url || ''; // Voice field (permanent URL)
+      contactFields.UF_CRM_1752621887 = q3Url || ''; // Voice field
       contactFields.UF_CRM_1752241386 = `Voice answer: ${q3Url || phase2_q3}`; // Text field with local URL
-      const q3Local = urlToLocalFile(q3Url || undefined);
-      if (q3Local) {
-        bitrixFileAttachments.push({ ufCode: 'UF_CRM_1752621887', ...q3Local });
-      }
       console.log(`  ✅ Q3 voice downloaded: ${q3Url}`);
     } else {
       contactFields.UF_CRM_1752241386 = phase2_q3; // Text field
@@ -402,7 +414,8 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
     console.log(`  ${isEmpty ? '⚪' : '✅'} ${key}: ${JSON.stringify(value)}`);
   });
 
-  const hasFileUploads = bitrixFileAttachments.length > 0;
+  // We're using file URLs now, not buffer attachments
+  const hasFileUploads = false;
 
   // Create JSON payload for contact when no file uploads
   const contactPayload = {
@@ -421,56 +434,40 @@ export async function processWebhookData(data: any): Promise<{ message: string; 
   if (existingContactId) {
     console.log(`  ✅ Existing contact found: ${existingContactId}`);
     console.log('  🔄 Updating existing contact...');
-
-    if (hasFileUploads) {
-      const form = new FormData();
-      form.append('id', existingContactId);
-      Object.entries(contactFields).forEach(([k, v]) => form.append(`fields[${k}]`, typeof v === 'object' ? JSON.stringify(v) : (v ?? '')));
-      for (const att of bitrixFileAttachments) {
-        try {
-          form.append(`fields[${att.ufCode}][fileData]`, fs.createReadStream(att.filePath) as any, { filename: att.filename, contentType: att.mimetype } as any);
-        } catch (e) {
-          console.warn(`[BITRIX] Skipping attachment for ${att.ufCode}, file not found: ${att.filePath}`);
-        }
-      }
-      const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, form, { headers: form.getHeaders(), timeout: 10000 });
-      console.log('  📨 Contact update response (multipart):', JSON.stringify(updateResp.data));
-    } else {
-      const updatePayload = { id: existingContactId, fields: contactFields };
-      const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, updatePayload, { headers: { 'Content-Type': 'application/json' }, timeout: 5000 });
-      console.log('  📨 Contact update response (json):', JSON.stringify(updateResp.data));
-    }
+    const updatePayload = {
+      id: existingContactId,
+      fields: contactFields
+    };
+    console.log('  📤 Update payload:', JSON.stringify(updatePayload, null, 2));
+    
+    const updateResp = await axios.post(`${BITRIX_BASE}/crm.contact.update.json`, updatePayload, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      timeout: 5000
+    });
+    console.log('  📨 Contact update response status:', updateResp.status);
+    console.log('  📨 Contact update response data:', JSON.stringify(updateResp.data, null, 2));
     contactId = existingContactId;
   } else {
     console.log('  ❌ No existing contact found');
     console.log('  ➕ Creating new contact...');
     console.log('  📤 Create payload:', JSON.stringify(contactPayload, null, 2));
     
-    if (hasFileUploads) {
-      const form = new FormData();
-      Object.entries(contactFields).forEach(([k, v]) => form.append(`fields[${k}]`, typeof v === 'object' ? JSON.stringify(v) : (v ?? '')));
-      for (const att of bitrixFileAttachments) {
-        try {
-          form.append(`fields[${att.ufCode}][fileData]`, fs.createReadStream(att.filePath) as any, { filename: att.filename, contentType: att.mimetype } as any);
-        } catch (e) {
-          console.warn(`[BITRIX] Skipping attachment for ${att.ufCode}, file not found: ${att.filePath}`);
-        }
-      }
-      const createResp = await axios.post(`${BITRIX_BASE}/crm.contact.add.json`, form, { headers: form.getHeaders(), timeout: 10000 });
-      console.log('  📨 Contact create response (multipart):', JSON.stringify(createResp.data));
-      if (createResp.data && createResp.data.result) {
-        contactId = createResp.data.result;
-      } else {
-        throw new Error('Failed to create contact in Bitrix24');
-      }
+    const createResp = await axios.post(`${BITRIX_BASE}/crm.contact.add.json`, contactPayload, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      timeout: 5000
+    });
+    console.log('  📨 Contact create response status:', createResp.status);
+    console.log('  📨 Contact create response data:', JSON.stringify(createResp.data, null, 2));
+    
+    if (createResp.data && createResp.data.result) {
+      contactId = createResp.data.result;
+      console.log(`  ✅ New contact created with ID: ${contactId}`);
     } else {
-      const createResp = await axios.post(`${BITRIX_BASE}/crm.contact.add.json`, contactPayload, { headers: { 'Content-Type': 'application/json' }, timeout: 5000 });
-      console.log('  📨 Contact create response (json):', JSON.stringify(createResp.data));
-      if (createResp.data && createResp.data.result) {
-        contactId = createResp.data.result;
-      } else {
-        throw new Error('Failed to create contact in Bitrix24');
-      }
+      throw new Error('Failed to create contact in Bitrix24');
     }
   }
 
